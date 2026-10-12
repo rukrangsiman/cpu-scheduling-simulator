@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPU Scheduling Simulator</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>CPU Scheduling Simulator</h1>
+      <p class="subtitle">
+        จำลองการจัดลำดับการใช้ CPU ด้วย FCFS · SJF (Non-preemptive) · Round Robin
+        — ทุกโปรเซสมี Arrival Time = 0
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ส่วนรับข้อมูล -->
+    <form id="input-form" class="card" novalidate>
+      <section class="step">
+        <h2><span class="step-number">1</span> กำหนดโปรเซส</h2>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="process-count">จำนวนโปรเซส</label>
+            <input id="process-count" type="text" inputmode="numeric" autocomplete="off" placeholder="เช่น 3, 5, 10">
+            <small class="hint">จำนวนเต็ม 1–20 ระบบตั้งชื่อเป็น P1, P2, …, Pn</small>
+          </div>
+
+          <fieldset class="field">
+            <legend>วิธีกำหนด Burst Time</legend>
+            <label class="radio"><input type="radio" name="burst-mode" value="random" checked> ให้ระบบสุ่ม (1–10)</label>
+            <label class="radio"><input type="radio" name="burst-mode" value="manual"> กรอกเอง</label>
+          </fieldset>
+
+          <div class="field field-actions">
+            <button type="button" id="build-button" class="button secondary">สร้างตาราง</button>
+            <button type="button" id="example-button" class="button ghost">ใช้ข้อมูลตัวอย่าง</button>
+          </div>
+        </div>
+
+        <div id="burst-section" class="burst-section" hidden>
+          <div class="burst-header">
+            <h3>Burst Time ของแต่ละโปรเซส <span class="muted">(AT = 0 ทุกโปรเซส)</span></h3>
+            <button type="button" id="reroll-button" class="button ghost small">สุ่มใหม่</button>
+          </div>
+          <div id="burst-grid" class="burst-grid"></div>
+        </div>
+      </section>
+
+      <section class="step">
+        <h2><span class="step-number">2</span> Time Quantum สำหรับ Round Robin</h2>
+        <div class="field field-narrow">
+          <label for="quantum">Time Quantum (TQ)</label>
+          <input id="quantum" type="text" inputmode="numeric" autocomplete="off" value="2">
+          <small class="hint">จำนวนเต็มบวก ค่าเริ่มต้น 2 — เปลี่ยนค่าแล้วกดคำนวณใหม่เพื่อเทียบผลบนชุดข้อมูลเดิม</small>
+        </div>
+      </section>
+
+      <div class="submit-row">
+        <button type="submit" class="button primary">คำนวณทั้ง 3 อัลกอริทึม</button>
+      </div>
+
+      <div id="error-box" class="error-box" role="alert" hidden>
+        <strong>กรุณาแก้ไขข้อมูลต่อไปนี้</strong>
+        <ul id="error-list"></ul>
+      </div>
+    </form>
+
+    <!-- ส่วนแสดงผล (ซ่อนไว้จนกว่าจะคำนวณครั้งแรก) -->
+    <section id="results" class="card" hidden>
+      <div class="results-header">
+        <h2>ผลลัพธ์</h2>
+        <label class="toggle">
+          <input type="checkbox" id="show-formulas"> แสดงวิธีคำนวณ TAT / WT ในตาราง
+        </label>
+      </div>
+
+      <p id="stale-note" class="stale-note" hidden>
+        ข้อมูลถูกแก้ไขหลังการคำนวณครั้งล่าสุด ผลด้านล่างยังเป็นของชุดข้อมูลเดิม — กด "คำนวณ" เพื่ออัปเดต
+      </p>
+
+      <div class="dataset">
+        <span class="dataset-label">ชุดข้อมูลที่ใช้คำนวณ</span>
+        <div id="dataset-chips" class="chips"></div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="เลือกดูผลของแต่ละอัลกอริทึม">
+        <button type="button" role="tab" class="tab" data-tab="FCFS">FCFS</button>
+        <button type="button" role="tab" class="tab" data-tab="SJF">SJF</button>
+        <button type="button" role="tab" class="tab" data-tab="RR" id="rr-tab">Round Robin</button>
+        <button type="button" role="tab" class="tab" data-tab="COMPARE">เปรียบเทียบ</button>
+      </div>
+
+      <div id="result-panel" class="result-panel" role="tabpanel" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">Term Project — CPU Scheduling Simulator</div>
+  </footer>
+
+  <!-- ลำดับสำคัญ: ui.js ใช้ Scheduler และ Validation จึงต้องโหลดสองไฟล์นี้ก่อน -->
+  <script src="js/scheduler.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>

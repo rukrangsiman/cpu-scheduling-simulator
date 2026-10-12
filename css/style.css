@@ -1,0 +1,667 @@
+/* style.css — หน้าตาของโปรแกรม (Role B) */
+
+/* ---------- สีและขนาด (เปลี่ยนที่นี่ที่เดียว) ---------- */
+:root {
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --surface-muted: #f0f3f8;
+  --border: #d9dfe8;
+  --text: #1c2430;
+  --text-muted: #5b6676;
+  --primary: #2f5bd3;
+  --primary-hover: #2449ad;
+  --primary-soft: #e6edfc;
+  --danger: #c0352b;
+  --danger-soft: #fdeceb;
+  --warning-soft: #fff6dc;
+  --warning-text: #7a5600;
+  --success: #1e7d4f;
+  --success-soft: #e3f4ea;
+  --gantt-lightness: 82%;
+  --gantt-text: #1c2430;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 30, 50, 0.08);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d;
+    --surface: #1b2029;
+    --surface-muted: #232a35;
+    --border: #333c4a;
+    --text: #e6eaf0;
+    --text-muted: #9aa5b5;
+    --primary: #6d93f2;
+    --primary-hover: #8aa8f5;
+    --primary-soft: #23304d;
+    --danger: #f07b72;
+    --danger-soft: #3a2224;
+    --warning-soft: #3a3120;
+    --warning-text: #f0cf7a;
+    --success: #5fcf95;
+    --success-soft: #1d3428;
+    --gantt-lightness: 38%;
+    --gantt-text: #f2f4f8;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  /* Leelawadee UI / Tahoma มีในทุกเครื่อง Windows และแสดงภาษาไทยได้ ไม่ต้องโหลดฟอนต์จากเน็ต */
+  font-family: system-ui, "Segoe UI", "Leelawadee UI", Tahoma, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  line-height: 1.3;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- ส่วนหัว / ท้าย ---------- */
+.site-header {
+  padding: 28px 0 20px;
+}
+
+.site-header h1 {
+  font-size: 1.75rem;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+}
+
+.site-footer {
+  padding: 24px 0 32px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* ---------- การ์ด ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.step + .step {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.step h2 {
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* ---------- ช่องกรอก ---------- */
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  align-items: flex-start;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-narrow {
+  max-width: 420px;
+}
+
+fieldset.field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.field label,
+.field legend {
+  font-weight: 600;
+  padding: 0;
+}
+
+.field .radio {
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.field-actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-self: center;
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+input[type="text"] {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  width: 100%;
+  max-width: 220px;
+}
+
+input[type="text"]:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+
+input[readonly] {
+  background: var(--surface-muted);
+  color: var(--text-muted);
+}
+
+input.invalid {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- ปุ่ม ---------- */
+.button {
+  font: inherit;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.button:focus-visible,
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.button.primary {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 22px;
+}
+
+.button.primary:hover {
+  background: var(--primary-hover);
+}
+
+.button.secondary {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: var(--primary-soft);
+  font-weight: 600;
+}
+
+.button.secondary:hover {
+  border-color: var(--primary);
+}
+
+.button.ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.button.ghost:hover {
+  background: var(--surface-muted);
+}
+
+.button.small {
+  padding: 4px 12px;
+  font-size: 0.875rem;
+}
+
+.submit-row {
+  margin-top: 24px;
+}
+
+/* ---------- ตาราง Burst Time ---------- */
+.burst-section {
+  margin-top: 20px;
+}
+
+.burst-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.burst-header h3 {
+  font-size: 1rem;
+}
+
+.burst-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 10px;
+}
+
+.burst-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.burst-item label {
+  font-weight: 600;
+  min-width: 2.2em;
+}
+
+.burst-item input {
+  padding: 6px 8px;
+  min-width: 0;
+}
+
+/* ---------- ข้อความแจ้งเตือน ---------- */
+.error-box {
+  margin-top: 16px;
+  border: 1px solid var(--danger);
+  background: var(--danger-soft);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.error-box strong {
+  color: var(--danger);
+}
+
+.error-box ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.stale-note {
+  background: var(--warning-soft);
+  color: var(--warning-text);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0 0 16px;
+}
+
+/* ---------- ส่วนผลลัพธ์ ---------- */
+.results-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.dataset {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 16px;
+}
+
+.dataset-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  background: var(--surface-muted);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip.total {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* ---------- แท็บ ---------- */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.tab {
+  font: inherit;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  padding: 10px 16px;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab[aria-selected="true"] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+.result-panel {
+  padding-top: 20px;
+}
+
+.result-panel h3 {
+  font-size: 1.125rem;
+  margin-bottom: 4px;
+}
+
+.result-panel h4 {
+  margin: 20px 0 8px;
+  font-size: 1rem;
+}
+
+.description {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+}
+
+.order {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Gantt chart ---------- */
+.gantt-scroll {
+  overflow-x: auto;
+  padding-bottom: 22px; /* เว้นที่ให้ตัวเลขเวลาใต้แถบ */
+}
+
+.gantt {
+  display: flex;
+  min-width: 100%;
+}
+
+.gantt-slot {
+  /* ความกว้างเป็นสัดส่วนกับเวลาที่ใช้ CPU ผ่าน flex-grow (ตั้งใน ui.js) */
+  flex-basis: 0;
+  min-width: 2.5rem;
+  position: relative;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--hue) 70% var(--gantt-lightness));
+  color: var(--gantt-text);
+  border-right: 2px solid var(--surface);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.gantt-slot:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.gantt-slot:last-child {
+  border-radius: 0 6px 6px 0;
+  border-right: 0;
+}
+
+.gantt-time {
+  position: absolute;
+  top: 100%;
+  margin-top: 3px;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.gantt-time.start {
+  left: 0;
+  transform: translateX(-50%);
+}
+
+.gantt-slot:first-child .gantt-time.start {
+  transform: none;
+}
+
+.gantt-time.end {
+  right: 0;
+}
+
+/* ---------- ตาราง ---------- */
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  padding: 8px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+thead th {
+  background: var(--surface-muted);
+  font-weight: 600;
+}
+
+thead th abbr {
+  text-decoration: none;
+  cursor: help;
+}
+
+tfoot td {
+  font-weight: 600;
+  border-bottom: 0;
+}
+
+.formula {
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.best-row td {
+  background: var(--success-soft);
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--success);
+  color: var(--surface);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ---------- กล่องสรุป AVG WT ---------- */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.stat {
+  flex: 1 1 240px;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-formula {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- แถบเปรียบเทียบ ---------- */
+.bars {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 9rem 1fr 4rem;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.bar-track {
+  background: var(--surface-muted);
+  border-radius: 4px;
+  height: 18px;
+}
+
+.bar-fill {
+  background: var(--primary);
+  height: 100%;
+  border-radius: 4px;
+  min-width: 2px;
+}
+
+.bar-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 8px 0 0;
+}
+
+/* ---------- จอเล็ก ---------- */
+@media (max-width: 600px) {
+  .card {
+    padding: 16px;
+  }
+
+  .field-row {
+    flex-direction: column;
+  }
+
+  .field,
+  .field-narrow {
+    width: 100%;
+  }
+
+  input[type="text"] {
+    max-width: none;
+  }
+
+  .bar-row {
+    grid-template-columns: 6.5rem 1fr 3.5rem;
+  }
+}

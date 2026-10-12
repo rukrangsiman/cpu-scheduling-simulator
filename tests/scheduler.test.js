@@ -182,6 +182,22 @@ test('RR q=2', () => {
   expectResult(result, { st: [0, 2, 4], ct: [8, 10, 12], wt: [4, 6, 8], avgWT: 6 });
 });
 
+// ---------- นับจำนวนครั้งที่สลับโปรเซส ----------
+
+console.log('countContextSwitches');
+
+test('TC-01: FCFS 3 ครั้ง, RR q=2 11 ครั้ง, RR q=4 6 ครั้ง', () => {
+  assert.equal(Scheduler.countContextSwitches(Scheduler.fcfs(tc01).gantt), 3);
+  assert.equal(Scheduler.countContextSwitches(Scheduler.roundRobin(tc01, 2).gantt), 11);
+  assert.equal(Scheduler.countContextSwitches(Scheduler.roundRobin(tc01, 4).gantt), 6);
+});
+
+test('ช่วงติดกันของโปรเซสเดียวกันไม่นับ', () => {
+  assert.equal(Scheduler.countContextSwitches(Scheduler.roundRobin(makeProcesses([7]), 2).gantt), 0);
+  // BT = [1, 7], q=2: P1 0-1, P2 1-3, P2 3-5, P2 5-7, P2 7-8 สลับครั้งเดียว
+  assert.equal(Scheduler.countContextSwitches(Scheduler.roundRobin(makeProcesses([1, 7]), 2).gantt), 1);
+});
+
 // ---------- ข้อมูลผิด ----------
 
 console.log('ข้อมูลผิด ต้อง throw Error');

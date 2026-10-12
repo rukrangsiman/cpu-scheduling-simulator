@@ -194,10 +194,25 @@ var Scheduler = (function () {
     return buildResult('RR', quantum, processes, startTimes, completionTimes, gantt);
   }
 
+  // ---------- นับจำนวนครั้งที่สลับโปรเซส ----------
+
+  // นับว่า CPU เปลี่ยนจากโปรเซสหนึ่งไปอีกโปรเซสกี่ครั้ง ใช้เปรียบเทียบผลของ TQ หลายค่า
+  // ถ้าช่วงที่ติดกันเป็นโปรเซสเดียวกัน (เช่นเหลือโปรเซสเดียวในคิว RR) ไม่นับว่าสลับ
+  function countContextSwitches(gantt) {
+    var switches = 0;
+    for (var i = 1; i < gantt.length; i++) {
+      if (gantt[i].id !== gantt[i - 1].id) {
+        switches++;
+      }
+    }
+    return switches;
+  }
+
   return {
     fcfs: fcfs,
     sjf: sjf,
-    roundRobin: roundRobin
+    roundRobin: roundRobin,
+    countContextSwitches: countContextSwitches
   };
 })();
 

@@ -7,26 +7,28 @@
 
 ---
 
-## ⏳ รอผู้ใช้ / สมาชิก
-1. **ส่งรายชื่อสมาชิก** และบอกว่าใครรับ Role A / B / C
-2. **สมาชิก Role A อ่าน `js/scheduler.js`** แล้วลองอธิบายด้วยคำพูดตัวเองว่า
+## ⏳ รอผู้ใช้ / สมาชิก (AI ทำแทนไม่ได้)
+1. **ส่งรายชื่อสมาชิก** และบอกว่าใครรับ Role A / B / C — ต้องใช้ใน README (D7)
+2. **ทดสอบเปิดจริง:** double-click `index.html` ใน Chrome และ Edge แล้วลองทำ TC-01, TC-02, TC-03 และ TC-V01–V08
+   - เสร็จเมื่อ: มีภาพหน้าจอเก็บไว้ (แนะนำโฟลเดอร์ `docs/screenshots/`) และติ๊กใน TEST_CASES
+3. **คำนวณมือ TC-01** แล้วลงชื่อใน `docs/TEST_CASES.md` (R1.6d)
+4. **อ่านและอธิบายโค้ด** — Role A: `js/scheduler.js`, Role B: `js/validation.js` + `js/ui.js`
+   คำถามฝึก:
    - ทำไม FCFS กับ SJF ใช้ `runInOrder` ร่วมกันได้
    - ทำไม RR ต้องเช็ก `startTimes[index] === null` ก่อนบันทึก ST
-   - ทำไม SJF แบบ Preemptive ได้ผลเหมือน Non-preemptive ในโจทย์นี้
-3. **สมาชิกคำนวณมือ TC-01** ใน `docs/TEST_CASES.md` แล้วลงชื่อ (R1.6d)
-4. ทบทวน entry AI-001 ถึง AI-003 ใน `docs/AI_LOG.md` แล้วเปลี่ยน ⬜ เป็น ✅ พร้อมชื่อผู้ตรวจ
+   - ทำไมตรวจ input ด้วย regex แทน `parseInt` (ลอง `parseInt('2.5')` ใน console)
+   - ทำไมกดคำนวณซ้ำแล้ว BT ที่สุ่มไว้ไม่เปลี่ยน
+5. ทบทวน AI-001 ถึง AI-004 ใน `docs/AI_LOG.md` แล้วเปลี่ยน ⬜ เป็น ✅ พร้อมชื่อผู้ตรวจ
 
-## ▶ งานถัดไป (Phase 2 — Role B)
-1. **สร้าง `js/validation.js`** ตาม D-006, D-007
-   - ฟังก์ชัน `validateProcessCount(text)`, `validateBurstTimes(texts)`, `validateQuantum(text)`
-     คืน `{ ok: true, value }` หรือ `{ ok: false, message }` ข้อความภาษาไทยระบุโปรเซสที่ผิด
-   - เสร็จเมื่อ: `node tests/validation.test.js` ผ่าน TC-V01 ถึง TC-V08
-2. **สร้าง `index.html` + `css/style.css` + `js/ui.js`**
-   - ส่วน input: จำนวนโปรเซส, โหมด BT (สุ่ม 1–10 / กรอกเอง), Time Quantum (ค่าเริ่มต้น 2), ปุ่มคำนวณ
-   - ส่วนผลลัพธ์: แท็บ FCFS / SJF / RR / เปรียบเทียบ, ตาราง 7 คอลัมน์ + AVG WT (ทศนิยม 2 ตำแหน่ง)
-   - เสร็จเมื่อ: double-click `index.html` ใน Chrome แล้วได้ผล TC-01 ตรงกับ TEST_CASES
-3. **ประวัติ RR หลายค่า TQ** (D-008) และ Gantt chart (D-009)
+## ▶ งานถัดไป (Phase 5 — ทำได้เลย)
+1. **เขียน `README.md`** ให้ครบ D3–D7
+   - วิธีเปิด (double-click `index.html`), วิธีรัน test (`node tests/*.test.js` — ไม่บังคับสำหรับผู้ตรวจ)
+   - เครื่องมือและ Version: HTML/CSS/JS, Chrome/Edge, Node v22.20.0 (เฉพาะรัน test), Git
+   - ตัวอย่างข้อมูลทดสอบ (สรุปจาก TEST_CASES), เครื่องมือ AI + prompt สำคัญ (สรุปจาก AI_LOG)
+   - รายชื่อสมาชิก (รอข้อ 1)
+   - เสร็จเมื่อ: `submission-auditor` ไม่พบข้อ ❌ ในส่วน D3–D6
+2. **เรียก `submission-auditor`** ตรวจทั้งโปรเจ็ค
 
-## ⏭ ถัดจากนั้น
-- Phase 4: ทดสอบผ่าน UI ทุก TC ใน Chrome และ Edge + จับภาพหน้าจอ
-- Phase 5: README.md แล้วเรียก `submission-auditor`
+## ⏭ ถัดจากนั้น (Phase 6)
+- `docs/VIDEO_PLAN.md`: บทวิดีโอส่วนที่ 2 (แบ่งช่วงให้ทุกคนพูด) และส่วนที่ 3 (จาก AI_LOG)
+- ไฟล์ `Test.txt` ที่ root เป็นไฟล์ว่าง ไม่ได้ใช้ — ลบก่อนส่งงาน

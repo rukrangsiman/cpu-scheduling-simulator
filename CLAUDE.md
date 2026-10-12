@@ -16,7 +16,9 @@ Term Project: เว็บจำลอง CPU Scheduling (FCFS, SJF Non-preempti
 
 ## 2. จบทุกงาน (Definition of Done)
 
-- [ ] `node tests/scheduler.test.js` ผ่านทั้งหมด (เมื่อมีไฟล์นี้แล้ว)
+- [ ] `node tests/scheduler.test.js` และ `node tests/validation.test.js` ผ่านทั้งหมด
+- [ ] ถ้าแก้ UI: เปิดผ่าน Browser pane (`.claude/launch.json` → `static`) แล้วลองใช้งานจริง ดู console error
+      (Browser pane เปิด `file://` แบบภาพนิ่ง จึงต้องใช้ local server ตอนทดสอบ แต่ผู้ตรวจเปิดไฟล์ตรงได้)
 - [ ] ติ๊ก checklist และเพิ่มบันทึก session ใน `docs/PROGRESS.md`
 - [ ] เขียน `docs/NEXT_STEPS.md` ใหม่ให้ตรงกับสถานะปัจจุบัน
 - [ ] เพิ่ม entry ใน `docs/AI_LOG.md` (ดูข้อ 6)
