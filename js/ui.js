@@ -358,6 +358,7 @@ function onDocumentMouseDown(event) {
 function onDocumentKeydown(event) {
   if (event.key === 'Escape') {
     closeColorPopover(true);
+    closeColumnHelp(true);
     hideGanttTooltip();
   }
 }
@@ -771,6 +772,7 @@ function updateCompareButton() {
 // isStatic = true เมื่อข้อมูลเดิมแค่เปลี่ยนสี/ภาษา ไม่ต้องเล่น animation ซ้ำ (ไม่ให้แถบกะพริบระหว่างเลื่อนเลือกสี)
 function renderResults(isStatic) {
   hideGanttTooltip();
+  closeColumnHelp(false);
   var hasResults = state.results !== null;
   byId('empty-state').hidden = hasResults;
   var container = byId('results');
@@ -1084,8 +1086,9 @@ function createFormulaCell(left, right, answer) {
 
 function createResultTable(result) {
   var wrapper = createElement('div', 'table-scroll');
-  var table = document.createElement('table');
-  table.appendChild(createResultTableHead());
+  var table = createElement('table', 'result-table');
+  table.appendChild(createResultTableColumns());
+  table.appendChild(createResultTableHead(result));
 
   var tbody = document.createElement('tbody');
   for (var i = 0; i < result.rows.length; i++) {
@@ -1119,11 +1122,24 @@ function createResultTable(result) {
   table.appendChild(tfoot);
 
   wrapper.appendChild(table);
+  // จอแคบตารางเลื่อนแนวนอนได้ กล่องคำอธิบายหัวคอลัมน์จึงต้องเลื่อนตามด้วย
+  wrapper.addEventListener('scroll', onColumnHelpScroll);
   return wrapper;
 }
 
-// หัวตาราง: ตัวย่อภาษาอังกฤษตามโจทย์ ชี้เมาส์ที่ตัวย่อเพื่อดูชื่อเต็ม
-function createResultTableHead() {
+// กำหนดความกว้างแต่ละคอลัมน์ไว้ล่วงหน้า (ร่วมกับ table-layout: fixed ใน CSS)
+// เปิด "แสดงวิธีคำนวณ" แล้วช่อง TAT / WT ยาวขึ้น แต่คอลัมน์อื่นไม่ขยับ เพราะความกว้างไม่ได้คิดจากเนื้อหา
+function createResultTableColumns() {
+  var columnNames = ['process', 'at', 'bt', 'st', 'ct', 'tat', 'wt'];
+  var colgroup = document.createElement('colgroup');
+  for (var i = 0; i < columnNames.length; i++) {
+    colgroup.appendChild(createElement('col', 'col-' + columnNames[i]));
+  }
+  return colgroup;
+}
+
+// หัวตาราง: ตัวย่อภาษาอังกฤษตามโจทย์ แต่ละหัวเป็นปุ่ม กดแล้วเปิดกล่องบอกความหมาย สูตร และตัวอย่างแทนค่า
+function createResultTableHead(result) {
   var headers = [
     ['Process', t('headerProcess')],
     ['AT', t('headerAT')],
@@ -1138,13 +1154,123 @@ function createResultTableHead() {
   for (var h = 0; h < headers.length; h++) {
     var th = createElement('th', h === 0 ? '' : 'num');
     th.scope = 'col';
-    var abbr = createElement('abbr', '', headers[h][0]);
-    abbr.title = headers[h][1];
-    th.appendChild(abbr);
+    th.appendChild(createColumnHelpButton(headers[h][0], headers[h][1], result));
     headRow.appendChild(th);
   }
   thead.appendChild(headRow);
   return thead;
+}
+
+// ---------- กล่องคำอธิบายหัวตาราง ----------
+
+var columnHelpButton = null; // ปุ่มหัวคอลัมน์ที่เปิดกล่องอยู่ (null = ปิดอยู่)
+
+function createColumnHelpButton(name, fullName, result) {
+  var button = createElement('button', 'th-help');
+  button.type = 'button';
+  button.title = fullName;
+  button.setAttribute('aria-label', t('columnHelpLabel', { name: name }));
+  button.setAttribute('aria-expanded', 'false');
+  button.setAttribute('aria-controls', 'column-help');
+  button.appendChild(createElement('span', 'th-help-text', name));
+  var mark = createElement('span', 'th-help-mark', '?');
+  mark.setAttribute('aria-hidden', 'true');
+  button.appendChild(mark);
+  button.addEventListener('click', function () {
+    toggleColumnHelp(button, name, result);
+  });
+  return button;
+}
+
+// กดหัวเดิมซ้ำ = ปิด / กดหัวอื่น = เปลี่ยนเนื้อหาและย้ายกล่องไปใต้หัวนั้น
+function toggleColumnHelp(button, name, result) {
+  if (columnHelpButton === button) {
+    closeColumnHelp(true);
+    return;
+  }
+  closeColumnHelp(false);
+  fillColumnHelp(columnHelpContent(name, result));
+  var box = byId('column-help');
+  box.hidden = false;
+  positionPopover(box, button);
+  button.setAttribute('aria-expanded', 'true');
+  columnHelpButton = button;
+}
+
+// เนื้อหาของคอลัมน์ ใช้ชุดเดียวกับส่วน "สูตรการคำนวณ" (buildFormulaLines) ตัวเลขจึงมาจากผลของ Scheduler เสมอ
+// แทนค่าด้วยโปรเซสเดียวกับที่เลือกไว้ในส่วนสูตร (ค่าเริ่มต้น P1)
+function columnHelpContent(name, result) {
+  if (name === 'Process') {
+    return { name: name, meaning: t('meaningProcess'), rule: t('ruleProcess'), exampleLabel: '', example: '' };
+  }
+  var row = findRow(result, state.formulaProcessId);
+  var lines = buildFormulaLines(result, row);
+  for (var i = 0; i < lines.length; i++) {
+    if (lines[i].name === name) {
+      return {
+        name: name,
+        meaning: lines[i].meaning,
+        rule: lines[i].rule,
+        exampleLabel: t('formulaExample', { id: row.id }),
+        example: lines[i].example
+      };
+    }
+  }
+  return null;
+}
+
+function fillColumnHelp(content) {
+  var box = byId('column-help');
+  box.textContent = '';
+  var title = createElement('strong', 'column-help-title', content.meaning);
+  title.id = 'column-help-title';
+  box.appendChild(title);
+
+  box.appendChild(createElement('span', 'column-help-label', t('formulaRule')));
+  box.appendChild(createElement('code', 'column-help-rule', content.rule));
+  if (content.example) {
+    box.appendChild(createElement('span', 'column-help-label', content.exampleLabel));
+    box.appendChild(createElement('code', 'column-help-example', content.example));
+  }
+  box.appendChild(createElement('p', 'column-help-tip', t('columnHelpTip')));
+}
+
+// returnFocus = true เมื่อปิดด้วยคีย์บอร์ด เพื่อให้ผู้ใช้กลับมาอยู่ที่หัวคอลัมน์เดิม
+function closeColumnHelp(returnFocus) {
+  if (columnHelpButton === null) {
+    return;
+  }
+  var button = columnHelpButton;
+  columnHelpButton = null;
+  byId('column-help').hidden = true;
+  button.setAttribute('aria-expanded', 'false');
+  if (returnFocus && document.body.contains(button)) {
+    button.focus();
+  }
+}
+
+// คลิกนอกกล่อง (และไม่ใช่หัวคอลัมน์ที่เปิดอยู่) = ปิด
+function onColumnHelpOutsideClick(event) {
+  if (columnHelpButton === null) {
+    return;
+  }
+  if (byId('column-help').contains(event.target) || columnHelpButton.contains(event.target)) {
+    return;
+  }
+  closeColumnHelp(false);
+}
+
+// หน้าหรือตารางเลื่อน: กล่องเลื่อนตามหัวคอลัมน์ ถ้าหัวคอลัมน์พ้นจอไปแล้วให้ปิด
+function onColumnHelpScroll() {
+  if (columnHelpButton === null) {
+    return;
+  }
+  var rect = columnHelpButton.getBoundingClientRect();
+  if (rect.bottom < 0 || rect.top > window.innerHeight || rect.right < 0 || rect.left > window.innerWidth) {
+    closeColumnHelp(false);
+    return;
+  }
+  positionPopover(byId('column-help'), columnHelpButton);
 }
 
 // ---------- สูตรการคำนวณของแต่ละค่า (แทนค่าด้วยโปรเซสที่เลือก) ----------
@@ -1832,6 +1958,7 @@ function onLanguageClick(event) {
 
 // ข้อความคงที่ i18n.js เปลี่ยนให้แล้ว ส่วนนี้เปลี่ยนข้อความที่ ui.js สร้างเอง (ข้อมูลโปรเซสและผลลัพธ์ไม่หาย)
 function refreshLanguage() {
+  closeColumnHelp(false);
   updateLanguageButtons();
   updateSidebarToggle();
   updateBurstModeNote();
@@ -1898,14 +2025,17 @@ function bindConfigForm() {
 function bindColorPopover() {
   byId('custom-color').addEventListener('input', onCustomColorInput);
   document.addEventListener('mousedown', onDocumentMouseDown);
+  document.addEventListener('mousedown', onColumnHelpOutsideClick);
   document.addEventListener('keydown', onDocumentKeydown);
   window.addEventListener('resize', function () {
     closeColorPopover(false);
+    closeColumnHelp(false);
     hideGanttTooltip();
   });
   window.addEventListener('scroll', function () {
     hideGanttTooltip();
     onPopoverAnchorScroll();
+    onColumnHelpScroll();
   });
   byId('cpu-list').addEventListener('scroll', onPopoverAnchorScroll);
 }

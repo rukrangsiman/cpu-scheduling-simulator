@@ -18,29 +18,39 @@
 /* ---------- 1) Design tokens: ธีมสว่าง "Cream" (ค่าเริ่มต้น) ---------- */
 :root {
   /* พื้นผิว เรียงจากชั้นล่างไปบน */
-  --bg-base: #f3ece3;                        /* พื้นหลังสีครีม */
-  --bg-surface: rgba(251, 248, 243, 0.64);   /* พื้นผิวหลักของแอป */
-  --bg-card: #fffdfa;                        /* การ์ด (ขาวนวล ไม่ขาวจัด) */
-  --bg-inset: #f5eee6;                       /* ช่องด้านในการ์ด (เบจอ่อน) */
-  --surface-hover: #efe5da;
-  --input-bg: #ffffff;
-  --track-bg: #eee3d7;
+  --bg-base: #ece6de;                        /* พื้นหลังครีมอมเทา (D-030: ลดความจ้า) */
+  --bg-surface: rgba(247, 243, 237, 0.62);   /* พื้นผิวหลักของแอป */
+  --bg-card: #faf7f2;                        /* การ์ด (ขาวนวลอมครีม ไม่แสบตา) */
+  --bg-inset: #f1ebe3;                       /* ช่องด้านในการ์ด (เบจอ่อน) */
+  --surface-hover: #ebe2d7;
+  --input-bg: #fdfbf7;
+  --track-bg: #e9e0d5;
 
-  /* แถบเมนูซ้าย: น้ำเงินเข้มหม่น ตัดกับพื้นครีม */
-  --bg-sidebar: #20233a;
-  --sidebar-surface: #2b2f4a;
-  --sidebar-hover: #353a59;
-  --sidebar-border: rgba(255, 255, 255, 0.09);
-  --sidebar-text: #f1ecf2;
-  --sidebar-muted: #c6c3d8;                  /* สว่างพอบนแถบที่โปร่ง (contrast ≥ 5:1) */
-  --cpu-active-bg: #fbf6ef;                  /* CPU ที่เลือก = การ์ดสีครีมลอยเด่นบนพื้นเข้ม */
+  /* แถบเมนูซ้าย: สีอ่อนแบบกระจกฝ้า กลืนกับพื้นครีม (D-031 — เดิมเป็นน้ำเงินเข้ม ตัดกับพื้นแรงเกินไป)
+     ธีมมืดยังเป็นแถบเข้มเหมือนเดิม (ค่าในบล็อกธีมมืด) */
+  --bg-sidebar: #f4efe8;
+  --sidebar-surface: #f8f4ee;                /* การ์ด CPU ที่ไม่ได้เลือก: ขาวนวลลอยบนแถบ (หม่นกว่าตัวที่เลือกเล็กน้อย) */
+  --sidebar-hover: #ece4da;
+  --sidebar-border: rgba(42, 44, 63, 0.09);
+  --sidebar-text: #2a2c3f;
+  --sidebar-muted: #67637a;
+  --sidebar-line: rgba(42, 44, 63, 0.2);     /* เส้นประปุ่ม "เพิ่ม CPU" */
+  --sidebar-line-hover: rgba(42, 44, 63, 0.34);
+  --sidebar-ghost: rgba(42, 44, 63, 0.03);   /* พื้นจาง ๆ ของปุ่มลูกศร */
+  --sidebar-ghost-hover: rgba(42, 44, 63, 0.07);
+  --sidebar-sheen: rgba(255, 255, 255, 0.7); /* เส้นแสงขอบบนของแถบและการ์ด */
+  --sidebar-card-shadow: 0 1px 2px rgba(60, 44, 40, 0.06), 0 10px 20px -14px rgba(60, 44, 40, 0.28);
+  --sidebar-card-shadow-hover: 0 2px 4px rgba(60, 44, 40, 0.08), 0 18px 30px -16px rgba(60, 44, 40, 0.34);
+  --sidebar-active-shadow: 0 2px 6px rgba(60, 44, 40, 0.08), 0 22px 40px -18px rgba(60, 44, 40, 0.32);
+  --cpu-active-bg: #fffcf8;                  /* CPU ที่เลือก = การ์ดสีขาวนวลลอยเด่นที่สุดในแถบ */
+  --cpu-active-ring: 1.5px;                  /* + เส้นขอบสีประจำ CPU (การ์ดทุกใบสีอ่อนเหมือนกัน ต้องมีขอบช่วยแยก) */
   --cpu-active-text: #22253a;
   --cpu-active-muted: #625e72;
 
   /* ตัวอักษร (น้ำเงินหมึก ไม่ใช่ดำสนิท) */
-  --text-primary: #22253a;
+  --text-primary: #2a2c3f;
   --text-secondary: #4d4e66;
-  --text-muted: #6a6679;
+  --text-muted: #67637a;
 
   --border-soft: rgba(34, 37, 58, 0.07);
   --border: rgba(34, 37, 58, 0.13);
@@ -76,20 +86,20 @@
   --shadow-xs: 0 1px 2px rgba(48, 36, 44, 0.06);
   --shadow-sm: 0 1px 2px rgba(48, 36, 44, 0.05), 0 4px 12px -4px rgba(48, 36, 44, 0.1);
   --shadow-md: 0 1px 2px rgba(48, 36, 44, 0.04), 0 12px 30px -14px rgba(72, 44, 52, 0.2);
-  --shadow-lg: 0 2px 6px rgba(48, 36, 44, 0.04), 0 30px 70px -30px rgba(72, 44, 52, 0.34);
+  --shadow-lg: 0 2px 6px rgba(48, 36, 44, 0.04), 0 30px 70px -30px rgba(72, 44, 52, 0.26);
   --shadow-popup: 0 4px 10px rgba(30, 24, 40, 0.06), 0 40px 90px -24px rgba(30, 24, 40, 0.45);
   --shadow-button: 0 10px 22px -10px rgba(185, 72, 72, 0.6);
 
   /* พื้นหลัง */
-  --glow-1: rgba(214, 198, 238, 0.55);       /* ลาเวนเดอร์จาง มุมขวาบน */
-  --glow-2: rgba(246, 205, 180, 0.6);        /* พีชจาง มุมซ้ายล่าง */
-  --sun-from: rgba(247, 196, 160, 0.9);
-  --sun-to: rgba(236, 160, 172, 0.45);
-  --sun-opacity: 0.55;
-  --ember: rgba(247, 165, 112, 0.55);         /* แสงส้ม ambient ที่ขยาย/หดในพื้นหลัง */
+  --glow-1: rgba(214, 198, 238, 0.36);       /* ลาเวนเดอร์จาง มุมขวาบน */
+  --glow-2: rgba(240, 205, 184, 0.4);        /* พีชจาง มุมซ้ายล่าง */
+  --sun-from: rgba(240, 196, 166, 0.8);
+  --sun-to: rgba(226, 168, 178, 0.38);
+  --sun-opacity: 0.42;
+  --ember: rgba(236, 168, 128, 0.4);          /* แสงส้ม ambient ที่ขยาย/หดในพื้นหลัง */
   --art-color: #7a5fa8;                      /* เส้นภาพชิป CPU พื้นหลัง (จางด้วย --art-opacity) */
-  --art-opacity: 0.16;
-  --panel-sidebar: rgba(21, 24, 43, 0.78);   /* แถบซ้ายโปร่ง 22% (สีเข้มกว่า --bg-sidebar เล็กน้อย ตัวอักษรจึงยังอ่านชัด) */
+  --art-opacity: 0.12;
+  --panel-sidebar: rgba(246, 242, 236, 0.72); /* แถบซ้ายสีอ่อนโปร่ง 28% + เบลอ (D-031) */
   --figure-from: #fdf1ea;                    /* พื้นภาพประกอบใน popup */
   --figure-to: #f1ecf8;
   --title-gradient: linear-gradient(100deg, #262a4f 0%, #6e4f8f 34%, #c9573f 70%, #d9965a 100%);
@@ -117,7 +127,16 @@
     --sidebar-border: rgba(255, 255, 255, 0.07);
     --sidebar-text: #f1ecf2;
     --sidebar-muted: #a19db5;
+    --sidebar-line: rgba(255, 255, 255, 0.2);
+    --sidebar-line-hover: rgba(255, 255, 255, 0.35);
+    --sidebar-ghost: rgba(255, 255, 255, 0.04);
+    --sidebar-ghost-hover: rgba(255, 255, 255, 0.1);
+    --sidebar-sheen: rgba(255, 255, 255, 0.07);
+    --sidebar-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 20px -14px rgba(0, 0, 0, 0.7);
+    --sidebar-card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 18px 30px -16px rgba(0, 0, 0, 0.8);
+    --sidebar-active-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 22px 40px -18px rgba(0, 0, 0, 0.75);
     --cpu-active-bg: #2d3049;
+    --cpu-active-ring: 0px;
     --cpu-active-text: #f6f1ec;
     --cpu-active-muted: #c4bfd3;
 
@@ -192,7 +211,16 @@
   --sidebar-border: rgba(255, 255, 255, 0.07);
   --sidebar-text: #f1ecf2;
   --sidebar-muted: #a19db5;
+  --sidebar-line: rgba(255, 255, 255, 0.2);
+  --sidebar-line-hover: rgba(255, 255, 255, 0.35);
+  --sidebar-ghost: rgba(255, 255, 255, 0.04);
+  --sidebar-ghost-hover: rgba(255, 255, 255, 0.1);
+  --sidebar-sheen: rgba(255, 255, 255, 0.07);
+  --sidebar-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 20px -14px rgba(0, 0, 0, 0.7);
+  --sidebar-card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 18px 30px -16px rgba(0, 0, 0, 0.8);
+  --sidebar-active-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 22px 40px -18px rgba(0, 0, 0, 0.75);
   --cpu-active-bg: #2d3049;
+  --cpu-active-ring: 0px;
   --cpu-active-text: #f6f1ec;
   --cpu-active-muted: #c4bfd3;
 
@@ -823,7 +851,7 @@ body.sidebar-collapsed {
   -webkit-backdrop-filter: blur(8px) saturate(1.2);
   backdrop-filter: blur(8px) saturate(1.2);
   color: var(--sidebar-text);
-  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 var(--sidebar-sheen);
   /* ซ่อน/แสดงแถบ: ความกว้างมาจากคอลัมน์ของ .app-shell ส่วนความสูงและขอบใน หดตามตรงนี้ */
   transition: height 0.45s var(--ease), padding 0.45s var(--ease);
 }
@@ -1035,18 +1063,12 @@ body.sidebar-instant .backdrop-cpu {
   text-align: left;
   cursor: pointer;
   /* ขอบบนสว่าง (แสงตกกระทบ) + เงาใต้การ์ด ให้ดูเป็นแผ่นที่ลอยอยู่ */
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 10px 20px -14px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 1px 0 var(--sidebar-sheen), var(--sidebar-card-shadow);
   transition: background-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
 }
 
 .cpu-item:hover .cpu-card {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    0 18px 30px -16px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 1px 0 var(--sidebar-sheen), var(--sidebar-card-shadow-hover);
 }
 
 /* CPU ที่เลือก: แผ่นสีครีมลอยเด่นที่สุดในแถบ มีแสงเงาสีประจำ CPU จาง ๆ */
@@ -1055,8 +1077,8 @@ body.sidebar-instant .backdrop-cpu {
   color: var(--cpu-active-text);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 2px 6px rgba(0, 0, 0, 0.18),
-    0 22px 40px -18px rgba(0, 0, 0, 0.75),
+    0 0 0 var(--cpu-active-ring) color-mix(in srgb, var(--cpu-accent) 60%, transparent),
+    var(--sidebar-active-shadow),
     0 12px 30px -16px var(--cpu-accent);
 }
 
@@ -1168,7 +1190,7 @@ body.sidebar-instant .backdrop-cpu {
 }
 
 .cpu-more:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--sidebar-ghost-hover);
   color: var(--sidebar-text);
 }
 
@@ -1189,7 +1211,7 @@ body.sidebar-instant .backdrop-cpu {
   gap: 8px;
   min-height: 46px;
   padding: 10px 14px;
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border: 1px dashed var(--sidebar-line);
   border-radius: 16px;
   background: transparent;
   color: var(--sidebar-muted);
@@ -1201,7 +1223,7 @@ body.sidebar-instant .backdrop-cpu {
 }
 
 .add-cpu-button:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: var(--sidebar-line-hover);
   background: var(--sidebar-hover);
   color: var(--sidebar-text);
 }
@@ -1236,7 +1258,7 @@ body.sidebar-instant .backdrop-cpu {
   padding: 0;
   border: 1px solid var(--sidebar-border);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--sidebar-ghost);
   color: var(--sidebar-muted);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -1249,7 +1271,7 @@ body.sidebar-instant .backdrop-cpu {
 }
 
 .cpu-toggle:hover {
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--sidebar-line-hover);
   background: var(--sidebar-hover);
   color: var(--sidebar-text);
 }
@@ -1280,8 +1302,8 @@ body.sidebar-instant .backdrop-cpu {
   background: var(--cpu-active-bg);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 2px 6px rgba(0, 0, 0, 0.18),
-    0 26px 46px -22px rgba(0, 0, 0, 0.75),
+    0 0 0 var(--cpu-active-ring) color-mix(in srgb, var(--cpu-accent) 60%, transparent),
+    var(--sidebar-active-shadow),
     0 14px 34px -18px var(--cpu-accent);
 }
 
@@ -2327,6 +2349,22 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
+/* ตารางผลลัพธ์: ความกว้างคอลัมน์คงที่ (ui.js ใส่ <colgroup>) เปิด/ปิดวิธีคำนวณแล้วคอลัมน์ไม่ขยับ
+   TAT / WT กว้างพอสำหรับสูตรที่ยาวที่สุด (20 โปรเซส BT 10 → "200 − 10 = 190")
+   จอแคบกว่าความกว้างขั้นต่ำ ตารางเลื่อนแนวนอนในกรอบแทนการบีบคอลัมน์ */
+.result-table {
+  min-width: 760px;
+  table-layout: fixed;
+}
+
+.result-table .col-process { width: 15%; }
+.result-table .col-at,
+.result-table .col-bt,
+.result-table .col-st,
+.result-table .col-ct { width: 11%; }
+.result-table .col-tat,
+.result-table .col-wt { width: 20.5%; }
+
 th,
 td {
   padding: 13px 18px;
@@ -2343,10 +2381,106 @@ thead th {
   color: var(--text-muted);
 }
 
-thead abbr {
-  text-decoration: none;
-  border-bottom: 1px dotted var(--text-muted);
-  cursor: help;
+/* หัวคอลัมน์ = ปุ่ม: ตัวย่อขีดเส้นประ + วงกลม "?" เล็ก ๆ บอกว่ากดดูคำอธิบายได้ */
+.th-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.th-help-text {
+  border-bottom: 1px dotted currentColor;
+}
+
+.th-help-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.th-help:hover,
+.th-help[aria-expanded="true"] {
+  background: var(--surface-hover);
+  color: var(--accent-text);
+}
+
+.th-help:hover .th-help-mark,
+.th-help[aria-expanded="true"] .th-help-mark {
+  opacity: 1;
+}
+
+/* กล่องคำอธิบายหัวคอลัมน์ (position: fixed — ui.js วางใต้หัวคอลัมน์ที่กด และเลื่อนตามเมื่อเลื่อนหน้า) */
+.column-help {
+  position: fixed;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(340px, calc(100vw - 32px));
+  padding: 16px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-popup);
+  font-size: 0.9rem;
+  white-space: normal;
+  animation: pop-in 0.2s var(--ease) both;
+}
+
+.column-help-title {
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.column-help-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.column-help code {
+  display: block;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--bg-inset);
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.column-help-rule {
+  font-weight: 600;
+}
+
+.column-help-example {
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.column-help-tip {
+  margin: 6px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-muted);
 }
 
 tbody th {
