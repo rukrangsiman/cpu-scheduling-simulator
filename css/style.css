@@ -47,6 +47,14 @@
   --cpu-active-text: #22253a;
   --cpu-active-muted: #625e72;
 
+  /* ป้ายสถานะบนการ์ด CPU (D-034) ตัวอักษรบนพื้นสีจางของตัวเอง contrast ≥ 5:1 บนการ์ดทั้งสองแบบ */
+  --status-done-text: #1b6b45;
+  --status-done-tint: #2f9e68;
+  --status-stale-text: #835410;
+  --status-stale-tint: #d49628;
+  --status-idle-text: #5c5870;
+  --status-idle-line: rgba(42, 44, 63, 0.3);
+
   /* ตัวอักษร (น้ำเงินหมึก ไม่ใช่ดำสนิท) */
   --text-primary: #2a2c3f;
   --text-secondary: #4d4e66;
@@ -140,6 +148,13 @@
     --cpu-active-text: #f6f1ec;
     --cpu-active-muted: #c4bfd3;
 
+    --status-done-text: #86e3b6;
+    --status-done-tint: #5fc898;
+    --status-stale-text: #f1c97f;
+    --status-stale-tint: #e3b25e;
+    --status-idle-text: #b3aec6;
+    --status-idle-line: rgba(255, 255, 255, 0.24);
+
     --text-primary: #f2ede7;
     --text-secondary: #c4bfce;
     --text-muted: #a09bae;
@@ -223,6 +238,13 @@
   --cpu-active-ring: 0px;
   --cpu-active-text: #f6f1ec;
   --cpu-active-muted: #c4bfd3;
+
+  --status-done-text: #86e3b6;
+  --status-done-tint: #5fc898;
+  --status-stale-text: #f1c97f;
+  --status-stale-tint: #e3b25e;
+  --status-idle-text: #b3aec6;
+  --status-idle-line: rgba(255, 255, 255, 0.24);
 
   --text-primary: #f2ede7;
   --text-secondary: #c4bfce;
@@ -550,18 +572,6 @@ select:focus-visible {
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
-/* ช่อง BT ในโหมดสุ่ม: แก้ไม่ได้ จึงเป็นพื้นเรียบไม่มีกรอบ ให้ต่างจากช่องที่แก้ได้ */
-input[readonly] {
-  color: var(--text-secondary);
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
-
-input[readonly]:hover {
-  border-color: transparent;
-}
-
 input.invalid {
   border-color: var(--color-error);
   background: var(--error-soft);
@@ -587,52 +597,6 @@ input[type="checkbox"] {
   font-size: 0.86rem;
   font-weight: 600;
   color: var(--text-secondary);
-}
-
-/* ปุ่มเลือกแบบแบ่งช่อง (สุ่ม / กรอกเอง) ใช้ radio จริงซ่อนไว้ เพื่อให้ใช้คีย์บอร์ดได้ */
-.segmented {
-  display: inline-flex;
-  gap: 2px;
-  padding: 4px;
-  border-radius: 999px;
-  background: var(--bg-inset);
-}
-
-.segmented label {
-  position: relative;
-  cursor: pointer;
-}
-
-.segmented input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.segmented span {
-  display: block;
-  padding: 7px 16px;
-  border-radius: 999px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  white-space: nowrap;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.segmented label:hover span {
-  color: var(--text-primary);
-}
-
-.segmented input:checked + span {
-  color: var(--text-primary);
-  background: var(--bg-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.segmented input:focus-visible + span {
-  outline: 2px solid var(--focus-color);
-  outline-offset: 2px;
 }
 
 .number-stepper {
@@ -686,7 +650,7 @@ input[type="checkbox"] {
 .backdrop-sun {
   position: absolute;
   top: 170px;
-  left: calc(50% + var(--sidebar-current) / 2);
+  left: calc(50% + var(--main-shift));
   transition: left 0.45s var(--ease);
   width: min(70vw, 760px);
   aspect-ratio: 1;
@@ -769,7 +733,7 @@ input[type="checkbox"] {
 /* ตัวใหญ่: อยู่ใต้ดวงอาทิตย์ กลางพื้นที่ผลลัพธ์ หมุนตามเข็มรอบละ 3 นาที */
 .backdrop-cpu.is-main {
   top: 58vh;
-  left: calc(50% + var(--sidebar-current) / 2);
+  left: calc(50% + var(--main-shift));
   width: min(74vw, 820px);
   height: min(74vw, 820px);
   margin: calc(min(74vw, 820px) / -2) 0 0 calc(min(74vw, 820px) / -2);
@@ -814,22 +778,29 @@ input[type="checkbox"] {
 
 /* ---------- โครงหน้า ---------- */
 
-/* --sidebar-current = ความกว้างแถบซ้ายตอนนี้ (ซ่อนแล้วเหลือแถบแคบ --sidebar-rail) ใช้ทั้งคอลัมน์และตำแหน่งดวงอาทิตย์ */
+/* --sidebar-current = ความกว้างแถบซ้ายตอนนี้ (ซ่อนแล้วเหลือแถบแคบ --sidebar-rail) ใช้เป็นความกว้างคอลัมน์
+   --shell-pad-right = ขอบขวาของหน้า / --main-shift = ระยะที่กลางพื้นที่ผลลัพธ์อยู่ขวาของกลางจอ (ใช้วางดวงอาทิตย์และภาพชิป) */
 body {
   --sidebar-current: var(--sidebar-width);
+  --shell-pad-right: 28px;
+  --main-shift: calc(var(--sidebar-current) / 2);
 }
 
+/* ซ่อนแถบ: ขวาเว้นที่เท่ากับซ้าย (ขอบ 16px + ช่องโลโก้ + ช่องห่าง 28px) พื้นที่ผลลัพธ์จึงอยู่กลางจอพอดี (D-035)
+   ถ้าเว้นขวาแค่ 28px เหมือนตอนแสดงแถบ ฝั่งซ้ายจะกว้างกว่าฝั่งขวาราว 108px */
 body.sidebar-collapsed {
   --sidebar-current: var(--sidebar-rail);
+  --shell-pad-right: calc(16px + var(--sidebar-rail) + 28px);
+  --main-shift: 0px;
 }
 
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-current) minmax(0, 1fr);
-  transition: grid-template-columns 0.45s var(--ease);
+  transition: grid-template-columns 0.45s var(--ease), padding-right 0.45s var(--ease);
   gap: 28px;
   min-height: 100vh;
-  padding: 16px 28px 16px 16px;
+  padding: 16px var(--shell-pad-right) 16px 16px;
 }
 
 /* ---------- แถบซ้าย: รายการ CPU (ลอยแยกจากเนื้อหา มุมโค้ง พื้นเข้ม) ----------
@@ -1047,13 +1018,13 @@ body.sidebar-instant .backdrop-cpu {
 .cpu-card {
   position: relative;
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  grid-template-areas:
-    "icon text"
-    "bars bars";
+  /* ไอคอน | ชื่อ + ข้อมูล | ป้ายสถานะ — ขวาสุดเว้น 46px ให้ปุ่ม ⋯ และปุ่มลูกศรที่วางทับมุมการ์ด */
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  grid-template-areas: "icon text status";
   align-items: center;
   gap: 12px;
   width: 100%;
+  min-height: 86px; /* สูงพอให้ปุ่ม ⋯ (บน) กับปุ่มลูกศร (ล่าง) ไม่ชนกัน */
   padding: 14px 46px 14px 14px;
   border: 0;
   border-radius: 18px;
@@ -1089,7 +1060,6 @@ body.sidebar-instant .backdrop-cpu {
 .cpu-card-icon {
   display: grid;
   grid-area: icon;
-  align-self: start;
   place-items: center;
   width: 40px;
   height: 40px;
@@ -1106,69 +1076,65 @@ body.sidebar-instant .backdrop-cpu {
   min-width: 0;
 }
 
+/* line-height 1.45 (ไม่ใช่ 1.3) เพราะช่องนี้ตัดส่วนเกิน หางสระล่าง/ตัวอักษรไทย (ฤ ฎ ฐ ุ ู) จะชิดขอบล่างจนเสี่ยงถูกตัด */
 .cpu-card-name {
   overflow: hidden;
   font-weight: 650;
-  line-height: 1.3;
+  line-height: 1.45;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.cpu-card-meta,
-.cpu-card-status {
-  overflow: hidden;
+/* ขึ้นบรรทัดใหม่ได้ (ไม่ตัดเป็น …) เพราะป้ายสถานะกินที่ด้านขวา บนมือถือจะเหลือที่น้อย */
+.cpu-card-meta {
   font-size: 0.82rem;
+  line-height: 1.4;
   color: var(--sidebar-muted);
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
-.cpu-card[aria-current="true"] .cpu-card-meta,
-.cpu-card[aria-current="true"] .cpu-card-status {
+.cpu-card[aria-current="true"] .cpu-card-meta {
   color: var(--cpu-active-muted);
 }
 
+/* ป้ายสถานะ: Run แล้ว = เขียวทึบ + ✓ / ผลเก่า = ทอง + ลูกศรวน / ยังไม่ Run = ขอบประ ไม่มีพื้น + นาฬิกา
+   แยกกันได้ทั้งจากสี รูปทรง (ทึบ / ประ) และไอคอน */
 .cpu-card-status {
   display: inline-flex;
+  grid-area: status;
   align-items: center;
   gap: 6px;
-  margin-top: 2px;
+  padding: 7px 13px 7px 10px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
-/* จุดสถานะ: วงเปล่า = ยังไม่ Run / เขียว = Run แล้ว / ทอง = ผลเก่า */
-.status-dot {
-  flex: none;
-  width: 7px;
-  height: 7px;
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
+.cpu-card-status .icon {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.4;
 }
 
-.is-done .status-dot {
-  border-color: #5fc898;
-  background: #5fc898;
+.cpu-card-status.is-done {
+  border-color: color-mix(in srgb, var(--status-done-tint) 42%, transparent);
+  background: color-mix(in srgb, var(--status-done-tint) 15%, transparent);
+  color: var(--status-done-text);
 }
 
-.is-stale .status-dot {
-  border-color: #e3b25e;
-  background: #e3b25e;
+.cpu-card-status.is-stale {
+  border-color: color-mix(in srgb, var(--status-stale-tint) 45%, transparent);
+  background: color-mix(in srgb, var(--status-stale-tint) 16%, transparent);
+  color: var(--status-stale-text);
 }
 
-/* แท่ง BT เล็ก ๆ (ui.js กำหนดความสูงและสีของแต่ละแท่ง) */
-.cpu-bars {
-  display: flex;
-  grid-area: bars;
-  align-items: flex-end;
-  gap: 3px;
-  height: 20px;
-}
-
-.cpu-bar {
-  flex: 1 1 0;
-  min-width: 3px;
-  max-width: 12px;
-  border-radius: 3px 3px 1px 1px;
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 70%);
+.cpu-card-status.is-idle {
+  border-style: dashed;
+  border-color: var(--status-idle-line);
+  background: transparent;
+  color: var(--status-idle-text);
 }
 
 /* ปุ่ม ⋯ มุมขวาบนของการ์ด เปิด popup รายละเอียด */
@@ -1289,11 +1255,6 @@ body.sidebar-instant .backdrop-cpu {
 
 .cpu-toggle[aria-expanded="true"] .icon {
   transform: rotate(180deg);
-}
-
-/* เผื่อที่ให้ปุ่มลูกศร ไม่ให้แท่ง BT วิ่งไปทับ */
-.cpu-bars {
-  margin-right: 38px;
 }
 
 /* CPU ที่กางอยู่: การ์ดกับแผงตั้งค่าต่อกันเป็นแผ่นสีครีมแผ่นเดียว ลอยเด่นที่สุดในแถบ */
@@ -1676,24 +1637,19 @@ body.sidebar-instant .backdrop-cpu {
   border-color: var(--accent);
 }
 
-/* สุ่ม / กรอกเอง เต็มความกว้างแผง */
-.cpu-panel .segmented {
-  display: flex;
-}
-
-.cpu-panel .segmented label {
-  flex: 1;
-}
-
-.cpu-panel .segmented span {
-  text-align: center;
+/* หัวข้อ "Burst Time" เหนือการ์ดโปรเซส หน้าตาเดียวกับ label ของช่องอื่นในแผง */
+.field-title {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 .mode-note {
   margin: -8px 0 0;
 }
 
-/* แถวโปรเซส 2 คอลัมน์: เตี้ยและแคบ มี 20 โปรเซสก็เห็นครบโดยไม่ต้องเลื่อนไกล */
+/* แถวโปรเซส 2 คอลัมน์: เตี้ยและแคบ มีครบ 10 โปรเซสก็เป็นแค่ 5 แถว */
 .process-deck {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1754,14 +1710,17 @@ body.sidebar-instant .backdrop-cpu {
   font-weight: 600;
 }
 
+/* ข้อความในปุ่มอยู่บรรทัดเดียวเสมอ ถ้าแถวไม่พอ (เช่น ภาษาอังกฤษ หรือจอมือถือ) ปุ่มจะขึ้นแถวใหม่ทั้งปุ่มแทนการตกบรรทัดในปุ่ม */
 .toolbar-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .toolbar-buttons .button {
-  flex: 1;
+  flex: 1 1 auto;
   padding: 6px 10px;
+  white-space: nowrap;
 }
 
 /* ปุ่ม Run เต็มความกว้าง ใต้สุดของแผง */
@@ -2275,6 +2234,7 @@ body.sidebar-instant .backdrop-cpu {
   max-width: 150px;
   min-width: 0;
   height: 38px;
+  overflow: hidden; /* ช่วงเยอะมาก (เช่น RR TQ = 1) แท่งเล็กสุดรวมกันยาวเกินกรอบ ให้ตัดในกรอบ ไม่ล้นออกนอกการ์ด */
 }
 
 /* หนึ่งแท่งต่อโปรเซส สูงตามค่า */
@@ -2350,7 +2310,7 @@ table {
 }
 
 /* ตารางผลลัพธ์: ความกว้างคอลัมน์คงที่ (ui.js ใส่ <colgroup>) เปิด/ปิดวิธีคำนวณแล้วคอลัมน์ไม่ขยับ
-   TAT / WT กว้างพอสำหรับสูตรที่ยาวที่สุด (20 โปรเซส BT 10 → "200 − 10 = 190")
+   TAT / WT กว้างพอสำหรับสูตรที่ยาวที่สุด (10 โปรเซส BT 100 → "1000 − 100 = 900")
    จอแคบกว่าความกว้างขั้นต่ำ ตารางเลื่อนแนวนอนในกรอบแทนการบีบคอลัมน์ */
 .result-table {
   min-width: 760px;
@@ -2975,7 +2935,7 @@ input[type="color"]::-webkit-color-swatch {
 
 .modal-facts {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
 }
@@ -3134,6 +3094,17 @@ input[type="color"]::-webkit-color-swatch {
 
 .settings-row .hint {
   margin-top: 2px;
+}
+
+/* ข้อความอธิบายทางซ้ายยอมขึ้นบรรทัดใหม่แทน ปุ่ม/สวิตช์ทางขวาจึงไม่ถูกบีบจนตัวอักษรในปุ่มตกบรรทัด */
+.settings-row > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.settings-row > :last-child {
+  flex: none;
+  white-space: nowrap;
 }
 
 .settings-row.danger-zone {
@@ -3331,12 +3302,16 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 @media (max-width: 760px) {
-  .formula-list {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .modal-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .modal-fact:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .formula-list {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .bar-group {
@@ -3350,6 +3325,19 @@ input[type="color"]::-webkit-color-swatch {
 
 /* มือถือ */
 @media (max-width: 600px) {
+  /* การ์ด CPU: ป้ายสถานะลงไปอยู่ใต้ชื่อ (ด้านขวาเหลือที่ไม่พอ ข้อความจะถูกบีบ) */
+  .cpu-card {
+    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-areas:
+      "icon text"
+      "icon status";
+    row-gap: 8px;
+  }
+
+  .cpu-card-status {
+    justify-self: start;
+  }
+
   .hero {
     padding-top: 60px;
   }
@@ -3398,6 +3386,28 @@ input[type="color"]::-webkit-color-swatch {
 
   .kpi-card {
     padding: 18px 16px 16px;
+  }
+
+  /* ไอคอนอยู่เหนือชื่อค่า ชื่อจึงได้ความกว้างเต็มการ์ด (ถ้าวางข้างกัน ชื่อจะถูกบีบจนตกบรรทัดทีละคำ) */
+  .kpi-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* กราฟจิ๋วอยู่ใต้ตัวเลข (การ์ดแคบ วางข้างกันแล้วกราฟล้นขอบการ์ด) */
+  .kpi-body {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .kpi-chart {
+    max-width: none;
+  }
+
+  .kpi-strip {
+    align-self: stretch; /* ถ้ากึ่งกลาง แถบจะกว้างตามจำนวนช่วงจนล้นการ์ด ยืดเต็มแล้วส่วนเกินถูกตัดในกรอบ */
   }
 
   .kpi-value {

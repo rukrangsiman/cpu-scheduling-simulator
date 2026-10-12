@@ -38,11 +38,11 @@ function expectFail(result, messagePattern) {
 
 console.log('จำนวนโปรเซส');
 
-test('ค่าปกติ 1, 3, 10, 20 และมีช่องว่างหัวท้าย', () => {
+test('ค่าปกติ 1, 3, 10 และมีช่องว่างหัวท้าย', () => {
   expectOk(Validation.validateProcessCount('1'), 1);
   expectOk(Validation.validateProcessCount('3'), 3);
   expectOk(Validation.validateProcessCount(' 10 '), 10);
-  expectOk(Validation.validateProcessCount('20'), 20);
+  expectOk(Validation.validateProcessCount('10'), 10);
 });
 
 test('TC-V01 ไม่กรอก', () => {
@@ -67,9 +67,9 @@ test('TC-V04 ไม่ใช่จำนวนเต็ม', () => {
   }
 });
 
-test('TC-V05 เกิน 20', () => {
-  expectFail(Validation.validateProcessCount('21'), /ไม่เกิน 20/);
-  expectFail(Validation.validateProcessCount('99999999999999999999'), /ไม่เกิน 20/);
+test('TC-V05 เกิน 10', () => {
+  expectFail(Validation.validateProcessCount('11'), /ไม่เกิน 10/);
+  expectFail(Validation.validateProcessCount('99999999999999999999'), /ไม่เกิน 10/);
 });
 
 test('ข้อความแจ้งเตือนแสดงค่าที่ผู้ใช้กรอก', () => {
@@ -146,7 +146,7 @@ console.log('ภาษาอังกฤษ');
 
 test('ส่ง language = "en" ได้ข้อความภาษาอังกฤษ', () => {
   expectFail(Validation.validateProcessCount('', 'en'), /^Number of processes: no value entered$/);
-  expectFail(Validation.validateProcessCount('21', 'en'), /^Number of processes: must not exceed 20 \(entered "21"\)$/);
+  expectFail(Validation.validateProcessCount('11', 'en'), /^Number of processes: must not exceed 10 \(entered "11"\)$/);
   expectFail(Validation.validateQuantum('0', 'en'), /^Time Quantum: must be greater than 0/);
   expectFail(Validation.validateBurstTimes(['5', ''], 'en'), /^Burst Time is incomplete: P2 still empty$/);
   expectFail(Validation.validateBurstTimes(['1.5'], 'en'), /^Burst Time of P1: must be a positive whole number/);

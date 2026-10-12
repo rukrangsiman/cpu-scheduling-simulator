@@ -27,7 +27,6 @@ function test(name, fn) {
 // โปรไฟล์ที่ "เคย Run แล้ว" แบบย่อ (ใส่เฉพาะช่องที่ profiles.js ใช้ ผลจริงมาจาก Scheduler ใน ui.js)
 function ranProfile() {
   const profile = Profiles.createProfile('CPU 1', ['5', '3', '8', '6']);
-  profile.burstMode = 'manual';
   profile.burstTimes = [5, 3, 8, 6];
   profile.results = { FCFS: {}, SJF: {}, RR: { quantum: 3 } };
   profile.rrHistory = [{ quantum: 2 }, { quantum: 3 }];
@@ -83,7 +82,6 @@ test('บันทึกแล้วอ่านกลับ: ข้อมูล
   assert.equal(loaded.nextNumber, 3);
 
   const first = loaded.profiles[0];
-  assert.equal(first.burstMode, 'manual');
   assert.deepEqual(first.burstValues, ['5', '3', '8', '6']);
   assert.deepEqual(first.processColors, ['#ff0000', null, '#00ff00']);
   assert.deepEqual(first.savedRun, { burstTimes: [5, 3, 8, 6], quantum: 3, historyQuantums: [2, 3] });
@@ -108,12 +106,12 @@ test('ข้าม CPU ที่ข้อมูลเสีย แต่เก�
   assert.equal(loaded.profiles[0].name, 'ดี');
 });
 
-test('ชุด BT ที่ Run ไว้ผิดขอบเขต (0, 2.5, 101, เกิน 20 ตัว) → ถือว่ายังไม่เคย Run', () => {
+test('ชุด BT ที่ Run ไว้ผิดขอบเขต (0, 2.5, 101, เกิน 10 ตัว) → ถือว่ายังไม่เคย Run', () => {
   const badRuns = [
     { burstTimes: [5, 0], quantum: 2 },
     { burstTimes: [5, 2.5], quantum: 2 },
     { burstTimes: [101], quantum: 2 },
-    { burstTimes: new Array(21).fill(1), quantum: 2 },
+    { burstTimes: new Array(11).fill(1), quantum: 2 },
     { burstTimes: [5, 3], quantum: 0 },
     { burstTimes: ['5', '3'], quantum: 2 }
   ];
@@ -126,6 +124,24 @@ test('ชุด BT ที่ Run ไว้ผิดขอบเขต (0, 2.5, 1
     assert.equal(loaded.profiles[0].showCompare, false);
     assert.equal(loaded.profiles[0].isStale, false);
   }
+});
+
+test('CPU ที่บันทึกไว้ตอนยังรับได้ 20 โปรเซส → เก็บ CPU ไว้ ตัดเหลือ 10 โปรเซสแรก (สีด้วย)', () => {
+  const values = [];
+  const colors = [];
+  for (let i = 1; i <= 15; i++) {
+    values.push(String(i));
+    colors.push(i === 1 ? '#ff0000' : null);
+  }
+  const loaded = Profiles.fromSavedData({
+    profiles: [{ name: 'เก่า', processCountText: '15', burstValues: values, processColors: colors }]
+  });
+  const profile = loaded.profiles[0];
+  assert.equal(profile.name, 'เก่า');
+  assert.deepEqual(profile.burstValues, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
+  assert.equal(profile.processCountText, '10');
+  assert.equal(profile.processColors.length, 10);
+  assert.equal(profile.processColors[0], '#ff0000');
 });
 
 test('สีที่ไม่ใช่รูปแบบ #RRGGBB → ใช้สีเริ่มต้นทั้งหมด', () => {

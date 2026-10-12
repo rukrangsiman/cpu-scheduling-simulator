@@ -94,7 +94,7 @@
                   <input id="process-count" type="text" inputmode="numeric" autocomplete="off" value="4" aria-describedby="process-count-hint">
                   <button type="button" class="stepper-button" data-count-step="1" aria-label="เพิ่มจำนวนโปรเซส" data-i18n-aria-label="increaseCount">+</button>
                 </div>
-                <small id="process-count-hint" class="hint" data-i18n="processCountHint">จำนวนเต็ม 1–20</small>
+                <small id="process-count-hint" class="hint" data-i18n="processCountHint">จำนวนเต็ม 1–10</small>
               </div>
 
               <div id="quantum-field" class="field quantum-field">
@@ -104,20 +104,15 @@
               </div>
             </div>
 
-            <fieldset class="field">
-              <legend data-i18n="burstModeLegend">วิธีกำหนด Burst Time</legend>
-              <div class="segmented">
-                <label><input type="radio" name="burst-mode" value="random" checked><span data-i18n="burstModeRandom">สุ่ม (1–10)</span></label>
-                <label><input type="radio" name="burst-mode" value="manual"><span data-i18n="burstModeManual">กรอกเอง</span></label>
-              </div>
-            </fieldset>
-            <p id="burst-mode-note" class="hint mode-note"></p>
+            <!-- ช่อง BT กรอกเองได้เสมอ ปุ่มสุ่มแค่ใส่ตัวเลขลงในช่องให้ (D-033) -->
+            <p class="field-title" data-i18n="burstLegend">Burst Time</p>
+            <p id="burst-note" class="hint mode-note"></p>
 
             <!-- ui.js สร้างการ์ดเล็กของแต่ละโปรเซส (แถบสี + ชื่อ + ช่อง BT) -->
             <div id="burst-grid" class="process-deck" role="group" aria-labelledby="panel-title"></div>
 
             <div class="toolbar-buttons">
-              <button type="button" id="reroll-button" class="button ghost small" data-i18n="rerollButton">สุ่ม Burst Time ใหม่</button>
+              <button type="button" id="reroll-button" class="button ghost small" data-i18n="rerollButton">สุ่ม Burst Time (1–10)</button>
               <button type="button" id="reset-colors-button" class="button ghost small" data-i18n="resetColorsButton">ใช้สีเริ่มต้น</button>
             </div>
 

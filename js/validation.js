@@ -15,7 +15,7 @@ var Validation = (function () {
 
   // ขอบเขตค่าที่รับ (DECISIONS D-006) ui.js ใช้ค่าชุดเดียวกันนี้
   var LIMITS = {
-    maxProcesses: 20,
+    maxProcesses: 10,
     maxBurstTime: 100,
     randomBurstMin: 1,
     randomBurstMax: 10,

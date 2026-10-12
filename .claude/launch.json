@@ -48,6 +48,16 @@
         "127.0.0.1"
       ],
       "port": 8768
+    },
+    {
+      "name": "static-auto",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-c",
+        "import os, http.server; http.server.test(HandlerClass=http.server.SimpleHTTPRequestHandler, port=int(os.environ.get('PORT', '8769')), bind='127.0.0.1')"
+      ],
+      "port": 8769,
+      "autoPort": true
     }
   ]
 }

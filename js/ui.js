@@ -38,19 +38,19 @@ var NEW_CPU_PROCESS_COUNT = 4;
 
 // ข้อความสถานะของ CPU: ยังไม่ Run / Run แล้ว / แก้ข้อมูลหลัง Run (ผลเก่า)
 var STATUS_TEXT = { idle: 'statusIdle', done: 'statusDone', stale: 'statusStale' };
+// ไอคอนในป้ายสถานะบนการ์ด CPU: ยังไม่ Run = นาฬิกา (รออยู่) / Run แล้ว = เครื่องหมายถูก / ผลเก่า = ลูกศรวน (ต้อง Run ใหม่)
+var STATUS_ICON = { idle: 'clock', done: 'check', stale: 'refresh' };
 
 // ข้อมูลตัวอย่าง TC-01 ใน docs/TEST_CASES.md — ใช้วาดภาพใน popup "วิธีทำงาน" เมื่อ CPU ยังไม่ได้ Run (modals.js)
 var EXAMPLE_BURST_TIMES = [5, 3, 8, 6];
 
-// สีเริ่มต้นของ P1..P20 และ "สีตัวอย่าง" ในกล่องเลือกสี (D-021)
+// สีเริ่มต้นของ P1..P10 และ "สีตัวอย่าง" ในกล่องเลือกสี (D-021, เหลือ 10 สีตาม D-036 — หนึ่งสีต่อหนึ่งโปรเซส ไม่ซ้ำกัน)
 // สดใส (saturation สูง) แต่ไม่จัดจ้านจนหลุดธีมของเว็บ และทุกสีเข้มพอให้ตัวอักษรสีขาวบนแถบ Gantt อ่านง่าย
 // (contrast กับสีขาว ≥ 4.6:1 ตามสูตร WCAG — แต่ละเฉดเลือกความสว่างสูงสุดที่ยังผ่านเกณฑ์นี้ สีจึงไม่ตุ่น)
-// แถวแรก = ส้ม ม่วง เขียวมรกต ฟ้า ชมพูกุหลาบ บานเย็น ฟ้าอมเขียว แดง คราม เขียว / แถวสอง = สีเดียวกันโทนเข้ม
+// ส้ม ม่วง เขียวมรกต ฟ้า ชมพูกุหลาบ / บานเย็น ฟ้าอมเขียว แดง คราม เขียว
 var DEFAULT_COLORS = [
   '#c54f14', '#8255ec', '#078564', '#1370ea', '#df2066',
-  '#bd2dda', '#087e9b', '#dd2f3a', '#6363e6', '#20871d',
-  '#a04010', '#6830e8', '#055e47', '#105ec4', '#bb1b56',
-  '#a321bd', '#065e74', '#c3202b', '#4040e0', '#186515'
+  '#bd2dda', '#087e9b', '#dd2f3a', '#6363e6', '#20871d'
 ];
 
 var ALGORITHM_TITLES = {
@@ -82,7 +82,8 @@ var ICONS = {
   copy: 'M9 9h11v11H9z M5 15H4V4h11v1',
   trash: 'M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v6 M14 11v6',
   open: 'M5 12h14 M13 6l6 6-6 6',
-  check: 'M5 12l5 5 9-10'
+  check: 'M5 12l5 5 9-10',
+  refresh: 'M20 11a8 8 0 1 0-2.3 5.7 M20 4v7h-7'
 };
 
 var SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
@@ -392,10 +393,6 @@ function markInvalid(input) {
 
 // ---------- หน้าต่างโปรเซส: จำนวนโปรเซส ----------
 
-function getBurstMode() {
-  return document.querySelector('input[name="burst-mode"]:checked').value; // 'random' หรือ 'manual'
-}
-
 // ตรวจช่องจำนวนโปรเซส ถ้าผิดจะไฮไลต์ช่องไว้
 function checkProcessCount() {
   var countInput = byId('process-count');
@@ -453,6 +450,7 @@ function randomBurstTime() {
   return min + Math.floor(Math.random() * (max - min + 1));
 }
 
+// ปุ่มสุ่ม: ใส่ตัวเลขสุ่มลงในช่อง BT ทุกช่อง (ทับค่าเดิม) หลังจากนั้นผู้ใช้ยังแก้ค่าเองได้ตามปกติ
 function fillRandomBurstTimes() {
   var inputs = getBurstInputs();
   for (var i = 0; i < inputs.length; i++) {
@@ -473,6 +471,7 @@ function randomBurstValues(count) {
 
 // เพิ่มหรือลบการ์ดโปรเซสที่ท้ายรายการให้เท่ากับ count
 // การ์ดที่มีอยู่แล้วไม่ถูกสร้างใหม่ ค่า BT และสีที่ผู้ใช้กำหนดไว้จึงไม่หาย
+// การ์ดใหม่ได้ BT สุ่มไว้ก่อน (แก้เองได้) กด Run ได้ทันทีโดยไม่ต้องกรอกช่องที่เพิ่มมา
 function syncProcessRows(count) {
   closeColorPopover(false);
   var grid = byId('burst-grid');
@@ -482,9 +481,7 @@ function syncProcessRows(count) {
   for (var i = grid.children.length; i < count; i++) {
     var tile = createProcessTile(i);
     grid.appendChild(tile);
-    if (getBurstMode() === 'random') {
-      tile.querySelector('input').value = String(randomBurstTime());
-    }
+    tile.querySelector('input').value = String(randomBurstTime());
   }
   updateCountButtons();
 }
@@ -503,7 +500,7 @@ function rebuildProcessRows(values) {
 }
 
 // แถวเล็กของโปรเซสหนึ่งตัว: จุดสี (กดเพื่อเลือกสี) | ชื่อ | ช่องกรอก BT
-// ทำให้เตี้ยและแคบ เรียงได้ 2 คอลัมน์ในแผงตั้งค่า มี 20 โปรเซสก็ยังดูทั้งหมดได้ง่าย
+// ทำให้เตี้ยและแคบ เรียงได้ 2 คอลัมน์ในแผงตั้งค่า มีครบ 10 โปรเซสก็เป็นแค่ 5 แถว
 // (AT = 0 ทุกโปรเซส บอกไว้ที่หัวแผงตั้งค่าแล้ว จึงไม่แสดงซ้ำในทุกแถว)
 function createProcessTile(index) {
   var processId = 'P' + (index + 1);
@@ -525,7 +522,6 @@ function createProcessTile(index) {
   input.id = 'bt-' + processId;
   input.inputMode = 'numeric';
   input.autocomplete = 'off';
-  input.readOnly = getBurstMode() === 'random';
   input.setAttribute('aria-label', t('burstInputLabel', { id: processId }));
 
   tile.appendChild(colorButton);
@@ -535,32 +531,14 @@ function createProcessTile(index) {
   return tile;
 }
 
-// แสดงช่อง BT ตามโหมด: สุ่ม = แก้ไม่ได้ + มีปุ่มสุ่มใหม่ / กรอกเอง = แก้ได้
-function applyBurstModeView() {
-  var isRandom = getBurstMode() === 'random';
-  var inputs = getBurstInputs();
-  for (var i = 0; i < inputs.length; i++) {
-    inputs[i].readOnly = isRandom;
-  }
-  byId('reroll-button').hidden = !isRandom;
-  updateBurstModeNote();
-}
-
-// ผู้ใช้เปลี่ยนโหมด: ถ้าเปลี่ยนเป็นสุ่มให้สุ่มค่าใหม่ ถ้าเป็นกรอกเองให้เก็บค่าเดิมไว้แก้ต่อ
-function applyBurstMode() {
-  applyBurstModeView();
-  if (getBurstMode() === 'random' && getBurstInputs().length > 0) {
-    fillRandomBurstTimes();
-  }
-}
-
-function updateBurstModeNote() {
+// คำอธิบายใต้หัวข้อ Burst Time (ใส่ตัวเลขขอบเขตจาก Validation.LIMITS จึงต้องสร้างข้อความในโค้ด)
+function updateBurstNote() {
   var limits = Validation.LIMITS;
-  if (getBurstMode() === 'random') {
-    byId('burst-mode-note').textContent = t('burstNoteRandom', { min: limits.randomBurstMin, max: limits.randomBurstMax });
-  } else {
-    byId('burst-mode-note').textContent = t('burstNoteManual', { max: limits.maxBurstTime });
-  }
+  byId('burst-note').textContent = t('burstNote', {
+    max: limits.maxBurstTime,
+    randomMin: limits.randomBurstMin,
+    randomMax: limits.randomBurstMax
+  });
 }
 
 // ตรวจช่อง BT ทุกช่อง และไฮไลต์ช่องที่ผิด
@@ -1598,7 +1576,6 @@ function createCompareTable(firstHeader, rows, badgeText) {
 // ค่า BT เก็บเป็นข้อความตามที่พิมพ์ไว้ แม้จะยังกรอกผิด สลับกลับมาแล้วจะได้แก้ต่อจากเดิม
 function storeFormInProfile() {
   state.processCountText = byId('process-count').value;
-  state.burstMode = getBurstMode();
   state.quantumText = byId('quantum').value;
   var inputs = getBurstInputs();
   state.burstValues = [];
@@ -1613,10 +1590,8 @@ function showProfile() {
   hideGanttTooltip();
   clearErrors(); // ข้อความเตือนเป็นของ CPU ตัวก่อน
   byId('process-count').value = state.processCountText;
-  document.querySelector('input[name="burst-mode"][value="' + state.burstMode + '"]').checked = true;
   byId('quantum').value = state.quantumText;
   rebuildProcessRows(state.burstValues);
-  applyBurstModeView(); // ไม่ใช้ applyBurstMode เพราะจะสุ่ม BT ใหม่ทับค่าที่ CPU เก็บไว้
   updateStaleNote();
   updateAlgorithmPicker();
   renderAlgorithmInfo();
@@ -1834,7 +1809,7 @@ function createCpuToggle(profile, index, isOpen) {
   return toggle;
 }
 
-// เนื้อหาในการ์ด: ไอคอนชิป | ชื่อ + จำนวนโปรเซส + TQ + สถานะ | แท่ง BT เล็ก ๆ
+// เนื้อหาในการ์ด: ไอคอนชิป | ชื่อ + จำนวนโปรเซส + TQ | ป้ายสถานะ (D-034)
 function fillCpuCard(card, profile) {
   card.textContent = '';
   var badge = createElement('span', 'cpu-card-icon');
@@ -1845,13 +1820,16 @@ function fillCpuCard(card, profile) {
   text.appendChild(createElement('span', 'cpu-card-name', profile.name));
   text.appendChild(createElement('span', 'cpu-card-meta',
     t('cpuMeta', { count: profile.burstValues.length, quantum: profile.quantumText })));
-  var status = cpuStatus(profile);
-  var statusText = createElement('span', 'cpu-card-status is-' + status);
-  statusText.appendChild(createElement('span', 'status-dot'));
-  statusText.appendChild(document.createTextNode(t(STATUS_TEXT[status])));
-  text.appendChild(statusText);
   card.appendChild(text);
-  card.appendChild(createMiniBars(profile));
+  card.appendChild(createStatusBadge(cpuStatus(profile)));
+}
+
+// ป้ายสถานะด้านขวาของการ์ด: สี + ไอคอน + ข้อความ ต่างกันทั้งสามอย่าง จึงแยกออกได้แม้มองไม่เห็นสี
+function createStatusBadge(status) {
+  var badge = createElement('span', 'cpu-card-status is-' + status);
+  badge.appendChild(createIcon(STATUS_ICON[status]));
+  badge.appendChild(createElement('span', '', t(STATUS_TEXT[status])));
+  return badge;
 }
 
 // อัปเดตเฉพาะการ์ดของ CPU ที่เลือก (ใช้ขณะพิมพ์ในแผงตั้งค่า / Run / เปลี่ยนสี) — แผงตั้งค่าไม่ถูกย้าย โฟกัสจึงไม่หลุด
@@ -1860,24 +1838,6 @@ function updateActiveCpuCard() {
   if (card) {
     fillCpuCard(card, state);
   }
-}
-
-// แท่งเล็ก ๆ หนึ่งแท่งต่อหนึ่งโปรเซส สีตามโปรเซส สูงตามสัดส่วน BT (ช่องที่ว่างหรือกรอกผิดเป็นแท่งเตี้ยสุด)
-function createMiniBars(profile) {
-  var bars = createElement('span', 'cpu-bars');
-  bars.setAttribute('aria-hidden', 'true');
-  var max = 1;
-  for (var i = 0; i < profile.burstValues.length; i++) {
-    max = Math.max(max, Number(profile.burstValues[i]) || 0);
-  }
-  for (var j = 0; j < profile.burstValues.length; j++) {
-    var value = Number(profile.burstValues[j]) || 0;
-    var bar = createElement('span', 'cpu-bar');
-    bar.style.height = Math.max(15, value / max * 100) + '%';
-    bar.style.backgroundColor = colorOf(profile, j);
-    bars.appendChild(bar);
-  }
-  return bars;
 }
 
 // ชื่อ CPU ตัวใหญ่ + ป้ายจำนวนโปรเซส / TQ / สถานะ
@@ -1961,7 +1921,7 @@ function refreshLanguage() {
   closeColumnHelp(false);
   updateLanguageButtons();
   updateSidebarToggle();
-  updateBurstModeNote();
+  updateBurstNote();
   closeColorPopover(false);
 
   var burstInputs = getBurstInputs();
@@ -2007,10 +1967,6 @@ function bindConfigForm() {
   var stepButtons = document.querySelectorAll('[data-count-step]');
   for (var i = 0; i < stepButtons.length; i++) {
     stepButtons[i].addEventListener('click', onCountStepClick);
-  }
-  var modeRadios = document.querySelectorAll('input[name="burst-mode"]');
-  for (var j = 0; j < modeRadios.length; j++) {
-    modeRadios[j].addEventListener('change', applyBurstMode);
   }
   var algorithmOptions = document.querySelectorAll('.algorithm-option');
   for (var k = 0; k < algorithmOptions.length; k++) {
@@ -2116,6 +2072,7 @@ function init() {
   // ใส่ข้อความตามภาษาที่เคยเลือกไว้ก่อนผูก event อื่น
   I18n.applyToPage();
   updateLanguageButtons();
+  updateBurstNote();
   var languageButtons = document.querySelectorAll('.language-option');
   for (var i = 0; i < languageButtons.length; i++) {
     languageButtons[i].addEventListener('click', onLanguageClick);

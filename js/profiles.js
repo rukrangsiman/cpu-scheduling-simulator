@@ -26,7 +26,6 @@ var Profiles = (function () {
   function createProfile(name, burstValues) {
     return {
       name: name,
-      burstMode: 'random',            // 'random' หรือ 'manual'
       processCountText: String(burstValues.length),
       burstValues: burstValues.slice(), // ข้อความในช่อง BT (เก็บเป็นข้อความ เพราะผู้ใช้อาจกรอกผิดค้างไว้)
       quantumText: String(LIMITS.defaultQuantum),
@@ -62,7 +61,6 @@ var Profiles = (function () {
   function toSavedProfile(profile) {
     var saved = {
       name: profile.name,
-      burstMode: profile.burstMode,
       processCountText: profile.processCountText,
       burstValues: profile.burstValues,
       quantumText: profile.quantumText,
@@ -102,8 +100,8 @@ var Profiles = (function () {
     return typeof value === 'number' && Math.floor(value) === value && value >= min && value <= max;
   }
 
-  function isTextList(value, maxLength) {
-    if (!Array.isArray(value) || value.length > maxLength) {
+  function isTextList(value) {
+    if (!Array.isArray(value)) {
       return false;
     }
     for (var i = 0; i < value.length; i++) {
@@ -157,22 +155,24 @@ var Profiles = (function () {
 
   // แปลงข้อมูลที่บันทึกไว้ของ CPU หนึ่งตัวกลับเป็นโปรไฟล์ (ยังไม่มีผลลัพธ์ ui.js จะคำนวณจาก savedRun)
   function fromSavedProfile(saved, fallbackName) {
-    if (!saved || typeof saved !== 'object' || !isTextList(saved.burstValues, LIMITS.maxProcesses) ||
-        saved.burstValues.length < 1) {
+    if (!saved || typeof saved !== 'object' || !isTextList(saved.burstValues) || saved.burstValues.length < 1) {
       return null;
     }
-    var profile = createProfile(cleanName(saved.name || '', fallbackName), saved.burstValues);
-    if (saved.burstMode === 'manual') {
-      profile.burstMode = 'manual';
-    }
-    if (typeof saved.processCountText === 'string') {
+    // CPU ที่บันทึกจากรุ่นก่อน (เคยรับได้ 20 โปรเซส) อาจมีเกิน 10 ตัว: เก็บเฉพาะโปรเซสแรก ๆ ไว้ ไม่ทิ้งทั้ง CPU (D-036)
+    var isTrimmed = saved.burstValues.length > LIMITS.maxProcesses;
+    var profile = createProfile(cleanName(saved.name || '', fallbackName),
+      saved.burstValues.slice(0, LIMITS.maxProcesses));
+    if (typeof saved.processCountText === 'string' && !isTrimmed) {
       profile.processCountText = saved.processCountText;
     }
     if (typeof saved.quantumText === 'string') {
       profile.quantumText = saved.quantumText;
     }
-    if (isValidColorList(saved.processColors)) {
-      profile.processColors = saved.processColors.slice();
+    if (Array.isArray(saved.processColors)) {
+      var colors = saved.processColors.slice(0, LIMITS.maxProcesses);
+      if (isValidColorList(colors)) {
+        profile.processColors = colors;
+      }
     }
     if (saved.selectedAlgorithm === 'SJF' || saved.selectedAlgorithm === 'RR') {
       profile.selectedAlgorithm = saved.selectedAlgorithm;

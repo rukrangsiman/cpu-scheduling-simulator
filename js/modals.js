@@ -130,20 +130,19 @@ function createBurstChart(profile) {
   return svg;
 }
 
-// จำนวนโปรเซส / TQ / วิธีกำหนด BT / สถานะ
+// จำนวนโปรเซส / TQ / สถานะ
 function createCpuFacts(profile) {
   var status = cpuStatus(profile);
   var facts = [
     [t('factProcesses'), String(profile.burstValues.length)],
     [t('factQuantum'), profile.quantumText],
-    [t('factMode'), t(profile.burstMode === 'random' ? 'modeRandom' : 'modeManual')],
     [t('factStatus'), t(STATUS_TEXT[status])]
   ];
   var list = createElement('dl', 'modal-facts');
   for (var i = 0; i < facts.length; i++) {
     var item = createElement('div', 'modal-fact');
     item.appendChild(createElement('dt', '', facts[i][0]));
-    item.appendChild(createElement('dd', i === 3 ? 'status-text is-' + status : '', facts[i][1]));
+    item.appendChild(createElement('dd', i === facts.length - 1 ? 'status-text is-' + status : '', facts[i][1]));
     list.appendChild(item);
   }
   return list;
