@@ -8,7 +8,7 @@
 ### 1.1 การกำหนดโปรเซส
 - ⬜ **R1.1a** ผู้ใช้กรอกจำนวนโปรเซส n
 - ⬜ **R1.1b** ระบบตั้งชื่อ P1, P2, …, Pn อัตโนมัติ
-- ⬜ **R1.1c** ทุกโปรเซส AT = 0, ลำดับเริ่มต้น P1→Pn
+- 🟨 **R1.1c** ทุกโปรเซส AT = 0, ลำดับเริ่มต้น P1→Pn (scheduler รองรับแล้ว รอ UI)
 
 ### 1.2 Burst Time
 - ⬜ **R1.2a** โหมดสุ่ม BT เป็นจำนวนเต็มบวก
@@ -16,15 +16,15 @@
 - ⬜ **R1.2c** ตรวจว่า n และ BT เป็นจำนวนเต็มบวก
 
 ### 1.3 อัลกอริทึม
-- ⬜ **R1.3a** FCFS
-- ⬜ **R1.3b** SJF Non-preemptive (บังคับ) — Preemptive เป็น optional (ดู DECISIONS D-005)
-- ⬜ **R1.3c** Round Robin, Time Quantum เริ่มต้น = 2
+- 🟨 **R1.3a** FCFS (`Scheduler.fcfs` เสร็จ รอ UI)
+- 🟨 **R1.3b** SJF Non-preemptive (บังคับ) — Preemptive เป็น optional (ดู DECISIONS D-005) (`Scheduler.sjf` เสร็จ รอ UI)
+- 🟨 **R1.3c** Round Robin, Time Quantum เริ่มต้น = 2 (`Scheduler.roundRobin` เสร็จ รอค่าเริ่มต้นใน UI)
 - ⬜ **R1.3d** แก้ TQ ได้ก่อนคำนวณ และต้องเป็นจำนวนเต็มบวก
 
 ### 1.4 ผลลัพธ์
 - ⬜ **R1.4a** ตารางมีคอลัมน์ Process, AT, BT, ST, CT, TAT, WT
-- ⬜ **R1.4b** TAT = CT − AT, WT = TAT − BT
-- ⬜ **R1.4c** RR: ST = เวลาที่ได้ CPU ครั้งแรก, CT = เวลาที่เสร็จสมบูรณ์
+- ✅ **R1.4b** TAT = CT − AT, WT = TAT − BT (`buildResult` ใน js/scheduler.js)
+- ✅ **R1.4c** RR: ST = เวลาที่ได้ CPU ครั้งแรก, CT = เวลาที่เสร็จสมบูรณ์ (`roundRobin` ใน js/scheduler.js)
 - ⬜ **R1.4d** แสดง AVG WT ของแต่ละอัลกอริทึม
 - ⬜ **R1.4e** เลือกดูผล FCFS / SJF / RR ได้ชัดเจน โดยใช้ชุดข้อมูลเดียวกัน
 

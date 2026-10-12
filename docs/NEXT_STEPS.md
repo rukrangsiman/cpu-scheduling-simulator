@@ -7,22 +7,26 @@
 
 ---
 
-## ⏳ รอผู้ใช้
-1. **ทบทวน `docs/DECISIONS.md`** แล้วยืนยันหรือแก้รายการ 🟦 โดยเฉพาะ
-   - D-005 จะทำ SRTF (optional) หรือไม่
-   - D-006 ขอบเขตค่า input
-2. **ส่งรายชื่อสมาชิก** และบอกว่าใครรับ Role A / B / C
-3. **ยืนยันให้ `git init`** หรือไม่
+## ⏳ รอผู้ใช้ / สมาชิก
+1. **ส่งรายชื่อสมาชิก** และบอกว่าใครรับ Role A / B / C
+2. **สมาชิก Role A อ่าน `js/scheduler.js`** แล้วลองอธิบายด้วยคำพูดตัวเองว่า
+   - ทำไม FCFS กับ SJF ใช้ `runInOrder` ร่วมกันได้
+   - ทำไม RR ต้องเช็ก `startTimes[index] === null` ก่อนบันทึก ST
+   - ทำไม SJF แบบ Preemptive ได้ผลเหมือน Non-preemptive ในโจทย์นี้
+3. **สมาชิกคำนวณมือ TC-01** ใน `docs/TEST_CASES.md` แล้วลงชื่อ (R1.6d)
+4. ทบทวน entry AI-001 ถึง AI-003 ใน `docs/AI_LOG.md` แล้วเปลี่ยน ⬜ เป็น ✅ พร้อมชื่อผู้ตรวจ
 
-## ▶ งานถัดไป (Phase 1 — Role A)
-1. **สร้าง `js/scheduler.js`** ตาม data contract ใน CLAUDE.md ข้อ 5
-   - เสร็จเมื่อ: มี `fcfs`, `sjf`, `roundRobin` และใช้ได้ทั้งใน browser (`window.Scheduler`) และ Node (`require`)
-2. **สร้าง `tests/scheduler.test.js`** โดยใช้ `node:assert` (ไม่มี dependency)
-   - เสร็จเมื่อ: `node tests/scheduler.test.js` ผ่าน TC-01 ถึง TC-05 และตรวจ invariant
-     (ผลรวมช่วง Gantt = ผลรวม BT, WT ≥ 0, CT สูงสุด = ผลรวม BT)
-3. **เรียก `algorithm-verifier`** กับ TC-01 และชุดสุ่มอีก 3 ชุด
-   - เสร็จเมื่อ: ไม่พบความต่างระหว่างการคำนวณมือกับผลของโค้ด
+## ▶ งานถัดไป (Phase 2 — Role B)
+1. **สร้าง `js/validation.js`** ตาม D-006, D-007
+   - ฟังก์ชัน `validateProcessCount(text)`, `validateBurstTimes(texts)`, `validateQuantum(text)`
+     คืน `{ ok: true, value }` หรือ `{ ok: false, message }` ข้อความภาษาไทยระบุโปรเซสที่ผิด
+   - เสร็จเมื่อ: `node tests/validation.test.js` ผ่าน TC-V01 ถึง TC-V08
+2. **สร้าง `index.html` + `css/style.css` + `js/ui.js`**
+   - ส่วน input: จำนวนโปรเซส, โหมด BT (สุ่ม 1–10 / กรอกเอง), Time Quantum (ค่าเริ่มต้น 2), ปุ่มคำนวณ
+   - ส่วนผลลัพธ์: แท็บ FCFS / SJF / RR / เปรียบเทียบ, ตาราง 7 คอลัมน์ + AVG WT (ทศนิยม 2 ตำแหน่ง)
+   - เสร็จเมื่อ: double-click `index.html` ใน Chrome แล้วได้ผล TC-01 ตรงกับ TEST_CASES
+3. **ประวัติ RR หลายค่า TQ** (D-008) และ Gantt chart (D-009)
 
-## ⏭ ถัดจากนั้น (Phase 2 — Role B, ทำคู่ขนานได้)
-- `js/validation.js` + test กรณี TC-V01 ถึง TC-V08
-- `index.html` + `js/ui.js` + `css/style.css`
+## ⏭ ถัดจากนั้น
+- Phase 4: ทดสอบผ่าน UI ทุก TC ใน Chrome และ Edge + จับภาพหน้าจอ
+- Phase 5: README.md แล้วเรียก `submission-auditor`

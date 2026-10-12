@@ -90,3 +90,6 @@ const result = {
 | `submission-auditor` | ก่อนส่งงาน หรือเมื่อจบแต่ละ Phase — ตรวจกับ checklist ใน `docs/SPEC.md` |
 
 เรียกใช้เมื่อผู้ใช้ขอ หรือเมื่อ NEXT_STEPS ระบุไว้ งานทั่วไปให้ทำใน session หลัก
+
+ถ้าเรียกด้วยชื่อแล้วไม่พบ agent (เช่น agent เพิ่งสร้างและ session ยังไม่โหลด) ให้ใช้ `general-purpose`
+แล้วสั่งให้อ่าน `.claude/agents/<ชื่อ>.md` และทำตามคำสั่งในไฟล์นั้นแทน
