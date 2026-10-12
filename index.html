@@ -150,7 +150,8 @@
           </button>
           <button type="button" id="settings-button" class="icon-button" aria-haspopup="dialog"
                   aria-label="ตั้งค่า" title="ตั้งค่า" data-i18n-aria-label="settingsButton" data-i18n-title="settingsButton">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6 M12 2v3 M12 19v3 M2 12h3 M19 12h3 M4.9 4.9l2.1 2.1 M17 17l2.1 2.1 M4.9 19.1L7 17 M17 7l2.1-2.1"/></svg>
+            <!-- ไอคอนแถบเลื่อนปรับค่า 3 เส้น (เดิมเป็นวงกลม + เส้นรอบ ๆ ซึ่งดูคล้ายไอคอนดวงอาทิตย์ของสวิตช์ธีมที่อยู่ข้างกัน) -->
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9 M17 7h3 M15 5a2 2 0 1 0 0 4a2 2 0 1 0 0-4 M4 12h3 M11 12h9 M9 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4 M4 17h10 M18 17h2 M16 15a2 2 0 1 0 0 4a2 2 0 1 0 0-4"/></svg>
           </button>
         </div>
 
@@ -252,33 +253,23 @@
     </div>
 
     <div class="settings-list">
+      <!-- ภาษาและโหมดมืดไม่อยู่ในนี้ เพราะมีปุ่มที่มุมขวาบนของหน้าหลักอยู่แล้ว (D-040) -->
+      <!-- สวิตช์ animation พื้นหลัง: aria-checked="true" = ทำงานอยู่ (theme.js ผูก event, D-041) -->
       <div class="settings-row">
         <div>
-          <strong data-i18n="settingsLanguage">ภาษา</strong>
-          <p class="hint" data-i18n="settingsLanguageHint">ข้อความบนหน้าเว็บทั้งหมด</p>
+          <strong data-i18n="settingsMotion">Animation พื้นหลัง</strong>
+          <p class="hint" data-i18n="settingsMotionHint">ปิดการเคลื่อนไหวของพื้นหลัง</p>
         </div>
-        <div class="language-switch" role="group" aria-label="เลือกภาษา" data-i18n-aria-label="languageGroup">
-          <button type="button" class="language-option" data-language="th" aria-pressed="true">TH</button>
-          <button type="button" class="language-option" data-language="en" aria-pressed="false">EN</button>
-        </div>
-      </div>
-
-      <div class="settings-row">
-        <div>
-          <strong data-i18n="settingsTheme">โหมดมืด</strong>
-          <p class="hint" data-i18n="settingsThemeHint">ถ้าไม่เคยเลือก จะใช้ตามการตั้งค่าของเครื่อง</p>
-        </div>
-        <button type="button" class="theme-switch" role="switch" aria-checked="false" aria-label="โหมดมืด" data-i18n-aria-label="themeSwitch">
-          <svg class="icon theme-switch-icon sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8 M12 2v2 M12 20v2 M2 12h2 M20 12h2 M5 5l1.5 1.5 M17.5 17.5L19 19 M5 19l1.5-1.5 M17.5 6.5L19 5"/></svg>
-          <svg class="icon theme-switch-icon moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
-          <span class="theme-switch-thumb" aria-hidden="true"></span>
+        <button type="button" id="motion-switch" class="toggle-switch" role="switch" aria-checked="true"
+                aria-label="Animation พื้นหลัง" data-i18n-aria-label="settingsMotion">
+          <span class="toggle-switch-thumb" aria-hidden="true"></span>
         </button>
       </div>
 
       <div class="settings-row danger-zone">
         <div>
           <strong data-i18n="settingsReset">ล้างข้อมูล CPU ที่บันทึกไว้</strong>
-          <p class="hint" data-i18n="settingsResetHint">ลบ CPU ทุกตัวแล้วเริ่มใหม่ที่ CPU 1 (ภาษาและธีมไม่เปลี่ยน)</p>
+          <p class="hint" data-i18n="settingsResetHint">ลบ CPU ทุกตัวแล้วเริ่มใหม่ที่ CPU 1 (ภาษา ธีม และ animation ไม่เปลี่ยน)</p>
         </div>
         <button type="button" id="reset-data-button" class="button ghost danger small" data-i18n="settingsResetButton">ล้างข้อมูล</button>
       </div>
