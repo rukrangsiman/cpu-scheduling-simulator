@@ -3020,7 +3020,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .rename-form {
-  margin-top: 22px;
+  margin-bottom: 20px;
 }
 
 .rename-form label {

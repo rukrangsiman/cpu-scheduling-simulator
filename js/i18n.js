@@ -99,7 +99,7 @@ var I18n = (function () {
       metaProcesses: '{count} โปรเซส',
       themeSwitch: 'โหมดมืด',
       languageGroup: 'เลือกภาษา',
-      footer: 'Term Project — CPU Scheduling Simulator · FCFS · SJF (Non-preemptive) · Round Robin · ทุกโปรเซสมี AT = 0',
+      footer: 'CPU Scheduling Simulator · FCFS · SJF (Non-preemptive) · Round Robin · ทุกโปรเซสมี AT = 0',
       errorTitle: 'กรุณาแก้ไขข้อมูลต่อไปนี้',
 
       // ---------- หน้าต่างโปรเซส ----------
@@ -318,7 +318,7 @@ var I18n = (function () {
       metaProcesses: '{count} processes',
       themeSwitch: 'Dark mode',
       languageGroup: 'Language',
-      footer: 'Term Project — CPU Scheduling Simulator · FCFS · SJF (Non-preemptive) · Round Robin · every process has AT = 0',
+      footer: 'CPU Scheduling Simulator · FCFS · SJF (Non-preemptive) · Round Robin · every process has AT = 0',
       errorTitle: 'Please fix the following',
 
       // ---------- Process window ----------

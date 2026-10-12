@@ -90,11 +90,11 @@ function renderCpuDialog() {
 
   var panel = createElement('div', 'modal-panel');
   panel.appendChild(createModalHead(t('cpuDialogEyebrow'), profile.name, 'cpu-dialog-title'));
+  panel.appendChild(createRenameForm(index)); // ไว้ใต้หัวข้อ เปลี่ยนชื่อได้ทันทีโดยไม่ต้องเลื่อนลงไปท้าย popup (D-038)
   panel.appendChild(createFigure(createBurstChart(profile),
     t('cpuFigureCaption', { count: profile.burstValues.length })));
   panel.appendChild(createCpuFacts(profile));
   panel.appendChild(createLastRunSummary(profile));
-  panel.appendChild(createRenameForm(index));
   panel.appendChild(createCpuActions(index));
   dialog.appendChild(panel);
 }
