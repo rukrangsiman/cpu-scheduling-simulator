@@ -3,7 +3,7 @@
 > AI: อัปเดตไฟล์นี้ทุกครั้งที่จบงาน (ติ๊ก checklist + เพิ่มบันทึก session ด้านล่าง)
 > สถานะ: ⬜ ยังไม่เริ่ม · 🟨 กำลังทำ · ✅ เสร็จ
 
-**Phase ปัจจุบัน:** Phase 1–3 เสร็จ (โปรแกรมใช้งานได้ครบ) → Phase 4 ทดสอบโดยสมาชิก และ Phase 5 README
+**Phase ปัจจุบัน:** โปรแกรมและ README เสร็จ → รอสมาชิกทดสอบ/กรอกข้อมูล (Phase 4–5) และเตรียมวิดีโอ (Phase 6)
 **อัปเดตล่าสุด:** 2026-10-12
 
 ---
@@ -39,8 +39,9 @@
 - ⬜ **สมาชิกคำนวณมือ TC-01 เอง** แล้วลงชื่อใน TEST_CASES (R1.6d — ห้ามให้ AI ทำแทน)
 
 ## Phase 5 — เอกสารส่งงาน
-- ⬜ README.md ครบ D3–D7
-- ⬜ เรียก `submission-auditor` ตรวจทั้งโปรเจ็ค
+- 🟨 README.md — เนื้อหาครบ D3–D7 แล้ว เหลือช่อง `______` ให้สมาชิกกรอก (ชื่อวิชา, สมาชิก, version browser, editor, ผู้ตรวจ, ลิงก์วิดีโอ)
+- ✅ เรียก `submission-auditor` — 24/44 ข้อผ่าน ข้อที่เหลือเป็นงานสมาชิก แก้ข้อผิดพลาดที่พบในเอกสารแล้ว (AI-005)
+- ⬜ เรียก `submission-auditor` อีกครั้งหลังสมาชิกกรอกข้อมูลครบ
 
 ## Phase 6 — วิดีโอ
 - ⬜ `docs/VIDEO_PLAN.md`: บทวิดีโอส่วนที่ 2 แบ่งช่วงให้สมาชิกทุกคน
@@ -56,3 +57,4 @@
 | 2026-10-12 | วางแผนโปรเจ็ค สร้าง CLAUDE.md, docs/ (SPEC, DECISIONS, PROGRESS, NEXT_STEPS, AI_LOG, TEST_CASES) และ subagents 2 ตัว | Claude Code |
 | 2026-10-12 | ยืนยัน DECISIONS, `git init`, เขียน `js/scheduler.js` และ `tests/scheduler.test.js` (17/17 ผ่าน), ตรวจด้วย algorithm-verifier | Claude Code |
 | 2026-10-12 | เขียน `js/validation.js` + test, `index.html`, `css/style.css`, `js/ui.js`, เพิ่ม `countContextSwitches`; ทดสอบผ่าน Browser pane ทั้งจอใหญ่/มือถือ/โหมดมืด-สว่าง | Claude Code |
+| 2026-10-12 | เขียน README.md, ตรวจด้วย submission-auditor แล้วแก้ README / TEST_CASES / DECISIONS / ข้อความในหน้าเว็บตามที่พบ | Claude Code |
