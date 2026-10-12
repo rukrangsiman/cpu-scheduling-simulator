@@ -11,6 +11,8 @@
 
 ทุกโปรเซสมี Arrival Time = 0 และเรียงลำดับเริ่มต้นเป็น P1, P2, …, Pn ตามที่โจทย์กำหนด
 
+**ลองใช้ออนไลน์:** https://rukrangsiman.github.io/cpu-scheduling-simulator/ (GitHub Pages — deploy จาก branch `main`)
+
 ---
 
 ## สารบัญ
@@ -54,7 +56,12 @@ node tests/validation.test.js
 node tests/profiles.test.js
 ```
 
-ผลที่ควรได้คือ `ผ่าน 19 / 19`, `ผ่าน 17 / 17` และ `ผ่าน 11 / 11` ตามลำดับ
+ผลที่ควรได้คือ `ผ่าน 19 / 19`, `ผ่าน 17 / 17` และ `ผ่าน 12 / 12` ตามลำดับ
+
+### (ไม่บังคับ) เปิดผ่านเว็บ
+
+เปิด https://rukrangsiman.github.io/cpu-scheduling-simulator/ ได้เลยโดยไม่ต้องดาวน์โหลด (ต้องใช้อินเทอร์เน็ต)
+ข้อมูล CPU ธีม และภาษาที่บันทึกบนเว็บแยกจากตอนเปิดไฟล์ในเครื่อง เพราะ browser เก็บ localStorage แยกตามที่อยู่ของหน้า
 
 ---
 

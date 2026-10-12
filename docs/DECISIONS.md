@@ -454,3 +454,13 @@ AI เสนอใน D-030 ว่าแถบเข้มบนพื้นค�
 - ล้างข้อมูล CPU ไม่เปลี่ยนค่านี้ (เหมือนภาษาและธีม)
 - วงแหวนในภาพชิปอยู่ใน `<symbol>` + `<use>` (shadow tree) selector ที่อ้างถึง `<html>` เข้าไม่ถึง จึงหยุดด้วยตัวแปร `--ring-animation: none` แทน
   (รอบแรก AI ใช้ selector ธรรมดา วงแหวนยังหมุน ผู้ใช้จับได้ — ดู AI-040)
+
+### D-042 Deploy ขึ้น GitHub Pages (public repo) — ✅ (ผู้ใช้ขอ 2026-10-13)
+ผู้ใช้ถามวิธี deploy ขึ้น public → AI เสนอ GitHub Pages / Netlify / Cloudflare Pages / Vercel → ผู้ใช้เลือก GitHub Pages, repo แบบ public (ชั่วคราว) และ merge เข้า `main` ก่อน
+- repo: https://github.com/rukrangsiman/cpu-scheduling-simulator (public) — push ทั้ง `main` และ `ui-multi-cpu-redesign`
+- เว็บ: https://rukrangsiman.github.io/cpu-scheduling-simulator/ — deploy จาก `main` โฟลเดอร์ root ทุกครั้งที่ push เข้า `main` เว็บจะอัปเดตเอง
+- `main` fast-forward ให้ตรงกับ `ui-multi-cpu-redesign` (main ไม่มี commit แยก จึงไม่มี merge commit / conflict)
+- ไม่ต้องแก้โค้ด: D-001 (ไม่มี absolute path / CDN / ES modules) ทำให้หน้าเว็บทำงานใต้ subpath `/cpu-scheduling-simulator/` ได้ทันที
+- **ผลที่ตามมา:** ไฟล์ทั้ง repo (รวม `docs/AI_LOG.md`, `CLAUDE.md`, `.claude/`) เปิดดูได้สาธารณะ, localStorage บนเว็บแยกจากตอนเปิดไฟล์ในเครื่อง
+  การส่งงานหลักยังเป็นไฟล์ zip / double-click `index.html` เหมือนเดิม (เว็บเป็นช่องทางเสริม)
+  ถ้าเปลี่ยน repo เป็น private ภายหลัง บัญชีฟรีจะใช้ Pages ไม่ได้ (เว็บจะปิด) และสิ่งที่เคย public ไปแล้วอาจถูก fork / cache ไว้
