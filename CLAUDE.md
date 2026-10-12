@@ -16,7 +16,7 @@ Term Project: เว็บจำลอง CPU Scheduling (FCFS, SJF Non-preempti
 
 ## 2. จบทุกงาน (Definition of Done)
 
-- [ ] `node tests/scheduler.test.js` และ `node tests/validation.test.js` ผ่านทั้งหมด
+- [ ] `node tests/scheduler.test.js`, `node tests/validation.test.js` และ `node tests/profiles.test.js` ผ่านทั้งหมด
 - [ ] ถ้าแก้ UI: เปิดผ่าน Browser pane (`.claude/launch.json` → `static`) แล้วลองใช้งานจริง ดู console error
       (Browser pane เปิด `file://` แบบภาพนิ่ง จึงต้องใช้ local server ตอนทดสอบ แต่ผู้ตรวจเปิดไฟล์ตรงได้)
 - [ ] ติ๊ก checklist และเพิ่มบันทึก session ใน `docs/PROGRESS.md`
@@ -38,10 +38,12 @@ Term Project: เว็บจำลอง CPU Scheduling (FCFS, SJF Non-preempti
   |---|---|---|
   | `js/scheduler.js` | อัลกอริทึม + คำนวณ ST/CT/TAT/WT/AVG | pure function, ห้ามแตะ DOM |
   | `js/validation.js` | ตรวจสอบ input | pure function, ห้ามแตะ DOM |
-  | `js/ui.js` | หน้าเว็บ 4 ขั้น, รับ input, เรียก scheduler, render ตาราง/Gantt | ห้ามคำนวณผลเอง |
+  | `js/profiles.js` | ข้อมูล CPU หลายตัว (สร้าง / ทำสำเนา / บันทึก localStorage) (D-014) | ห้ามแตะ DOM, ห้ามคำนวณผล |
+  | `js/ui.js` | แถบ CPU + แผงตั้งค่าแบบ dropdown + พื้นที่ผลลัพธ์ (D-017), รับ input, เรียก scheduler, render Gantt/KPI/ตาราง | ห้ามคำนวณผลเอง |
+  | `js/modals.js` | popup (`<dialog>`) รายละเอียด CPU / วิธีทำงาน / ตั้งค่า + ภาพประกอบ SVG (D-016) | ห้ามคำนวณผลเอง โหลดก่อน `ui.js` |
   | `js/theme.js` | สลับธีมมืด/สว่าง (โหลดใน `<head>`) | ไม่ยุ่งกับข้อมูลโปรเซส |
   | `js/i18n.js` | ข้อความบนหน้าเว็บ TH/EN (`I18n.t()`, `data-i18n`) | ข้อความใหม่ต้องเพิ่มทั้ง `th` และ `en` |
-- `scheduler.js` และ `validation.js` ต้องใช้ได้ทั้งใน browser และ Node:
+- `scheduler.js`, `validation.js` และ `profiles.js` ต้องใช้ได้ทั้งใน browser และ Node:
   ```js
   if (typeof module !== 'undefined' && module.exports) { module.exports = Scheduler; }
   ```

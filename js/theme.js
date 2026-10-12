@@ -45,14 +45,14 @@ var Theme = (function () {
   }
 
   // สวิตช์เลื่อนไปขวา (aria-checked="true") เมื่อเป็นโหมดมืด CSS ใช้ค่านี้เลื่อนปุ่มกลม
+  // มีสวิตช์ 2 อัน (มุมขวาบน และในหน้าตั้งค่า) จึงอัปเดตทุกอันที่มี class theme-switch ให้ตรงกันเสมอ
   // ชื่อของสวิตช์ ("โหมดมืด" / "Dark mode") ตั้งโดย i18n.js ผ่าน data-i18n-aria-label
   function updateSwitch() {
-    var themeSwitch = document.getElementById('theme-switch');
-    if (!themeSwitch) {
-      return;
-    }
     var isDark = getCurrentTheme() === 'dark';
-    themeSwitch.setAttribute('aria-checked', isDark ? 'true' : 'false');
+    var switches = document.querySelectorAll('.theme-switch');
+    for (var i = 0; i < switches.length; i++) {
+      switches[i].setAttribute('aria-checked', isDark ? 'true' : 'false');
+    }
   }
 
   function toggle() {
@@ -70,7 +70,10 @@ var Theme = (function () {
 
   // 2) สวิตช์อยู่ใน <body> ซึ่งยังไม่ถูกสร้าง จึงต้องรอให้หน้าเว็บโหลดเสร็จก่อนผูก event
   document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('theme-switch').addEventListener('click', toggle);
+    var switches = document.querySelectorAll('.theme-switch');
+    for (var i = 0; i < switches.length; i++) {
+      switches[i].addEventListener('click', toggle);
+    }
     updateSwitch();
   });
 

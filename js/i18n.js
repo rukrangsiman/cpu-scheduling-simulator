@@ -3,9 +3,9 @@
  *
  * วิธีใช้:
  *   - ข้อความคงที่ใน index.html: ใส่ data-i18n="ชื่อข้อความ" ที่แท็ก แล้ว applyToPage() จะเปลี่ยนให้
- *     (data-i18n-placeholder / data-i18n-aria-label ใช้กับ placeholder และ aria-label)
+ *     (data-i18n-placeholder / data-i18n-aria-label / data-i18n-title ใช้กับ placeholder, aria-label และ title)
  *   - ข้อความที่ ui.js สร้างเอง: เรียก I18n.t('ชื่อข้อความ', { ค่า: ... })
- *     เช่น t('rrTab', { quantum: 2 }) → 'Round Robin (TQ = 2)'
+ *     เช่น t('totalTime', { value: 22 }) → 'เวลารวม 22'
  *
  * ข้อความแจ้งเตือนการกรอกข้อมูลอยู่ใน validation.js (ส่งภาษาเป็นพารามิเตอร์)
  */
@@ -17,73 +17,173 @@ var I18n = (function () {
 
   var TEXTS = {
     th: {
-      // ---------- ส่วนหัว ----------
-      subtitle: 'จำลองการจัดลำดับการใช้ CPU ด้วย FCFS · SJF (Non-preemptive) · Round Robin — ทุกโปรเซสมี Arrival Time = 0',
+      // ---------- ส่วนหัวหน้าหลัก ----------
+      introBadge: 'OS Term Project',
+
+      // ---------- แถบ CPU และแผงตั้งค่า ----------
+      sidebarHide: 'ซ่อนแถบ CPU (ดูผลลัพธ์เต็มจอ)',
+      sidebarShow: 'แสดงแถบ CPU',
+      brandTagline: 'Simulation Studio',
+      cpuDetailsOf: 'รายละเอียดของ {name}',
+      toggleSettings: 'แสดง / ซ่อนการตั้งค่าของ {name}',
+      simulationSettings: 'ตั้งค่าการจำลอง',
+      resultsOf: 'ผลการจำลองของ',
+      settingsButton: 'ตั้งค่า',
+
+      // ---------- ส่วนหลัก ----------
+      manageCpu: 'จัดการ CPU',
+      howItWorks: 'วิธีทำงาน',
+
+      // ---------- popup ----------
+      closeDialog: 'ปิด',
+      cancel: 'ยกเลิก',
+      cpuDialogEyebrow: 'รายละเอียด CPU',
+      cpuFigureCaption: 'Burst Time ของแต่ละโปรเซส ({count} โปรเซส) สีตามที่เลือกไว้',
+      factProcesses: 'จำนวนโปรเซส',
+      factQuantum: 'Time Quantum',
+      factMode: 'วิธีกำหนด BT',
+      factStatus: 'สถานะ',
+      modeRandom: 'สุ่ม',
+      modeManual: 'กรอกเอง',
+      lastRunTitle: 'ผลการ Run ล่าสุด',
+      lastRunNone: 'ยังไม่ได้ Run — กด Run ในหน้าหลักเพื่อดูผลของ CPU นี้',
+      lastRunStale: 'ข้อมูลถูกแก้หลัง Run ครั้งล่าสุด ค่าด้านบนยังเป็นของข้อมูลเดิม',
+      renameLabel: 'ชื่อ CPU',
+      renameSave: 'บันทึกชื่อ',
+      openCpu: 'เปิด CPU นี้',
+      currentCpu: 'กำลังเปิดอยู่',
+      confirmDelete: 'ยืนยันการลบ',
+      algoDialogEyebrow: 'วิธีทำงาน',
+      readyQueue: 'คิวพร้อมทำงาน (ลำดับที่ได้ CPU ครั้งแรก)',
+      queueFigureTitle: 'ลำดับการได้ CPU',
+      ganttFigureTitle: 'Gantt chart ย่อ — ความกว้างตามเวลาที่ใช้ CPU',
+      figureFromCpu: 'จากผล Run ของ {name}',
+      figureFromExample: 'CPU นี้ยังไม่ได้ Run จึงคำนวณจากข้อมูลตัวอย่าง TC-01 (BT = 5, 3, 8, 6, TQ = 2)',
+      rrLoopLabel: 'ยังไม่เสร็จหลังใช้ CPU ครบ {quantum} หน่วย → กลับไปต่อท้ายคิว',
+      stepsTitle: 'ขั้นตอน',
+      stepFCFS1: 'เรียงคิวตามลำดับที่มาถึง — ทุกโปรเซสมาถึงพร้อมกัน (AT = 0) จึงเป็น P1 → Pn',
+      stepFCFS2: 'ให้โปรเซสหน้าคิวใช้ CPU จนทำงานเสร็จ',
+      stepFCFS3: 'ทำซ้ำกับโปรเซสถัดไปจนหมดคิว',
+      stepSJF1: 'ดูโปรเซสที่ยังรออยู่ทั้งหมด',
+      stepSJF2: 'เลือกตัวที่ BT น้อยที่สุด (ถ้าเท่ากัน หมายเลขน้อยกว่าได้ก่อน)',
+      stepSJF3: 'ให้ใช้ CPU จนเสร็จ แล้วเลือกตัวถัดไปแบบเดิม',
+      stepRR1: 'เริ่มคิวที่ P1 → Pn',
+      stepRR2: 'โปรเซสหน้าคิวใช้ CPU ได้ไม่เกิน Time Quantum',
+      stepRR3: 'ถ้ายังไม่เสร็จ กลับไปต่อท้ายคิว ทำจนทุกโปรเซสเสร็จ',
+
+      // ---------- ตั้งค่า ----------
+      settingsEyebrow: 'การตั้งค่า',
+      settingsTitle: 'ตั้งค่าโปรแกรม',
+      settingsLanguage: 'ภาษา',
+      settingsLanguageHint: 'ข้อความบนหน้าเว็บทั้งหมด',
+      settingsTheme: 'โหมดมืด',
+      settingsThemeHint: 'ถ้าไม่เคยเลือก จะใช้ตามการตั้งค่าของเครื่อง',
+      settingsReset: 'ล้างข้อมูล CPU ที่บันทึกไว้',
+      settingsResetHint: 'ลบ CPU ทุกตัวแล้วเริ่มใหม่ที่ CPU 1 (ภาษาและธีมไม่เปลี่ยน)',
+      settingsResetButton: 'ล้างข้อมูล',
+      settingsResetConfirm: 'ลบ CPU ทุกตัวและผลการจำลองทั้งหมดหรือไม่? ย้อนกลับไม่ได้',
+      confirmReset: 'ยืนยันล้างข้อมูล',
+
+      // ---------- แถบ CPU ด้านซ้าย ----------
+      cpuListTitle: 'CPU ของฉัน',
+      addCpu: 'เพิ่ม CPU',
+      cpuLimitNote: 'สร้างได้สูงสุด {max} ตัว ลบตัวที่ไม่ใช้ก่อนจึงจะเพิ่มได้',
+      cpuMeta: '{count} โปรเซส · TQ {quantum}',
+      statusIdle: 'ยังไม่ Run',
+      statusDone: 'Run แล้ว',
+      statusStale: 'ผลเก่า',
+
+      // ---------- หัวพื้นที่ทำงาน ----------
+      activeCpuLabel: 'CPU ที่เลือก',
+      duplicateCpu: 'ทำสำเนา',
+      deleteCpu: 'ลบ CPU นี้',
+      deleteConfirm: 'ลบ "{name}" และข้อมูลทั้งหมดของ CPU นี้หรือไม่? ลบแล้วย้อนกลับไม่ได้',
+      copyName: '{name} (สำเนา)',
+      metaProcesses: '{count} โปรเซส',
       themeSwitch: 'โหมดมืด',
       languageGroup: 'เลือกภาษา',
-      footer: 'Term Project — CPU Scheduling Simulator',
-
-      // ---------- แถบขั้นตอน ----------
-      stepperLabel: 'ขั้นตอนการใช้งาน',
-      step1Name: 'จำนวนโปรเซส',
-      step2Name: 'Burst Time และสี',
-      step3Name: 'Time Quantum',
-      step4Name: 'ผลลัพธ์',
+      footer: 'Term Project — CPU Scheduling Simulator · FCFS · SJF (Non-preemptive) · Round Robin · ทุกโปรเซสมี AT = 0',
       errorTitle: 'กรุณาแก้ไขข้อมูลต่อไปนี้',
-      nextButton: 'ถัดไป →',
-      backButton: '← ย้อนกลับ',
 
-      // ---------- ขั้นที่ 1 ----------
-      step1Title: 'ขั้นที่ 1 — กำหนดจำนวนโปรเซส',
-      step1Description: 'ระบบจะตั้งชื่อโปรเซสเป็น P1, P2, …, Pn และทุกโปรเซสมาถึงพร้อมกัน (AT = 0)',
+      // ---------- หน้าต่างโปรเซส ----------
+      processWindowTitle: 'โปรเซสและ Burst Time',
       processCountLabel: 'จำนวนโปรเซส',
-      processCountPlaceholder: 'เช่น 3, 5, 10',
       processCountHint: 'จำนวนเต็ม 1–20',
+      decreaseCount: 'ลดจำนวนโปรเซส',
+      increaseCount: 'เพิ่มจำนวนโปรเซส',
       burstModeLegend: 'วิธีกำหนด Burst Time',
-      burstModeRandom: 'ให้ระบบสุ่ม (1–10)',
+      burstModeRandom: 'สุ่ม (1–10)',
       burstModeManual: 'กรอกเอง',
-      exampleButton: 'ใช้ข้อมูลตัวอย่าง',
-      countMismatch: 'จำนวนโปรเซสเป็น {count} แต่มีช่อง Burst Time {burstCount} ช่อง กรุณากด "ถัดไป" ในขั้นที่ 1 เพื่อสร้างช่องใหม่',
-
-      // ---------- ขั้นที่ 2 ----------
-      step2Title: 'ขั้นที่ 2 — Burst Time และสีของแต่ละโปรเซส',
-      burstNoteRandom: 'ระบบสุ่ม Burst Time ให้แล้ว (จำนวนเต็ม {min}–{max}) ถ้าต้องการกรอกเอง ให้ย้อนกลับไปเลือก "กรอกเอง" ในขั้นที่ 1',
+      burstNoteRandom: 'สุ่ม Burst Time ให้แล้ว (จำนวนเต็ม {min}–{max}) ถ้าต้องการแก้ค่าเอง ให้เลือก "กรอกเอง"',
       burstNoteManual: 'กรอก Burst Time ของแต่ละโปรเซส เป็นจำนวนเต็ม 1–{max}',
       rerollButton: 'สุ่ม Burst Time ใหม่',
       resetColorsButton: 'ใช้สีเริ่มต้น',
-      colorHint: 'กดที่ช่องสีหน้าชื่อโปรเซสเพื่อเลือกสีที่ใช้ใน Gantt chart และตารางผลลัพธ์',
       burstInputLabel: 'Burst Time ของ {id}',
-      colorButtonLabel: 'เลือกสีของ {id} (ตอนนี้ {color})',
+      colorButtonLabel: 'กดเพื่อเปลี่ยนสีของ {id} (ตอนนี้ {color})',
       colorPopoverTitle: 'สีของ {id}',
       presetColors: 'สีตัวอย่าง',
       customColor: 'กำหนดเอง (RGB)',
       presetColorLabel: 'สี {color}',
 
-      // ---------- ขั้นที่ 3 ----------
-      step3Title: 'ขั้นที่ 3 — Time Quantum สำหรับ Round Robin',
-      step3Description: 'FCFS และ SJF ไม่ใช้ค่านี้ ระบบจะคำนวณทั้ง 3 อัลกอริทึมจากชุด Burst Time เดียวกัน',
+      // ---------- แท็บอัลกอริทึม ----------
+      algorithmGroup: 'เลือกอัลกอริทึมที่จะแสดงผล',
+      algoTypeLabel: 'ประเภท',
+      algoStrengthLabel: 'จุดเด่น',
+      algoLimitLabel: 'ข้อจำกัด',
+      typeNonPreemptive: 'Non-preemptive — ได้ CPU แล้วรันจนเสร็จ',
+      typePreemptive: 'Preemptive — ถูกพักเมื่อครบ Time Quantum',
+      summaryFCFS: 'โปรเซสได้ CPU ตามลำดับ P1 → Pn และรันจนเสร็จทีละโปรเซส',
+      summarySJF: 'เลือกโปรเซสที่ BT น้อยที่สุดก่อน ถ้า BT เท่ากันให้หมายเลขน้อยกว่าได้ก่อน',
+      summaryRR: 'ผลัดกันใช้ CPU ครั้งละไม่เกิน Time Quantum ถ้ายังไม่เสร็จให้กลับไปต่อท้ายคิว',
+      strengthFCFS: 'เข้าใจง่าย ไม่มีโปรเซสไหนถูกแซงคิว',
+      strengthSJF: 'ได้ AVG WT ต่ำที่สุดเมื่อทุกโปรเซสมาถึงพร้อมกัน',
+      strengthRR: 'ทุกโปรเซสได้ใช้ CPU เร็ว และผลัดกันอย่างเท่าเทียม',
+      limitFCFS: 'ถ้างานยาวมาก่อน งานสั้นต้องรอนาน (Convoy effect)',
+      limitSJF: 'ต้องรู้ BT ล่วงหน้า และงานยาวอาจต้องรอนาน',
+      limitRR: 'สลับโปรเซสบ่อย และผลขึ้นกับค่า Time Quantum',
       quantumLabel: 'Time Quantum (TQ)',
-      quantumHint: 'จำนวนเต็มบวก ค่าเริ่มต้น 2 — เปลี่ยนค่าแล้วกดคำนวณใหม่เพื่อเทียบผลบนชุดข้อมูลเดิม',
-      calculateButton: 'คำนวณทั้ง 3 อัลกอริทึม',
+      quantumHint: 'ใช้กับ Round Robin (จำนวนเต็ม 1–100)',
 
-      // ---------- ขั้นที่ 4 ----------
-      resultsTitle: 'ผลลัพธ์',
-      showFormulas: 'แสดงวิธีคำนวณ TAT / WT ในตาราง',
-      staleNote: 'ข้อมูลถูกแก้ไขหลังการคำนวณครั้งล่าสุด ผลด้านล่างยังเป็นของชุดข้อมูลเดิม — ทำขั้นที่ 1–3 ให้ครบแล้วกด "คำนวณทั้ง 3 อัลกอริทึม" อีกครั้งเพื่ออัปเดต',
-      datasetLabel: 'ชุดข้อมูลที่ใช้คำนวณ',
+      // ---------- แถบ Run ----------
+      runButton: 'RUN',
+      runButtonTitle: 'คำนวณ FCFS, SJF และ Round Robin พร้อมกัน',
+      compareButton: 'เปรียบเทียบ',
+
+      // ---------- พื้นที่ผลลัพธ์ ----------
+      resultsWindowTitle: 'ผลการจำลอง',
+      emptyTitle: 'CPU นี้ยังไม่มีผลการจำลอง',
+      emptyText: 'ตั้งค่าโปรเซสในการ์ด CPU ทางซ้าย แล้วกด Run เพื่อดู Gantt chart ค่าสรุป และตารางผลลัพธ์',
+      staleNote: 'ข้อมูลถูกแก้ไขหลัง Run ครั้งล่าสุด ผลด้านล่างยังเป็นของชุดข้อมูลเดิม — กด Run อีกครั้งเพื่ออัปเดต',
       totalBurst: 'รวม BT = {total}',
-      tabsLabel: 'เลือกดูผลของแต่ละอัลกอริทึม',
-      rrTab: 'Round Robin (TQ = {quantum})',
-      compareTab: 'เปรียบเทียบ',
-      changeQuantumButton: '← เปลี่ยน Time Quantum',
-      editProcessesButton: 'แก้ไขโปรเซส / Burst Time',
 
+      // ---------- Gantt chart ----------
+      ganttEyebrow: 'ไทม์ไลน์การใช้ CPU',
+      ganttTitle: 'Gantt Chart',
+      totalTime: 'เวลารวม {value}',
       describeFCFS: 'มาก่อนได้ก่อน: ทุกโปรเซสมาถึงพร้อมกัน (AT = 0) จึงได้ CPU ตามลำดับ P1 → Pn และรันจนเสร็จทีละโปรเซส',
       describeSJF: 'งานสั้นได้ก่อน: เลือกโปรเซสที่ BT น้อยที่สุดก่อนและรันจนเสร็จ ถ้า BT เท่ากันให้หมายเลขน้อยกว่าได้ก่อน',
       describeRR: 'ผลัดกันใช้ CPU ครั้งละไม่เกิน {quantum} หน่วยเวลา ถ้ายังไม่เสร็จให้กลับไปต่อท้ายคิว ST คือเวลาที่ได้ CPU ครั้งแรก',
-      cpuOrder: 'ลำดับการได้ CPU: {order}',
-      ganttTitle: 'Gantt Chart',
-      resultTableTitle: 'ตารางผลลัพธ์',
+      orderLabel: 'ลำดับการได้ CPU',
+      orderRun: 'รัน {duration}',
+      slotLabel: '{id} ได้ CPU ช่วง {start}–{end} นาน {duration} หน่วยเวลา',
+      tooltipStart: 'เริ่ม',
+      tooltipEnd: 'สิ้นสุด',
+      tooltipDuration: 'ระยะเวลา',
+
+      // ---------- ค่าสรุป (KPI) ----------
+      kpiGroup: 'ค่าสรุปของ {name}',
+      avgWtTitle: 'AVG WT',
+      avgWtFull: 'Average Waiting Time',
+      avgTatTitle: 'AVG TAT',
+      avgTatFull: 'Average Turnaround Time',
+      kpiTotalTitle: 'เวลารวม',
+      kpiTotalFull: 'Total time',
+      kpiSwitchTitle: 'สลับโปรเซส',
+      kpiSwitchFull: 'Process switches',
+
+      // ---------- ตารางผลลัพธ์ ----------
+      resultTableTitle: 'ตารางผลลัพธ์ของแต่ละโปรเซส',
+      showFormulas: 'แสดงวิธีคำนวณ TAT / WT ในตาราง',
       headerProcess: 'ชื่อโปรเซส',
       headerAT: 'Arrival Time — เวลาที่มาถึง',
       headerBT: 'Burst Time — เวลาที่ต้องใช้ CPU',
@@ -92,16 +192,13 @@ var I18n = (function () {
       headerTAT: 'Turnaround Time = CT − AT',
       headerWT: 'Waiting Time = TAT − BT',
       average: 'ค่าเฉลี่ย',
-      avgWtTitle: 'AVG WT (Average Waiting Time)',
-      avgTatTitle: 'AVG TAT (Average Turnaround Time)',
 
       // ---------- สูตรการคำนวณ ----------
       formulaTitle: 'สูตรการคำนวณของแต่ละค่า',
       formulaExampleFor: 'แทนค่าด้วยข้อมูลของ',
-      formulaVariable: 'ค่า',
-      formulaMeaning: 'ความหมาย',
       formulaRule: 'สูตร / วิธีหา',
       formulaExample: 'แทนค่า ({id})',
+      formulaExampleAll: 'แทนค่า (ทุกโปรเซส)',
       meaningAT: 'Arrival Time — เวลาที่โปรเซสมาถึง',
       meaningBT: 'Burst Time — เวลาที่ต้องใช้ CPU',
       meaningST: 'Start Time — เวลาที่ได้ CPU ครั้งแรก',
@@ -125,87 +222,189 @@ var I18n = (function () {
       exampleSTRoundRobin: 'ST = {value} (ช่วงแรก {start}–{end})',
       exampleCTRoundRobin: 'CT = {value} (ช่วงสุดท้าย {start}–{end}, ได้ CPU ทั้งหมด {count} ครั้ง)',
 
-      // ---------- แท็บเปรียบเทียบ ----------
-      compareTitle: 'เปรียบเทียบ 3 อัลกอริทึม (ชุดข้อมูลเดียวกัน)',
-      avgWtChartTitle: 'AVG WT (ยิ่งน้อยยิ่งดี)',
+      // ---------- เปรียบเทียบ ----------
+      compareEyebrow: 'ชุดข้อมูลเดียวกัน',
+      compareTitle: 'เปรียบเทียบ 3 อัลกอริทึม',
+      avgChartTitle: 'AVG WT และ AVG TAT (ยิ่งน้อยยิ่งดี)',
       summaryTitle: 'สรุปค่าเฉลี่ย',
       algorithmHeader: 'อัลกอริทึม',
       contextSwitchHeader: 'จำนวนครั้งที่สลับโปรเซส',
       badgeLowest: 'ต่ำสุด',
       lowestNote: 'AVG WT ต่ำสุดสำหรับชุดข้อมูลนี้: {names} ({value})',
+      compareCaveat: 'ค่าต่ำสุดในชุดข้อมูลนี้ไม่ได้แปลว่าอัลกอริทึมนั้นดีที่สุดในทุกสถานการณ์',
       rrHistoryTitle: 'Round Robin เมื่อเปลี่ยน Time Quantum',
       badgeShowing: 'กำลังแสดง',
-      rrHistoryNote: 'กดปุ่ม "← เปลี่ยน Time Quantum" ด้านล่าง ใส่ค่าใหม่แล้วกดคำนวณ ระบบจะใช้ชุด BT เดิมและเพิ่มแถวในตารางนี้ (ถ้าชุด BT เปลี่ยน ตารางนี้จะเริ่มใหม่)'
+      rrHistoryNote: 'เปลี่ยนค่า Time Quantum ท้ายหน้าต่างโปรเซส แล้วกด Run อีกครั้ง ระบบจะใช้ชุด BT เดิมและเพิ่มแถวในตารางนี้ (ถ้าชุด BT เปลี่ยน ตารางนี้จะเริ่มใหม่) ถ้าอยากเก็บข้อมูลหลายแบบไว้เทียบกัน ให้กด "ทำสำเนา" CPU นี้'
     },
 
     en: {
-      // ---------- Header ----------
-      subtitle: 'Simulates CPU scheduling with FCFS · SJF (Non-preemptive) · Round Robin — every process has Arrival Time = 0',
+      // ---------- Main header ----------
+      introBadge: 'OS Term Project',
+
+      // ---------- CPU sidebar and settings panel ----------
+      sidebarHide: 'Hide CPU sidebar (full-width results)',
+      sidebarShow: 'Show CPU sidebar',
+      brandTagline: 'Simulation Studio',
+      cpuDetailsOf: 'Details of {name}',
+      toggleSettings: 'Show / hide settings of {name}',
+      simulationSettings: 'Simulation settings',
+      resultsOf: 'Results for',
+      settingsButton: 'Settings',
+
+      // ---------- Main area ----------
+      manageCpu: 'Manage CPU',
+      howItWorks: 'How it works',
+
+      // ---------- Popups ----------
+      closeDialog: 'Close',
+      cancel: 'Cancel',
+      cpuDialogEyebrow: 'CPU details',
+      cpuFigureCaption: 'Burst Time of each process ({count} processes) in their chosen colors',
+      factProcesses: 'Processes',
+      factQuantum: 'Time Quantum',
+      factMode: 'Burst Time mode',
+      factStatus: 'Status',
+      modeRandom: 'Random',
+      modeManual: 'Manual',
+      lastRunTitle: 'Latest run',
+      lastRunNone: 'Not run yet — press Run on the main page to see results for this CPU',
+      lastRunStale: 'The data changed after the last Run, so these values are for the old data',
+      renameLabel: 'CPU name',
+      renameSave: 'Save name',
+      openCpu: 'Open this CPU',
+      currentCpu: 'Currently open',
+      confirmDelete: 'Delete',
+      algoDialogEyebrow: 'How it works',
+      readyQueue: 'Ready queue (order of first CPU turn)',
+      queueFigureTitle: 'CPU order',
+      ganttFigureTitle: 'Mini Gantt chart — width follows CPU time',
+      figureFromCpu: 'from the latest run of {name}',
+      figureFromExample: 'This CPU has not been run, so this uses sample data TC-01 (BT = 5, 3, 8, 6, TQ = 2)',
+      rrLoopLabel: 'Not finished after {quantum} time units → back to the end of the queue',
+      stepsTitle: 'Steps',
+      stepFCFS1: 'Queue processes in arrival order — all arrive together (AT = 0), so P1 → Pn',
+      stepFCFS2: 'The process at the front uses the CPU until it finishes',
+      stepFCFS3: 'Repeat with the next process until the queue is empty',
+      stepSJF1: 'Look at every waiting process',
+      stepSJF2: 'Pick the one with the smallest BT (ties go to the lower process number)',
+      stepSJF3: 'Run it to completion, then pick the next one the same way',
+      stepRR1: 'Start the queue as P1 → Pn',
+      stepRR2: 'The process at the front uses the CPU for at most one Time Quantum',
+      stepRR3: 'If it is not finished, it goes to the end of the queue. Repeat until all finish',
+
+      // ---------- Settings ----------
+      settingsEyebrow: 'Settings',
+      settingsTitle: 'Preferences',
+      settingsLanguage: 'Language',
+      settingsLanguageHint: 'All text on the page',
+      settingsTheme: 'Dark mode',
+      settingsThemeHint: 'Follows your device setting until you choose',
+      settingsReset: 'Clear saved CPUs',
+      settingsResetHint: 'Delete every CPU and start again with CPU 1 (language and theme stay)',
+      settingsResetButton: 'Clear data',
+      settingsResetConfirm: 'Delete every CPU and all simulation results? This cannot be undone',
+      confirmReset: 'Clear everything',
+
+      // ---------- CPU list (left) ----------
+      cpuListTitle: 'My CPUs',
+      addCpu: 'Add CPU',
+      cpuLimitNote: 'Up to {max} CPUs. Delete one you no longer need to add another',
+      cpuMeta: '{count} processes · TQ {quantum}',
+      statusIdle: 'Not run yet',
+      statusDone: 'Up to date',
+      statusStale: 'Out of date',
+
+      // ---------- Workspace header ----------
+      activeCpuLabel: 'Selected CPU',
+      duplicateCpu: 'Duplicate',
+      deleteCpu: 'Delete this CPU',
+      deleteConfirm: 'Delete "{name}" and all of its data? This cannot be undone',
+      copyName: '{name} (copy)',
+      metaProcesses: '{count} processes',
       themeSwitch: 'Dark mode',
       languageGroup: 'Language',
-      footer: 'Term Project — CPU Scheduling Simulator',
-
-      // ---------- Stepper ----------
-      stepperLabel: 'Steps',
-      step1Name: 'Processes',
-      step2Name: 'Burst Time & colors',
-      step3Name: 'Time Quantum',
-      step4Name: 'Results',
+      footer: 'Term Project — CPU Scheduling Simulator · FCFS · SJF (Non-preemptive) · Round Robin · every process has AT = 0',
       errorTitle: 'Please fix the following',
-      nextButton: 'Next →',
-      backButton: '← Back',
 
-      // ---------- Step 1 ----------
-      step1Title: 'Step 1 — Number of processes',
-      step1Description: 'Processes are named P1, P2, …, Pn and all arrive at the same time (AT = 0)',
+      // ---------- Process window ----------
+      processWindowTitle: 'Processes & Burst Time',
       processCountLabel: 'Number of processes',
-      processCountPlaceholder: 'e.g. 3, 5, 10',
       processCountHint: 'Whole number 1–20',
+      decreaseCount: 'Remove a process',
+      increaseCount: 'Add a process',
       burstModeLegend: 'How to set Burst Time',
       burstModeRandom: 'Random (1–10)',
-      burstModeManual: 'Enter manually',
-      exampleButton: 'Use sample data',
-      countMismatch: 'Number of processes is {count} but there are {burstCount} Burst Time fields. Please press "Next" in step 1 to rebuild them',
-
-      // ---------- Step 2 ----------
-      step2Title: 'Step 2 — Burst Time and color of each process',
-      burstNoteRandom: 'Burst Times were generated randomly (whole numbers {min}–{max}). To type them yourself, go back and choose "Enter manually" in step 1',
+      burstModeManual: 'Manual',
+      burstNoteRandom: 'Burst Times were generated randomly (whole numbers {min}–{max}). Choose "Manual" to edit them yourself',
       burstNoteManual: 'Enter the Burst Time of each process as a whole number 1–{max}',
       rerollButton: 'Randomize again',
       resetColorsButton: 'Default colors',
-      colorHint: 'Click the color box next to a process name to choose its color in the Gantt chart and result table',
       burstInputLabel: 'Burst Time of {id}',
-      colorButtonLabel: 'Choose color of {id} (currently {color})',
+      colorButtonLabel: 'Click to change the color of {id} (currently {color})',
       colorPopoverTitle: 'Color of {id}',
       presetColors: 'Sample colors',
       customColor: 'Custom (RGB)',
       presetColorLabel: 'Color {color}',
 
-      // ---------- Step 3 ----------
-      step3Title: 'Step 3 — Time Quantum for Round Robin',
-      step3Description: 'FCFS and SJF do not use this value. All 3 algorithms are calculated from the same Burst Times',
+      // ---------- Algorithm tabs ----------
+      algorithmGroup: 'Choose an algorithm to view',
+      algoTypeLabel: 'Type',
+      algoStrengthLabel: 'Strength',
+      algoLimitLabel: 'Limitation',
+      typeNonPreemptive: 'Non-preemptive — runs to completion once it gets the CPU',
+      typePreemptive: 'Preemptive — paused when the Time Quantum ends',
+      summaryFCFS: 'Processes get the CPU in order P1 → Pn and each runs to completion',
+      summarySJF: 'The process with the smallest BT runs first. If BTs are equal, the lower process number goes first',
+      summaryRR: 'Processes take turns for at most one Time Quantum. An unfinished process goes back to the end of the queue',
+      strengthFCFS: 'Simple, and no process ever jumps the queue',
+      strengthSJF: 'Lowest AVG WT when every process arrives at the same time',
+      strengthRR: 'Every process gets the CPU early, and turns are shared fairly',
+      limitFCFS: 'A long job at the front makes short jobs wait (convoy effect)',
+      limitSJF: 'BT must be known in advance, and long jobs may wait a long time',
+      limitRR: 'Frequent process switches, and results depend on the Time Quantum',
       quantumLabel: 'Time Quantum (TQ)',
-      quantumHint: 'Positive whole number, default 2 — change it and calculate again to compare on the same data',
-      calculateButton: 'Calculate all 3 algorithms',
+      quantumHint: 'Used by Round Robin (whole number 1–100)',
 
-      // ---------- Step 4 ----------
-      resultsTitle: 'Results',
-      showFormulas: 'Show TAT / WT calculation in the table',
-      staleNote: 'The data was changed after the last calculation, so the results below are for the old data — complete steps 1–3 and press "Calculate all 3 algorithms" again to update',
-      datasetLabel: 'Data used',
+      // ---------- Run strip ----------
+      runButton: 'RUN',
+      runButtonTitle: 'Run FCFS, SJF and Round Robin together',
+      compareButton: 'Compare',
+
+      // ---------- Results area ----------
+      resultsWindowTitle: 'Simulation results',
+      emptyTitle: 'This CPU has no results yet',
+      emptyText: 'Set up the processes in the CPU card on the left, then press Run to see the Gantt chart, summary values and result table',
+      staleNote: 'The data was changed after the last Run, so the results below are for the old data — press Run again to update',
       totalBurst: 'Total BT = {total}',
-      tabsLabel: 'Choose an algorithm to view',
-      rrTab: 'Round Robin (TQ = {quantum})',
-      compareTab: 'Compare',
-      changeQuantumButton: '← Change Time Quantum',
-      editProcessesButton: 'Edit processes / Burst Time',
 
+      // ---------- Gantt chart ----------
+      ganttEyebrow: 'CPU Execution Timeline',
+      ganttTitle: 'Gantt Chart',
+      totalTime: 'Total time {value}',
       describeFCFS: 'First come, first served: all processes arrive together (AT = 0), so they get the CPU in order P1 → Pn and each runs to completion',
       describeSJF: 'Shortest job first: the process with the smallest BT runs first, to completion. If BTs are equal, the lower process number goes first',
       describeRR: 'Processes take turns using the CPU for at most {quantum} time units. An unfinished process goes back to the end of the queue. ST is the first time it gets the CPU',
-      cpuOrder: 'CPU order: {order}',
-      ganttTitle: 'Gantt Chart',
-      resultTableTitle: 'Result table',
+      orderLabel: 'CPU order',
+      orderRun: 'ran {duration}',
+      slotLabel: '{id} runs from {start} to {end} ({duration} time units)',
+      tooltipStart: 'Start',
+      tooltipEnd: 'End',
+      tooltipDuration: 'Duration',
+
+      // ---------- Summary values (KPI) ----------
+      kpiGroup: 'Summary of {name}',
+      avgWtTitle: 'AVG WT',
+      avgWtFull: 'Average Waiting Time',
+      avgTatTitle: 'AVG TAT',
+      avgTatFull: 'Average Turnaround Time',
+      kpiTotalTitle: 'Total time',
+      kpiTotalFull: 'Time until all processes finish',
+      kpiSwitchTitle: 'Switches',
+      kpiSwitchFull: 'Process switches',
+
+      // ---------- Result table ----------
+      resultTableTitle: 'Process Metrics',
+      showFormulas: 'Show TAT / WT calculation in the table',
       headerProcess: 'Process name',
       headerAT: 'Arrival Time',
       headerBT: 'Burst Time — CPU time needed',
@@ -214,16 +413,13 @@ var I18n = (function () {
       headerTAT: 'Turnaround Time = CT − AT',
       headerWT: 'Waiting Time = TAT − BT',
       average: 'Average',
-      avgWtTitle: 'AVG WT (Average Waiting Time)',
-      avgTatTitle: 'AVG TAT (Average Turnaround Time)',
 
       // ---------- Formulas ----------
-      formulaTitle: 'Formula for each value',
+      formulaTitle: 'How metrics are calculated',
       formulaExampleFor: 'Plug in the data of',
-      formulaVariable: 'Value',
-      formulaMeaning: 'Meaning',
       formulaRule: 'Formula / how to find',
       formulaExample: 'Worked example ({id})',
+      formulaExampleAll: 'Worked example (all processes)',
       meaningAT: 'Arrival Time — when the process arrives',
       meaningBT: 'Burst Time — CPU time the process needs',
       meaningST: 'Start Time — first time it gets the CPU',
@@ -247,17 +443,19 @@ var I18n = (function () {
       exampleSTRoundRobin: 'ST = {value} (first slot {start}–{end})',
       exampleCTRoundRobin: 'CT = {value} (last slot {start}–{end}, {count} CPU turns in total)',
 
-      // ---------- Compare tab ----------
-      compareTitle: 'Comparing the 3 algorithms (same data)',
-      avgWtChartTitle: 'AVG WT (lower is better)',
+      // ---------- Compare ----------
+      compareEyebrow: 'Same data',
+      compareTitle: 'Algorithm Comparison',
+      avgChartTitle: 'AVG WT and AVG TAT (lower is better)',
       summaryTitle: 'Average summary',
       algorithmHeader: 'Algorithm',
       contextSwitchHeader: 'Process switches',
       badgeLowest: 'lowest',
       lowestNote: 'Lowest AVG WT for this data: {names} ({value})',
+      compareCaveat: 'The lowest value for this data does not mean that algorithm is the best in every situation',
       rrHistoryTitle: 'Round Robin with different Time Quantum',
       badgeShowing: 'showing',
-      rrHistoryNote: 'Press "← Change Time Quantum" below, enter a new value and calculate. The same BTs are used and a row is added to this table (the table restarts if the BTs change)'
+      rrHistoryNote: 'Change the Time Quantum at the bottom of the process window and press Run again. The same BTs are used and a row is added to this table (the table restarts if the BTs change). To keep several setups side by side, duplicate this CPU'
     }
   };
 
@@ -312,6 +510,11 @@ var I18n = (function () {
     var labelledElements = document.querySelectorAll('[data-i18n-aria-label]');
     for (var k = 0; k < labelledElements.length; k++) {
       labelledElements[k].setAttribute('aria-label', t(labelledElements[k].getAttribute('data-i18n-aria-label')));
+    }
+    // title = กล่องข้อความเล็กที่ขึ้นเมื่อชี้เมาส์ (ใช้กับปุ่มที่มีแต่ไอคอน)
+    var titledElements = document.querySelectorAll('[data-i18n-title]');
+    for (var m = 0; m < titledElements.length; m++) {
+      titledElements[m].title = t(titledElements[m].getAttribute('data-i18n-title'));
     }
   }
 

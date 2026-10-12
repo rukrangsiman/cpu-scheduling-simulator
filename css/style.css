@@ -1,896 +1,2404 @@
-/* style.css — หน้าตาของโปรแกรม (Role B) */
+/* style.css — หน้าตาของโปรแกรม (Role B) — Minimal Luxury (DECISIONS D-016)
+ *
+ * แนวคิด: "นิ่ง แต่โดดเด่น" — สีน้อย พื้นผิวสวย ใช้ระยะห่างและเงานุ่มแยกชั้นของหน้าจอ
+ * ชั้นจากหลังไปหน้า: 1) พื้นหลัง  2) แถบ CPU ด้านซ้าย / พื้นผิวผลลัพธ์ (.surface)  3) การ์ด  4) popup
+ * แถบซ้าย = รายการ CPU ที่กดแล้วการตั้งค่ากางลงมาเป็น dropdown / ตรงกลาง = ผลลัพธ์อย่างเดียว (D-017)
+ *
+ * โครงไฟล์:
+ *   1) Design tokens: ธีมสว่าง "Cream" และธีมมืด "Ink"
+ *   2) พื้นฐาน (ตัวอักษร, ไอคอน, ปุ่ม, ช่องกรอก)
+ *   3) พื้นหลัง และโครงหน้า (แถบ CPU + dropdown ตั้งค่า, ส่วนหัว, พื้นผิวผลลัพธ์)
+ *   4) การ์ดเนื้อหา (โปรเซส, ผลลัพธ์, Gantt, ค่าสรุป, ตาราง, สูตร, เปรียบเทียบ)
+ *   5) popup และกล่องลอย
+ *   6) Animation, Responsive, การลดการเคลื่อนไหว
+ *
+ * ทุก component ใช้สีจากตัวแปร (--ชื่อ) เท่านั้น เปลี่ยนธีมได้โดยเปลี่ยนชุดตัวแปรชุดเดียว
+ */
 
-/* ---------- สีและขนาด (เปลี่ยนที่นี่ที่เดียว) ---------- */
+/* ---------- 1) Design tokens: ธีมสว่าง "Cream" (ค่าเริ่มต้น) ---------- */
 :root {
-  --bg: #f4f6fa;
-  --surface: #ffffff;
-  --surface-muted: #f0f3f8;
-  --border: #d9dfe8;
-  --text: #1c2430;
-  --text-muted: #5b6676;
-  --primary: #2f5bd3;
-  --primary-hover: #2449ad;
-  --primary-soft: #e6edfc;
-  --danger: #c0352b;
-  --danger-soft: #fdeceb;
-  --warning-soft: #fff6dc;
-  --warning-text: #7a5600;
-  --success: #1e7d4f;
-  --success-soft: #e3f4ea;
-  --radius: 10px;
-  --shadow: 0 1px 3px rgba(20, 30, 50, 0.08);
+  /* พื้นผิว เรียงจากชั้นล่างไปบน */
+  --bg-base: #f3ece3;                        /* พื้นหลังสีครีม */
+  --bg-surface: rgba(251, 248, 243, 0.64);   /* พื้นผิวหลักของแอป */
+  --bg-card: #fffdfa;                        /* การ์ด (ขาวนวล ไม่ขาวจัด) */
+  --bg-inset: #f5eee6;                       /* ช่องด้านในการ์ด (เบจอ่อน) */
+  --surface-hover: #efe5da;
+  --input-bg: #ffffff;
+  --track-bg: #eee3d7;
+
+  /* แถบเมนูซ้าย: น้ำเงินเข้มหม่น ตัดกับพื้นครีม */
+  --bg-sidebar: #20233a;
+  --sidebar-surface: #2b2f4a;
+  --sidebar-hover: #353a59;
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-text: #f1ecf2;
+  --sidebar-muted: #c6c3d8;                  /* สว่างพอบนแถบที่โปร่ง (contrast ≥ 5:1) */
+  --cpu-active-bg: #fbf6ef;                  /* CPU ที่เลือก = การ์ดสีครีมลอยเด่นบนพื้นเข้ม */
+  --cpu-active-text: #22253a;
+  --cpu-active-muted: #625e72;
+
+  /* ตัวอักษร (น้ำเงินหมึก ไม่ใช่ดำสนิท) */
+  --text-primary: #22253a;
+  --text-secondary: #4d4e66;
+  --text-muted: #6a6679;
+
+  --border-soft: rgba(34, 37, 58, 0.07);
+  --border: rgba(34, 37, 58, 0.13);
+  --border-strong: rgba(34, 37, 58, 0.22);
+
+  /* สีเน้น: คอรัล (หลัก) / ลาเวนเดอร์หม่น / ทองแชมเปญ / ชมพูหม่น */
+  --accent: #d9664f;
+  --accent-text: #ad4733;                    /* คอรัลเข้มพอให้อ่านบนพื้นอ่อน */
+  --accent-soft: #fbe5dc;
+  --accent-lavender: #8278c4;
+  --accent-gold: #bf9454;
+  --accent-rose: #c96a82;
+  --button-from: #bd4f39;                    /* ปุ่มหลักใช้ตัวอักษรขาว จึงต้องเข้มพอ (contrast ≥ 4.5:1) */
+  --button-to: #b0476b;
+  --focus-color: #c9573f;
+
+  --color-success: #266f4f;
+  --color-warning: #8f610b;
+  --color-error: #b3364d;
+  --success-soft: #e2f1e9;
+  --warning-soft: #fbefd8;
+  --error-soft: #fbe4e7;
+  --badge-text: #ffffff;
+
+
+  /* สีประจำ CPU ในแถบซ้าย วนตามลำดับ */
+  --cpu-accent-0: #d9664f;
+  --cpu-accent-1: #8278c4;
+  --cpu-accent-2: #bf9454;
+  --cpu-accent-3: #c96a82;
+
+  /* เงานุ่ม 4 ระดับ ยิ่งลอยสูง เงายิ่งกว้างและจาง */
+  --shadow-xs: 0 1px 2px rgba(48, 36, 44, 0.06);
+  --shadow-sm: 0 1px 2px rgba(48, 36, 44, 0.05), 0 4px 12px -4px rgba(48, 36, 44, 0.1);
+  --shadow-md: 0 1px 2px rgba(48, 36, 44, 0.04), 0 12px 30px -14px rgba(72, 44, 52, 0.2);
+  --shadow-lg: 0 2px 6px rgba(48, 36, 44, 0.04), 0 30px 70px -30px rgba(72, 44, 52, 0.34);
+  --shadow-popup: 0 4px 10px rgba(30, 24, 40, 0.06), 0 40px 90px -24px rgba(30, 24, 40, 0.45);
+  --shadow-button: 0 10px 22px -10px rgba(185, 72, 72, 0.6);
+
+  /* พื้นหลัง */
+  --glow-1: rgba(214, 198, 238, 0.55);       /* ลาเวนเดอร์จาง มุมขวาบน */
+  --glow-2: rgba(246, 205, 180, 0.6);        /* พีชจาง มุมซ้ายล่าง */
+  --sun-from: rgba(247, 196, 160, 0.9);
+  --sun-to: rgba(236, 160, 172, 0.45);
+  --sun-opacity: 0.55;
+  --ember: rgba(247, 165, 112, 0.55);         /* แสงส้ม ambient ที่ขยาย/หดในพื้นหลัง */
+  --art-color: #7a5fa8;                      /* เส้นภาพชิป CPU พื้นหลัง (จางด้วย --art-opacity) */
+  --art-opacity: 0.16;
+  --panel-sidebar: rgba(21, 24, 43, 0.78);   /* แถบซ้ายโปร่ง 22% (สีเข้มกว่า --bg-sidebar เล็กน้อย ตัวอักษรจึงยังอ่านชัด) */
+  --figure-from: #fdf1ea;                    /* พื้นภาพประกอบใน popup */
+  --figure-to: #f1ecf8;
+  --title-gradient: linear-gradient(100deg, #262a4f 0%, #6e4f8f 34%, #c9573f 70%, #d9965a 100%);
+
   color-scheme: light;
 }
 
-/* โหมดมืด ใช้ได้ 2 ทาง:
+/* ธีมมืด "Ink" ใช้ได้ 2 ทาง:
    1) ผู้ใช้ไม่ได้กดปุ่มสลับ และเครื่องตั้งเป็นโหมดมืด (@media)
    2) ผู้ใช้กดปุ่มสลับเป็นโหมดมืด (theme.js ใส่ data-theme="dark" ที่ <html>)
    CSS รวมสองกรณีไว้ใน selector เดียวไม่ได้ จึงต้องเขียนชุดสีซ้ำสองที่ ถ้าแก้สีให้แก้ทั้งสองที่ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #12161d;
-    --surface: #1b2029;
-    --surface-muted: #232a35;
-    --border: #333c4a;
-    --text: #e6eaf0;
-    --text-muted: #9aa5b5;
-    --primary: #6d93f2;
-    --primary-hover: #8aa8f5;
-    --primary-soft: #23304d;
-    --danger: #f07b72;
-    --danger-soft: #3a2224;
-    --warning-soft: #3a3120;
-    --warning-text: #f0cf7a;
-    --success: #5fcf95;
-    --success-soft: #1d3428;
-    --shadow: none;
+    --bg-base: #121320;
+    --bg-surface: rgba(25, 27, 41, 0.62);
+    --bg-card: #1d1f2f;
+    --bg-inset: #171928;
+    --surface-hover: #262941;
+    --input-bg: #141626;
+    --track-bg: #2a2d44;
+
+    --bg-sidebar: #0d0e18;
+    --sidebar-surface: #1b1d2d;
+    --sidebar-hover: #24273b;
+    --sidebar-border: rgba(255, 255, 255, 0.07);
+    --sidebar-text: #f1ecf2;
+    --sidebar-muted: #a19db5;
+    --cpu-active-bg: #2d3049;
+    --cpu-active-text: #f6f1ec;
+    --cpu-active-muted: #c4bfd3;
+
+    --text-primary: #f2ede7;
+    --text-secondary: #c4bfce;
+    --text-muted: #a09bae;
+
+    --border-soft: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.11);
+    --border-strong: rgba(255, 255, 255, 0.2);
+
+    --accent: #ee8a73;
+    --accent-text: #f29d88;
+    --accent-soft: rgba(238, 138, 115, 0.14);
+    --accent-lavender: #a99ee6;
+    --accent-gold: #d8b47a;
+    --accent-rose: #e392a8;
+    --button-from: #cf6249;
+    --button-to: #b1507a;
+    --focus-color: #f29d88;
+
+    --color-success: #66d3a0;
+    --color-warning: #e9bc62;
+    --color-error: #f1869b;
+    --success-soft: rgba(102, 211, 160, 0.12);
+    --warning-soft: rgba(233, 188, 98, 0.11);
+    --error-soft: rgba(241, 134, 155, 0.13);
+    --badge-text: #0f2a1d;
+
+
+    --cpu-accent-0: #e07a62;
+    --cpu-accent-1: #8f85d6;
+    --cpu-accent-2: #c9a066;
+    --cpu-accent-3: #d27d95;
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 14px -6px rgba(0, 0, 0, 0.45);
+    --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 34px -16px rgba(0, 0, 0, 0.65);
+    --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.3), 0 34px 80px -30px rgba(0, 0, 0, 0.8);
+    --shadow-popup: 0 4px 12px rgba(0, 0, 0, 0.35), 0 44px 100px -24px rgba(0, 0, 0, 0.85);
+    --shadow-button: 0 10px 24px -10px rgba(207, 98, 73, 0.6);
+
+    --glow-1: rgba(110, 92, 170, 0.28);
+    --glow-2: rgba(170, 90, 90, 0.2);
+    --sun-from: rgba(228, 143, 120, 0.75);
+    --sun-to: rgba(150, 82, 130, 0.35);
+    --sun-opacity: 0.32;
+    --ember: rgba(236, 122, 78, 0.45);
+    --art-color: #b7a2ff;
+    --art-opacity: 0.11;
+    --panel-sidebar: rgba(13, 14, 24, 0.72);
+    --figure-from: #262236;
+    --figure-to: #1e2236;
+    --title-gradient: linear-gradient(100deg, #f4ebe3 0%, #c9b8ec 34%, #ee8a73 70%, #f0c48a 100%);
+
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #12161d;
-  --surface: #1b2029;
-  --surface-muted: #232a35;
-  --border: #333c4a;
-  --text: #e6eaf0;
-  --text-muted: #9aa5b5;
-  --primary: #6d93f2;
-  --primary-hover: #8aa8f5;
-  --primary-soft: #23304d;
-  --danger: #f07b72;
-  --danger-soft: #3a2224;
-  --warning-soft: #3a3120;
-  --warning-text: #f0cf7a;
-  --success: #5fcf95;
-  --success-soft: #1d3428;
-  --shadow: none;
+  --bg-base: #121320;
+  --bg-surface: rgba(25, 27, 41, 0.62);
+  --bg-card: #1d1f2f;
+  --bg-inset: #171928;
+  --surface-hover: #262941;
+  --input-bg: #141626;
+  --track-bg: #2a2d44;
+
+  --bg-sidebar: #0d0e18;
+  --sidebar-surface: #1b1d2d;
+  --sidebar-hover: #24273b;
+  --sidebar-border: rgba(255, 255, 255, 0.07);
+  --sidebar-text: #f1ecf2;
+  --sidebar-muted: #a19db5;
+  --cpu-active-bg: #2d3049;
+  --cpu-active-text: #f6f1ec;
+  --cpu-active-muted: #c4bfd3;
+
+  --text-primary: #f2ede7;
+  --text-secondary: #c4bfce;
+  --text-muted: #a09bae;
+
+  --border-soft: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.11);
+  --border-strong: rgba(255, 255, 255, 0.2);
+
+  --accent: #ee8a73;
+  --accent-text: #f29d88;
+  --accent-soft: rgba(238, 138, 115, 0.14);
+  --accent-lavender: #a99ee6;
+  --accent-gold: #d8b47a;
+  --accent-rose: #e392a8;
+  --button-from: #cf6249;
+  --button-to: #b1507a;
+  --focus-color: #f29d88;
+
+  --color-success: #66d3a0;
+  --color-warning: #e9bc62;
+  --color-error: #f1869b;
+  --success-soft: rgba(102, 211, 160, 0.12);
+  --warning-soft: rgba(233, 188, 98, 0.11);
+  --error-soft: rgba(241, 134, 155, 0.13);
+  --badge-text: #0f2a1d;
+
+
+  --cpu-accent-0: #e07a62;
+  --cpu-accent-1: #8f85d6;
+  --cpu-accent-2: #c9a066;
+  --cpu-accent-3: #d27d95;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 14px -6px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 34px -16px rgba(0, 0, 0, 0.65);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.3), 0 34px 80px -30px rgba(0, 0, 0, 0.8);
+  --shadow-popup: 0 4px 12px rgba(0, 0, 0, 0.35), 0 44px 100px -24px rgba(0, 0, 0, 0.85);
+  --shadow-button: 0 10px 24px -10px rgba(207, 98, 73, 0.6);
+
+  --glow-1: rgba(110, 92, 170, 0.28);
+  --glow-2: rgba(170, 90, 90, 0.2);
+  --sun-from: rgba(228, 143, 120, 0.75);
+  --sun-to: rgba(150, 82, 130, 0.35);
+  --sun-opacity: 0.32;
+  --ember: rgba(236, 122, 78, 0.45);
+  --art-color: #b7a2ff;
+  --art-opacity: 0.11;
+  --panel-sidebar: rgba(13, 14, 24, 0.72);
+  --figure-from: #262236;
+  --figure-to: #1e2236;
+  --title-gradient: linear-gradient(100deg, #f4ebe3 0%, #c9b8ec 34%, #ee8a73 70%, #f0c48a 100%);
+
   color-scheme: dark;
+}
+
+/* ---------- 2) พื้นฐาน ---------- */
+
+/* ฟอนต์ในเครื่อง Windows ไม่โหลดจากเน็ต (D-013): Segoe UI Variable ดูสะอาดแบบ editorial, Leelawadee UI แสดงภาษาไทย */
+:root {
+  --font-body: "Segoe UI Variable Text", "Segoe UI", "Leelawadee UI", Tahoma, system-ui, sans-serif;
+  --font-display: "Segoe UI Variable Display", "Segoe UI", "Leelawadee UI", Tahoma, system-ui, sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, "Leelawadee UI", ui-monospace, monospace;  /* ใช้กับสูตรเท่านั้น */
+  --radius-xl: 28px;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --sidebar-width: 420px;
+  --sidebar-rail: 92px; /* แถบซ้ายตอนซ่อน: โลโก้ 56px + ขอบซ้ายขวา */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  /* Leelawadee UI / Tahoma มีในทุกเครื่อง Windows และแสดงภาษาไทยได้ ไม่ต้องโหลดฟอนต์จากเน็ต */
-  font-family: system-ui, "Segoe UI", "Leelawadee UI", Tahoma, sans-serif;
-  font-size: 16px;
-  line-height: 1.55;
-}
-
-.container {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
-h1, h2, h3 {
-  margin: 0;
-  line-height: 1.3;
-}
-
-.muted {
-  color: var(--text-muted);
-  font-weight: normal;
-}
-
+/* ให้แอตทริบิวต์ hidden ชนะ display ที่กำหนดใน class เสมอ */
 [hidden] {
   display: none !important;
 }
 
-/* ---------- ส่วนหัว / ท้าย ---------- */
-.site-header {
-  padding: 28px 0 20px;
+/* ขนาดตัวอักษรฐาน 17px (106.25% ของค่าเริ่มต้น 16px ของ browser) — ทุกขนาดในไฟล์นี้เป็น rem จึงใหญ่ขึ้นตามกันทั้งหน้า
+   ใช้ % แทน px เพื่อให้ยังขยายตามที่ผู้ใช้ตั้งขนาดตัวอักษรใน browser ได้ */
+html {
+  font-size: 106.25%;
 }
 
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.site-header h1 {
-  font-size: 1.75rem;
+h1, h2, h3, h4, h5 {
+  line-height: 1.25;
 }
 
-.subtitle {
-  margin: 6px 0 0;
-  color: var(--text-muted);
+code {
+  font-family: var(--font-mono);
 }
 
-.site-footer {
-  padding: 24px 0 32px;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-/* ---------- การ์ด ---------- */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.step-page h2 {
-  font-size: 1.25rem;
-  margin-bottom: 6px;
-}
-
-.step-page > .description {
-  margin-bottom: 20px;
-}
-
-/* ปุ่มย้อนกลับ (ซ้าย) / ถัดไป (ขวา) ท้ายแต่ละขั้น */
-.step-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-
-/* ---------- แถบขั้นตอน 1–4 ---------- */
-.stepper {
-  list-style: none;
-  display: flex;
-  margin: 0 0 20px;
-  padding: 0;
-}
-
-.stepper li {
-  flex: 1 1 0;
-  position: relative;
-  min-width: 0;
-}
-
-/* เส้นเชื่อมระหว่างวงกลม: วาดจากกึ่งกลางขั้นก่อนหน้าถึงกึ่งกลางขั้นนี้ แล้วเว้นที่ให้วงกลม */
-.stepper li + li::before {
-  content: "";
-  position: absolute;
-  top: 20px;
-  left: calc(-50% + 22px);
-  right: calc(50% + 22px);
-  height: 2px;
-  background: var(--border);
-}
-
-.step-link {
-  font: inherit;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 4px;
-  background: none;
-  border: 0;
-  border-radius: 8px;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-
-.step-link:focus-visible {
-  outline: 2px solid var(--primary);
+/* กรอบโฟกัสชัดเจนสำหรับผู้ใช้คีย์บอร์ดทุกปุ่ม/ช่อง (เห็นเฉพาะตอนกด Tab ไม่ขึ้นตอนคลิกเมาส์) */
+:focus-visible {
+  outline: 2px solid var(--focus-color);
   outline-offset: 2px;
 }
 
-.step-link:disabled {
-  cursor: default;
-  opacity: 0.55;
-}
-
-.step-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  background: var(--surface);
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.step-label {
-  font-size: 0.875rem;
-  text-align: center;
-  line-height: 1.3;
-}
-
-.step-link:not(:disabled):hover .step-label {
-  color: var(--text);
-}
-
-.step-link.is-done .step-number {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-  color: var(--primary);
-}
-
-.step-link.is-current .step-number {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-}
-
-.step-link.is-current .step-label {
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* ---------- ช่องกรอก ---------- */
-.field-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px 24px;
-  align-items: flex-start;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.field-narrow {
-  max-width: 420px;
-}
-
-fieldset.field {
+/* ซ่อนจากตา แต่โปรแกรมอ่านหน้าจอยังอ่านได้ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
   border: 0;
-  padding: 0;
-  margin: 0;
 }
 
-.field label,
-.field legend {
+/* ไอคอนเส้น 24×24 สีตามตัวอักษร */
+.icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ไอคอนจุด 3 จุด (⋯) ต้องใช้เส้นหนาจุดจึงจะมองเห็น */
+.icon.dots,
+.cpu-more .icon {
+  stroke-width: 3;
+}
+
+.gradient-text {
+  background: var(--title-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.82rem;
   font-weight: 600;
-  padding: 0;
-}
-
-.field .radio {
-  font-weight: normal;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
+  letter-spacing: 0.04em;
+  color: var(--accent-text);
 }
 
 .hint {
+  display: block;
+  margin: 6px 0 0;
+  font-size: 0.86rem;
   color: var(--text-muted);
+}
+
+.tag {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--bg-inset);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ---------- ปุ่ม ---------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease, color 0.2s ease, filter 0.2s ease;
+}
+
+.button .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.button.primary {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--button-from), var(--button-to));
+  box-shadow: var(--shadow-button);
+}
+
+.button.primary .icon {
+  fill: currentColor;
+}
+
+.button.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.button.primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.button.large {
+  min-height: 52px;
+  padding: 12px 28px;
+  font-size: 1rem;
+}
+
+.button.ghost {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+.button.ghost:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+.button.small {
+  min-height: 36px;
+  padding: 6px 14px;
   font-size: 0.85rem;
 }
 
-input[type="text"] {
-  font: inherit;
-  color: var(--text);
-  background: var(--surface);
+.button.danger {
+  color: var(--color-error);
+}
+
+.button.danger:hover:not(:disabled) {
+  background: var(--error-soft);
+  border-color: var(--color-error);
+}
+
+.button.danger-solid {
+  color: #ffffff;
+  background: var(--color-error);
+}
+
+:root[data-theme="dark"] .button.danger-solid {
+  color: #2a0d14;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .button.danger-solid {
+    color: #2a0d14;
+  }
+}
+
+/* ปุ่มที่กดไม่ได้ต้องดูต่างจากปุ่มปกติชัดเจน */
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ข้อมูลถูกแก้หลัง Run: วงแหวนสีทองรอบปุ่ม Run กะพริบเบา ๆ 2 ครั้ง แล้วค้างไว้ */
+.button.primary.needs-run {
+  box-shadow: 0 0 0 3px var(--bg-card), 0 0 0 5px var(--accent-gold), var(--shadow-button);
+  animation: attention 1.4s ease-in-out 2;
+}
+
+/* ปุ่มกลมที่มีแต่ไอคอน */
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  width: 100%;
-  max-width: 220px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-input[type="text"]:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
-  border-color: var(--primary);
+.icon-button:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
 }
 
+/* ---------- ช่องกรอก ---------- */
+
+input[type="text"],
+select {
+  min-height: 44px;
+  padding: 9px 14px;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 1px 2px rgba(34, 37, 58, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+}
+
+input[type="text"]:hover,
+select:hover {
+  border-color: var(--border-strong);
+}
+
+input[type="text"]:focus,
+select:focus-visible {
+  outline: none;
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+/* ช่อง BT ในโหมดสุ่ม: แก้ไม่ได้ จึงเป็นพื้นเรียบไม่มีกรอบ ให้ต่างจากช่องที่แก้ได้ */
 input[readonly] {
-  background: var(--surface-muted);
-  color: var(--text-muted);
+  color: var(--text-secondary);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+input[readonly]:hover {
+  border-color: transparent;
 }
 
 input.invalid {
-  border-color: var(--danger);
-  background: var(--danger-soft);
+  border-color: var(--color-error);
+  background: var(--error-soft);
 }
 
 input[type="radio"],
 input[type="checkbox"] {
-  accent-color: var(--primary);
-  width: 16px;
-  height: 16px;
+  accent-color: var(--accent);
 }
 
-/* ---------- ปุ่ม ---------- */
-.button {
-  font: inherit;
-  border-radius: 8px;
-  padding: 8px 16px;
+.field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field > label,
+.field > legend {
+  display: block;
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ปุ่มเลือกแบบแบ่งช่อง (สุ่ม / กรอกเอง) ใช้ radio จริงซ่อนไว้ เพื่อให้ใช้คีย์บอร์ดได้ */
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--bg-inset);
+}
+
+.segmented label {
+  position: relative;
   cursor: pointer;
-  border: 1px solid transparent;
 }
 
-.button:focus-visible,
-.tab:focus-visible {
-  outline: 2px solid var(--primary);
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented span {
+  display: block;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.segmented label:hover span {
+  color: var(--text-primary);
+}
+
+.segmented input:checked + span {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.segmented input:focus-visible + span {
+  outline: 2px solid var(--focus-color);
   outline-offset: 2px;
 }
 
-.button.primary {
-  background: var(--primary);
-  color: #fff;
-  font-weight: 600;
-  padding: 10px 22px;
+.number-stepper {
+  display: grid;
+  grid-template-columns: 44px 68px 44px;
+  gap: 6px;
 }
 
-.button.primary:hover {
-  background: var(--primary-hover);
-}
-
-.button.secondary {
-  background: var(--primary-soft);
-  color: var(--primary);
-  border-color: var(--primary-soft);
+.number-stepper input {
+  width: 100%;
+  text-align: center;
   font-weight: 600;
 }
 
-.button.secondary:hover {
-  border-color: var(--primary);
+.stepper-button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--bg-inset);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.button.ghost {
-  background: transparent;
-  color: var(--text);
-  border-color: var(--border);
+.stepper-button:hover:not(:disabled) {
+  background: var(--surface-hover);
 }
 
-.button.ghost:hover {
-  background: var(--surface-muted);
-}
-
-.button:disabled {
-  opacity: 0.5;
+.stepper-button:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
-  pointer-events: none; /* ไม่ให้สีเปลี่ยนตอนเอาเมาส์ชี้ */
 }
 
-.button.small {
-  padding: 4px 12px;
-  font-size: 0.875rem;
+/* ---------- 3) พื้นหลัง ---------- */
+
+/* แสงไล่สีจาง ๆ + ดวงอาทิตย์นุ่ม ๆ ติดอยู่กับจอ — แค่เสริมบรรยากาศ ไม่แย่งความเด่นจากการ์ด */
+.page-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(1100px 700px at 92% -12%, var(--glow-1), transparent 62%),
+    radial-gradient(900px 640px at -6% 108%, var(--glow-2), transparent 62%);
 }
 
-/* ---------- ปุ่มเปลี่ยนภาษาและสวิตช์ธีม (มุมขวาบน) ---------- */
-.header-controls {
+.backdrop-sun {
+  position: absolute;
+  top: 170px;
+  left: calc(50% + var(--sidebar-current) / 2);
+  transition: left 0.45s var(--ease);
+  width: min(70vw, 760px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--sun-from) 0%, var(--sun-to) 42%, transparent 70%);
+  opacity: var(--sun-opacity);
+  transform: translate(-50%, -50%);
+  animation: sun-breathe 11s ease-in-out infinite;
+}
+
+/* แสงส้ม ambient: วงแสงนุ่ม ๆ 2 ดวง (ซ้ายล่าง / ขวากลาง) ขยาย-หดและสว่าง-จางช้า ๆ
+   ดวงขวาเริ่มช้ากว่าครึ่งรอบ จึงสลับกันขยาย — ดวงหนึ่งสว่าง อีกดวงจาง แบบไฟ ambient
+   ปิดเองเมื่อเครื่องตั้ง "ลดการเคลื่อนไหว" (กฎท้ายไฟล์) */
+.backdrop-ember {
+  position: absolute;
+  width: 620px;
+  height: 620px;
+  margin: -310px 0 0 -310px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--ember) 0%, transparent 65%);
+  opacity: 0.35;
+  animation: ember-pulse 14s ease-in-out infinite;
+}
+
+/* ดวงซ้ายอยู่ใกล้แถบ CPU และไม่มีอะไรบัง จึงดูสว่างกว่าดวงขวา — ลดความสว่างสูงสุดเหลือราวครึ่งหนึ่ง */
+.backdrop-ember.is-left {
+  --ember-low: 0.18;
+  --ember-peak: 0.5;
+  top: 82vh;
+  left: calc(var(--sidebar-current) * 0.55);
+  transition: left 0.45s var(--ease);
+}
+
+.backdrop-ember.is-right {
+  top: 48vh;
+  left: 96vw;
+  animation-delay: -7s;
+}
+
+@keyframes sun-breathe {
+  0%,
+  100% {
+    opacity: var(--sun-opacity);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: calc(var(--sun-opacity) * 1.3);
+    transform: translate(-50%, -51%) scale(1.12);
+  }
+}
+
+/* --ember-low / --ember-peak = ความสว่างต่ำสุด/สูงสุดของแต่ละดวง (ค่าเริ่มต้น 0.35 / 1) */
+@keyframes ember-pulse {
+  0%,
+  100% {
+    opacity: var(--ember-low, 0.35);
+    transform: scale(0.85) translate(0, 0);
+  }
+  50% {
+    opacity: var(--ember-peak, 1);
+    transform: scale(1.2) translate(2%, -3%);
+  }
+}
+
+/* ภาพชิป CPU แบบเส้น จาง ๆ หมุนช้ามาก (ไม่แย่งสายตาจากผลลัพธ์) — ปิดเองเมื่อเครื่องตั้ง "ลดการเคลื่อนไหว" */
+.backdrop-art-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.backdrop-cpu {
+  position: absolute;
+  color: var(--art-color);
+  opacity: var(--art-opacity);
+  overflow: visible;
+}
+
+/* ตัวใหญ่: อยู่ใต้ดวงอาทิตย์ กลางพื้นที่ผลลัพธ์ หมุนตามเข็มรอบละ 3 นาที */
+.backdrop-cpu.is-main {
+  top: 58vh;
+  left: calc(50% + var(--sidebar-current) / 2);
+  width: min(74vw, 820px);
+  height: min(74vw, 820px);
+  margin: calc(min(74vw, 820px) / -2) 0 0 calc(min(74vw, 820px) / -2);
+  animation: art-spin 180s linear infinite;
+  transition: left 0.45s var(--ease);
+}
+
+/* ตัวเล็ก: มุมขวาบน หมุนทวนเข็ม เร็วกว่าเล็กน้อย */
+.backdrop-cpu.is-corner {
+  top: -110px;
+  right: -110px;
+  width: 360px;
+  height: 360px;
+  opacity: calc(var(--art-opacity) * 0.8);
+  animation: art-spin 120s linear infinite reverse;
+}
+
+.art-lines {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.art-dots {
+  fill: currentColor;
+}
+
+/* วงแหวนเส้นประด้านในหมุนสวนทางกับตัวชิป ให้ภาพดูมีชีวิต */
+.art-ring-inner {
+  transform-box: view-box;
+  transform-origin: 200px 200px;
+  animation: art-spin 40s linear infinite reverse;
+}
+
+@keyframes art-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- โครงหน้า ---------- */
+
+/* --sidebar-current = ความกว้างแถบซ้ายตอนนี้ (ซ่อนแล้วเหลือแถบแคบ --sidebar-rail) ใช้ทั้งคอลัมน์และตำแหน่งดวงอาทิตย์ */
+body {
+  --sidebar-current: var(--sidebar-width);
+}
+
+body.sidebar-collapsed {
+  --sidebar-current: var(--sidebar-rail);
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-current) minmax(0, 1fr);
+  transition: grid-template-columns 0.45s var(--ease);
+  gap: 28px;
+  min-height: 100vh;
+  padding: 16px 28px 16px 16px;
+}
+
+/* ---------- แถบซ้าย: รายการ CPU (ลอยแยกจากเนื้อหา มุมโค้ง พื้นเข้ม) ----------
+   ค้างอยู่กับที่สูงเต็มจอ เลื่อนหน้าผลลัพธ์แล้วแถบนี้ไม่เลื่อนตาม ส่วนรายการ CPU เลื่อนขึ้นลงได้ในแถบเอง (D-024) */
+
+.sidebar {
+  position: sticky;
+  top: 16px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: calc(100vh - 32px);
+  padding: 22px 18px 18px;
+  overflow: hidden;
+  border-radius: 26px;
+  /* โปร่งนิดหน่อยให้เห็นพื้นหลัง + เบลอสิ่งที่อยู่ข้างหลัง ตัวอักษรจึงยังอ่านง่าย */
+  background: var(--panel-sidebar);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+  backdrop-filter: blur(8px) saturate(1.2);
+  color: var(--sidebar-text);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  /* ซ่อน/แสดงแถบ: ความกว้างมาจากคอลัมน์ของ .app-shell ส่วนความสูงและขอบใน หดตามตรงนี้ */
+  transition: height 0.45s var(--ease), padding 0.45s var(--ease);
+}
+
+.sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
+  gap: 14px;
+  padding: 0 0 18px;
+  border-bottom: 1px solid var(--sidebar-border);
+  transition: border-color 0.3s ease, padding 0.45s var(--ease);
 }
 
-/* TH | ENG: ปุ่มสองปุ่มติดกัน ปุ่มของภาษาที่ใช้อยู่เป็นสีหลัก */
+/* โลโก้ = ปุ่มซ่อน/แสดงแถบ CPU: ใหญ่ ไล่สี มีแสงเรือง ชี้เมาส์แล้วยกขึ้นเล็กน้อย */
+.brand-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 120% at 30% 0%, rgba(255, 255, 255, 0.28), transparent 55%),
+    linear-gradient(135deg, var(--button-from), var(--button-to));
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 12px 26px -10px rgba(225, 98, 72, 0.85);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s ease;
+}
+
+.brand-mark .icon {
+  width: 30px;
+  height: 30px;
+  stroke-width: 1.7;
+}
+
+.brand-mark:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 16px 32px -10px rgba(225, 98, 72, 0.95);
+}
+
+/* กดแล้วหมุนหนึ่งรอบ (ซ่อน = ทวนเข็ม, แสดง = ตามเข็ม) ui.js ใส่ class แล้วลบออกเมื่อหมุนเสร็จ */
+.brand-mark.spin-close {
+  animation: brand-spin-close 0.6s var(--ease);
+}
+
+.brand-mark.spin-open {
+  animation: brand-spin-open 0.6s var(--ease);
+}
+
+@keyframes brand-spin-close {
+  0% { transform: rotate(0deg) scale(1); }
+  45% { transform: rotate(-200deg) scale(0.86); }
+  100% { transform: rotate(-360deg) scale(1); }
+}
+
+@keyframes brand-spin-open {
+  0% { transform: rotate(0deg) scale(1); }
+  45% { transform: rotate(200deg) scale(0.86); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.brand-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.brand-text strong {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.brand-text small {
+  font-size: 0.86rem;
+  color: var(--sidebar-muted);
+  white-space: nowrap;
+}
+
+/* ---------- แถบซ้ายตอนซ่อน: เหลือแถบแคบที่มีแค่โลโก้ ----------
+   เนื้อหาอื่นจางหายก่อนแถบหด (ไม่เห็นการจัดบรรทัดใหม่ระหว่างหด) ตอนแสดงจะค่อย ๆ ปรากฏหลังแถบขยายเสร็จ
+   visibility: hidden ทำให้ปุ่มที่ซ่อนอยู่กด Tab ไปไม่ถึง */
+.sidebar > :not(.sidebar-brand),
+.brand-text {
+  transition: opacity 0.25s ease 0.2s, visibility 0s linear 0s;
+}
+
+body.sidebar-collapsed .sidebar > :not(.sidebar-brand),
+body.sidebar-collapsed .brand-text {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease, visibility 0s linear 0.12s;
+}
+
+body.sidebar-collapsed .sidebar-brand {
+  padding-bottom: 0;
+  border-bottom-color: transparent;
+}
+
+/* ตอนซ่อน แถบหดทั้งกว้างและสูง เหลือเป็นกล่องสี่เหลี่ยมเล็ก ๆ ที่มีแค่โลโก้ (ขอบในเท่ากันทุกด้าน)
+   กล่องนี้ยังค้างอยู่มุมซ้ายบนตอนเลื่อนหน้า กดโลโก้เพื่อขยายกลับได้ตลอด */
+body.sidebar-collapsed .sidebar {
+  height: var(--sidebar-rail);
+  padding: 18px;
+}
+
+/* ตอนเปิดหน้า ใช้สถานะที่จำไว้ทันทีโดยไม่เล่น animation */
+body.sidebar-instant .app-shell,
+body.sidebar-instant .sidebar,
+body.sidebar-instant .sidebar > *,
+body.sidebar-instant .brand-text,
+body.sidebar-instant .backdrop-sun,
+body.sidebar-instant .backdrop-ember,
+body.sidebar-instant .backdrop-cpu {
+  transition: none !important;
+}
+
+.sidebar-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 4px 6px 0;
+}
+
+.sidebar-section-head h2 {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--sidebar-muted);
+}
+
+.sidebar-count {
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sidebar-muted);
+}
+
+/* รายการ CPU (รวมแผงตั้งค่าที่กางอยู่) เลื่อนได้ในแถบเอง โลโก้ด้านบนและปุ่มเพิ่ม CPU ด้านล่างอยู่กับที่
+   แถบเลื่อนวางในขอบว่างด้านขวาของแถบ (margin ติดลบ) และจองที่ไว้ตลอด (scrollbar-gutter)
+   การ์ดจึงกว้างเท่าเดิมเสมอ ไม่ถูกบีบตอนกางการตั้งค่าแล้วแถบเลื่อนโผล่ */
+.cpu-list {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  margin: 0 -14px 0 -6px;
+  padding: 6px 4px 12px 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sidebar-hover) transparent;
+  list-style: none;
+}
+
+/* ---------- การ์ด CPU แบบ 3D ลอย ---------- */
+
+.cpu-item {
+  position: relative;
+  flex: none;
+  transition: transform 0.25s var(--ease);
+}
+
+.cpu-item.accent-0 { --cpu-accent: var(--cpu-accent-0); }
+.cpu-item.accent-1 { --cpu-accent: var(--cpu-accent-1); }
+.cpu-item.accent-2 { --cpu-accent: var(--cpu-accent-2); }
+.cpu-item.accent-3 { --cpu-accent: var(--cpu-accent-3); }
+
+/* ชี้เมาส์ = ยกทั้งการ์ดขึ้นเล็กน้อย (การ์ดและปุ่ม ⋯ ไปพร้อมกัน) */
+.cpu-item:hover {
+  transform: translateY(-3px);
+}
+
+.cpu-item.is-active {
+  transform: translateY(-2px) scale(1.015);
+}
+
+.cpu-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-areas:
+    "icon text"
+    "bars bars";
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 46px 14px 14px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--sidebar-surface);
+  color: var(--sidebar-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  /* ขอบบนสว่าง (แสงตกกระทบ) + เงาใต้การ์ด ให้ดูเป็นแผ่นที่ลอยอยู่ */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 10px 20px -14px rgba(0, 0, 0, 0.7);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+}
+
+.cpu-item:hover .cpu-card {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 18px 30px -16px rgba(0, 0, 0, 0.8);
+}
+
+/* CPU ที่เลือก: แผ่นสีครีมลอยเด่นที่สุดในแถบ มีแสงเงาสีประจำ CPU จาง ๆ */
+.cpu-card[aria-current="true"] {
+  background: var(--cpu-active-bg);
+  color: var(--cpu-active-text);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 6px rgba(0, 0, 0, 0.18),
+    0 22px 40px -18px rgba(0, 0, 0, 0.75),
+    0 12px 30px -16px var(--cpu-accent);
+}
+
+.cpu-card:focus-visible {
+  outline-offset: 3px;
+}
+
+.cpu-card-icon {
+  display: grid;
+  grid-area: icon;
+  align-self: start;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--cpu-accent);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 6px 14px -6px var(--cpu-accent);
+}
+
+.cpu-card-text {
+  display: flex;
+  grid-area: text;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cpu-card-name {
+  overflow: hidden;
+  font-weight: 650;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cpu-card-meta,
+.cpu-card-status {
+  overflow: hidden;
+  font-size: 0.82rem;
+  color: var(--sidebar-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cpu-card[aria-current="true"] .cpu-card-meta,
+.cpu-card[aria-current="true"] .cpu-card-status {
+  color: var(--cpu-active-muted);
+}
+
+.cpu-card-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* จุดสถานะ: วงเปล่า = ยังไม่ Run / เขียว = Run แล้ว / ทอง = ผลเก่า */
+.status-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.is-done .status-dot {
+  border-color: #5fc898;
+  background: #5fc898;
+}
+
+.is-stale .status-dot {
+  border-color: #e3b25e;
+  background: #e3b25e;
+}
+
+/* แท่ง BT เล็ก ๆ (ui.js กำหนดความสูงและสีของแต่ละแท่ง) */
+.cpu-bars {
+  display: flex;
+  grid-area: bars;
+  align-items: flex-end;
+  gap: 3px;
+  height: 20px;
+}
+
+.cpu-bar {
+  flex: 1 1 0;
+  min-width: 3px;
+  max-width: 12px;
+  border-radius: 3px 3px 1px 1px;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 70%);
+}
+
+/* ปุ่ม ⋯ มุมขวาบนของการ์ด เปิด popup รายละเอียด */
+.cpu-more {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sidebar-muted);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.cpu-more:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--sidebar-text);
+}
+
+.cpu-item.is-active .cpu-more {
+  color: var(--cpu-active-muted);
+}
+
+.cpu-item.is-active .cpu-more:hover {
+  background: rgba(34, 37, 58, 0.08);
+  color: var(--cpu-active-text);
+}
+
+.add-cpu-button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  background: transparent;
+  color: var(--sidebar-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.add-cpu-button:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text);
+}
+
+.add-cpu-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sidebar-note {
+  margin: 0 6px;
+  font-size: 0.84rem;
+  color: var(--sidebar-muted);
+}
+
+/* ---------- dropdown ตั้งค่าการจำลอง (กางใต้การ์ด CPU ที่เลือก) ---------- */
+
+/* กรอบของการ์ด: ปุ่ม ⋯ และปุ่มลูกศรวางทับมุมการ์ดโดยอ้างอิงกรอบนี้ (ไม่ใช่ทั้ง <li> ที่รวมแผงตั้งค่าด้วย) */
+.cpu-item-head {
+  position: relative;
+}
+
+/* ปุ่มลูกศรมุมขวาล่างของการ์ด CPU: กดเพื่อพับ/กางการตั้งค่า (กดที่ตัวการ์ด = เลือก CPU อย่างเดียว) */
+.cpu-toggle {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--sidebar-muted);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.cpu-toggle .icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s var(--ease);
+}
+
+.cpu-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text);
+}
+
+.cpu-item.is-active .cpu-toggle {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--cpu-active-muted);
+}
+
+.cpu-item.is-active .cpu-toggle:hover {
+  background: rgba(34, 37, 58, 0.08);
+  color: var(--cpu-active-text);
+}
+
+.cpu-toggle[aria-expanded="true"] .icon {
+  transform: rotate(180deg);
+}
+
+/* เผื่อที่ให้ปุ่มลูกศร ไม่ให้แท่ง BT วิ่งไปทับ */
+.cpu-bars {
+  margin-right: 38px;
+}
+
+/* CPU ที่กางอยู่: การ์ดกับแผงตั้งค่าต่อกันเป็นแผ่นสีครีมแผ่นเดียว ลอยเด่นที่สุดในแถบ */
+.cpu-item.is-open {
+  border-radius: 20px;
+  background: var(--cpu-active-bg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 6px rgba(0, 0, 0, 0.18),
+    0 26px 46px -22px rgba(0, 0, 0, 0.75),
+    0 14px 34px -18px var(--cpu-accent);
+}
+
+/* แผ่นใหญ่ไม่ต้องยกตัวตอนชี้เมาส์ (จะดูโยกไปมาขณะกรอกข้อมูล) */
+.cpu-item.is-open,
+.cpu-item.is-open:hover {
+  transform: none;
+}
+
+.cpu-item.is-open .cpu-card,
+.cpu-item.is-open:hover .cpu-card {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cpu-panel {
+  padding: 0 16px 18px;
+  color: var(--text-primary);
+  animation: panel-in 0.3s var(--ease) both;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.panel-head .eyebrow {
+  margin: 0;
+}
+
+/* จำนวนโปรเซส (ซ้าย) คู่กับ Time Quantum (ขวา) */
+.panel-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px 14px;
+}
+
+.cpu-panel .field > label,
+.cpu-panel .field > legend {
+  margin-bottom: 6px;
+  font-size: 0.84rem;
+}
+
+.cpu-panel .hint {
+  font-size: 0.82rem;
+}
+
+/* ---------- ส่วนหัว: ชื่อโปรแกรมกึ่งกลาง ---------- */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hero {
+  position: relative;
+  padding: 72px 0 40px; /* ปุ่มมุมขวาบนอยู่เหนือหัวข้อ จึงไม่ต้องเว้นด้านข้าง */
+  text-align: center;
+}
+
+.hero-controls {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-badge {
+  display: inline-block;
+  margin: 0;
+  padding: 5px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-xs);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+}
+
+.hero-title {
+  margin: 18px 0 14px;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 4.1rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  /* ตัวอักษรไล่สีวาดเฉพาะในกรอบของหัวข้อ ถ้าบรรทัดแน่นเกิน หางตัวอักษร (g, p) จะถูกตัด
+     จึงใช้ line-height 1.2 และเว้นด้านล่างเล็กน้อย */
+  line-height: 1.2;
+  padding-bottom: 0.08em;
+  /* ทั้งหัวข้อเป็นตัวอักษรไล่สี: หมึก → ม่วง → คอรัล → ทอง */
+  background: var(--title-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-title .gradient-text {
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: inherit;
+}
+
+.hero-subtitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.hero-dot {
+  margin: 0 0.8em;
+  color: var(--accent-text);
+}
+
+/* ปุ่มภาษา: ตัวที่เลือกเป็นเม็ดสีหมึก */
 .language-switch {
   display: inline-flex;
+  gap: 2px;
+  padding: 4px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 3px;
-  background: var(--surface);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-xs);
 }
 
 .language-option {
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  min-width: 48px;
-  padding: 4px 10px;
+  min-width: 42px;
+  min-height: 30px;
+  padding: 3px 12px;
   border: 0;
   border-radius: 999px;
-  background: none;
+  background: transparent;
   color: var(--text-muted);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .language-option:hover {
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .language-option[aria-pressed="true"] {
-  background: var(--primary);
-  color: #fff;
+  color: var(--bg-card);
+  background: var(--text-primary);
 }
 
-.language-option:focus-visible,
-.theme-switch:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* สวิตช์สไลด์: ราง (track) มีไอคอนสองข้าง ปุ่มกลม (thumb) เลื่อนไปทับฝั่งของโหมดปัจจุบัน */
+/* สวิตช์ธีม: ปุ่มกลมเลื่อนซ้าย-ขวา บังไอคอนฝั่งที่เป็นธีมปัจจุบัน */
 .theme-switch {
   position: relative;
-  flex-shrink: 0;
-  width: 68px;
-  height: 34px;
+  flex: none;
+  width: 66px;
+  height: 38px;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: #dbe6fb;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
-  transition: background-color 0.25s;
-}
-
-.theme-switch[aria-checked="true"] {
-  background: #2a3550;
 }
 
 .theme-switch-icon {
   position: absolute;
   top: 50%;
+  width: 16px;
+  height: 16px;
   transform: translateY(-50%);
-  font-size: 15px;
-  line-height: 1;
-  z-index: 1; /* อยู่เหนือปุ่มกลม ไอคอนของโหมดปัจจุบันจึงแสดงบนปุ่มกลม */
+  transition: opacity 0.2s ease;
 }
 
 .theme-switch-icon.sun {
-  left: 8px;
+  left: 10px;
 }
 
 .theme-switch-icon.moon {
-  right: 8px;
+  right: 10px;
 }
 
 .theme-switch-thumb {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 26px;
-  height: 26px;
+  top: 4px;
+  left: 4px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  transition: transform 0.25s;
+  background: linear-gradient(135deg, var(--button-from), var(--button-to));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s var(--ease);
 }
 
 .theme-switch[aria-checked="true"] .theme-switch-thumb {
-  transform: translateX(34px);
-  background: #c9d6f5;
+  transform: translateX(28px);
 }
 
-/* ไอคอนของโหมดที่ไม่ได้ใช้จะจางลง */
-.theme-switch[aria-checked="false"] .theme-switch-icon.moon,
-.theme-switch[aria-checked="true"] .theme-switch-icon.sun {
-  opacity: 0.45;
+.theme-switch[aria-checked="false"] .theme-switch-icon.sun,
+.theme-switch[aria-checked="true"] .theme-switch-icon.moon {
+  opacity: 0;
 }
 
-/* ผู้ใช้ที่ตั้งเครื่องให้ลดภาพเคลื่อนไหว ไม่ต้องมี animation */
-@media (prefers-reduced-motion: reduce) {
-  .theme-switch,
-  .theme-switch-thumb {
-    transition: none;
+/* ---------- พื้นผิวหลักของแอป (ชั้นที่ 2) ---------- */
+
+.surface {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-xl);
+  /* โปร่งนิดหน่อย (--bg-surface) + เบลอข้างหลัง เห็นสีพื้นหลังและภาพชิปแบบนุ่ม ๆ การ์ดข้างในยังทึบเพื่อให้อ่านง่าย */
+  background: var(--bg-surface);
+  -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  backdrop-filter: blur(8px) saturate(1.15);
+  box-shadow: var(--shadow-lg);
+}
+
+:root[data-theme="dark"] .surface {
+  border-color: var(--border-soft);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .surface {
+    border-color: var(--border-soft);
   }
 }
 
-/* ---------- ช่อง Burst Time และสี (ขั้นที่ 2) ---------- */
-.burst-toolbar {
+/* หัวผลลัพธ์: ชื่อ CPU + ป้ายสถานะ (ซ้าย) / แท็บอัลกอริทึม + ปุ่มจัดการ CPU (ขวา) */
+.results-head {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 20px;
+  padding: 2px 4px 4px;
 }
 
-.burst-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.burst-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--surface-muted);
-  border-radius: 8px;
-  padding: 6px 8px;
-}
-
-.burst-item label {
-  font-weight: 600;
-  min-width: 2.2em;
-}
-
-.burst-item input[type="text"] {
-  padding: 6px 8px;
+.cpu-heading {
   min-width: 0;
 }
 
-/* ช่องสีหน้าชื่อโปรเซส (กดแล้วเปิดกล่องเลือกสี) */
-.color-button {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 2px solid var(--surface);
-  border-radius: 6px;
-  box-shadow: 0 0 0 1px var(--border);
-  cursor: pointer;
-}
-
-.color-button:hover,
-.color-button[aria-expanded="true"] {
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.color-button:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* ---------- กล่องเลือกสี ---------- */
-.color-popover {
-  position: absolute; /* ตำแหน่ง top/left ตั้งใน ui.js ให้อยู่ใต้ช่องสีที่กด */
-  z-index: 10;
-  width: 220px;
-  padding: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 24px rgba(10, 20, 40, 0.18);
-}
-
-.color-popover-title {
-  display: block;
-  margin-bottom: 8px;
-}
-
-.color-popover-section {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  margin-bottom: 6px;
-}
-
-.preset-colors {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.preset-color {
-  width: 100%;
-  aspect-ratio: 1;
-  padding: 0;
-  border: 2px solid var(--surface);
-  border-radius: 6px;
-  box-shadow: 0 0 0 1px var(--border);
-  cursor: pointer;
-}
-
-.preset-color:hover {
-  transform: scale(1.1);
-}
-
-/* สีที่ใช้อยู่ตอนนี้: มีวงสีหลักล้อมรอบ */
-.preset-color[aria-pressed="true"] {
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.preset-color:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.custom-color {
+.results-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-  font-size: 0.875rem;
-  cursor: pointer;
+  gap: 10px;
 }
 
-.custom-color code {
-  margin-left: auto;
-  color: var(--text-muted);
-  font-size: 0.8rem;
+.cpu-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
-/* ช่อง RGB ของ browser: ตัดกรอบเริ่มต้นออกให้เหลือแค่สี่เหลี่ยมสี */
-input[type="color"] {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
+.cpu-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
   padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
+  list-style: none;
 }
 
-input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 0;
+.meta-chip {
+  padding: 3px 11px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-xs);
+  font-size: 0.84rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
 }
 
-input[type="color"]::-webkit-color-swatch {
-  border: 1px solid var(--border);
-  border-radius: 6px;
+.meta-chip.is-done {
+  background: var(--success-soft);
+  box-shadow: none;
+  color: var(--color-success);
 }
 
-input[type="color"]:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+.meta-chip.is-stale {
+  background: var(--warning-soft);
+  box-shadow: none;
+  color: var(--color-warning);
 }
 
-/* จุดสีหน้าชื่อโปรเซสในตารางผลลัพธ์และชุดข้อมูล */
-.swatch {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-  margin-right: 6px;
-  vertical-align: 0;
+/* ---------- 4) การ์ดเนื้อหา (ชั้นที่ 3) ---------- */
+
+.card {
+  position: relative;
+  min-width: 0;
+  padding: 26px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
 }
 
 /* ---------- ข้อความแจ้งเตือน ---------- */
+
 .error-box {
-  margin-bottom: 16px;
-  border: 1px solid var(--danger);
-  background: var(--danger-soft);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 12px 16px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: var(--error-soft);
+  animation: fade-up 0.25s ease-out both;
 }
 
 .error-box strong {
-  color: var(--danger);
+  color: var(--color-error);
 }
 
 .error-box ul {
   margin: 6px 0 0;
   padding-left: 20px;
+  font-size: 0.9rem;
 }
 
 .stale-note {
+  margin: 0;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
   background: var(--warning-soft);
-  color: var(--warning-text);
-  border-radius: 8px;
-  padding: 8px 12px;
-  margin: 0 0 16px;
+  color: var(--color-warning);
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-/* ---------- ส่วนผลลัพธ์ ---------- */
-.results-header {
+/* ---------- ช่องกรอกในแผงตั้งค่า ---------- */
+
+.cpu-panel .number-stepper {
+  grid-template-columns: 40px 56px 40px;
+}
+
+.quantum-field input {
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* เลือกแท็บ RR อยู่: เน้นช่อง TQ ให้รู้ว่าค่านี้มีผลกับผลที่กำลังดู */
+.quantum-field.is-active > label {
+  color: var(--accent-text);
+}
+
+.quantum-field.is-active input {
+  border-color: var(--accent);
+}
+
+/* สุ่ม / กรอกเอง เต็มความกว้างแผง */
+.cpu-panel .segmented {
+  display: flex;
+}
+
+.cpu-panel .segmented label {
+  flex: 1;
+}
+
+.cpu-panel .segmented span {
+  text-align: center;
+}
+
+.mode-note {
+  margin: -8px 0 0;
+}
+
+/* แถวโปรเซส 2 คอลัมน์: เตี้ยและแคบ มี 20 โปรเซสก็เห็นครบโดยไม่ต้องเลื่อนไกล */
+.process-deck {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 8px;
+}
+
+/* แถวของโปรเซสหนึ่งตัว: จุดสี | ชื่อ | ช่อง BT  (เส้นซ้ายเป็นสีของโปรเซส) */
+/* แถวของโปรเซสหนึ่งตัว: จุดสี | ชื่อ | ช่อง BT
+   เส้นซ้ายเป็นสีของโปรเซส และพื้นอมสีนั้นจางมาก ๆ ทางซ้าย (ui.js ตั้งค่า --process-color) */
+.process-tile {
+  display: grid;
+  grid-template-columns: 22px auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 8px;
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--process-color, var(--border));
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--process-color, transparent) 8%, transparent), transparent 60%),
+    var(--bg-card);
+  animation: fade-up 0.2s ease-out both;
+}
+
+/* จุดสีกลม = ปุ่มเปิดกล่องเลือกสี */
+/* จุดสีกลม = ปุ่มเปิดกล่องเลือกสี (มีแสงสะท้อนและแสงเรือง ให้ดูเป็นเม็ดสีที่กดได้) */
+/* จุดสีกลม = ปุ่มเปิดกล่องเลือกสี (มีแสงสะท้อนเล็กน้อย ให้ดูเป็นเม็ดสีที่กดได้) */
+.color-button {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid var(--bg-card);
+  border-radius: 50%;
+  background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 60%);
+  box-shadow: 0 0 0 1px var(--border);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease);
+}
+
+.color-button:hover {
+  transform: scale(1.12);
+}
+
+.process-name {
+  min-width: 22px;
+  font-size: 0.86rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.burst-input {
+  width: 100%;
+  min-height: 32px !important;
+  padding: 3px 8px !important;
+  border-radius: 8px !important;
+  text-align: center;
+  font-size: 0.95rem !important;
+  font-weight: 600;
+}
+
+.toolbar-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.toolbar-buttons .button {
+  flex: 1;
+  padding: 6px 10px;
+}
+
+/* ปุ่ม Run เต็มความกว้าง ใต้สุดของแผง */
+.run-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.run-strip .button {
+  width: 100%;
+}
+
+/* ---------- ผลการจำลอง ---------- */
+
+/* แท็บเลือกอัลกอริทึม: กรอบเม็ดยาพื้นการ์ด มีขอบและเงา ตัวที่เลือกเป็นเม็ดไล่สีคอรัล (สีเดียวกับปุ่ม RUN) ตัวขาว
+   ตัวที่ไม่ได้เลือกใช้ตัวอักษรเข้มกว่าเดิม ชี้เมาส์แล้วมีพื้นจาง ๆ — เห็นชัดว่าเป็นปุ่มที่กดได้ */
+.view-tabs {
+  display: inline-flex;
+  gap: 4px;
+  max-width: 100%;
+  padding: 5px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.view-tab {
+  flex: none;
+  min-height: 40px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.2s var(--ease);
+}
+
+.view-tab:hover:not(:disabled):not([aria-pressed="true"]) {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+/* ต้นไล่สีเข้มลง 12% (ผสมดำ) ให้ตัวอักษรขาวขนาดปกติได้ contrast ≥ 4.5:1 ทั้งสองธีม */
+.view-tab[aria-pressed="true"] {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--button-from) 88%, #000000), var(--button-to));
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), var(--shadow-button);
+}
+
+.view-tab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ปุ่ม ⋯ (จัดการ CPU) ข้างแท็บ: ขนาดเท่าความสูงของแท็บ มีขอบและเงาเหมือนกัน ชี้เมาส์แล้วเป็นสีคอรัล */
+.results-actions .icon-button {
+  width: 52px;
+  height: 52px;
+  border-color: var(--border);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s var(--ease);
+}
+
+.results-actions .icon-button:hover {
+  border-color: var(--accent);
+  background: var(--bg-card);
+  color: var(--accent-text);
+  transform: translateY(-1px);
+}
+
+/* ชื่อเต็ม + คำอธิบายสั้นของอัลกอริทึม + ปุ่ม "วิธีทำงาน" */
+.algorithm-info {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px 16px;
-  margin-bottom: 16px;
+  gap: 12px 20px;
+  padding: 18px 22px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.algorithm-text {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.algorithm-name {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 650;
+}
+
+.algorithm-summary {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  padding: 52px 24px;
+  text-align: center;
+}
+
+.empty-state h4 {
+  margin: 20px 0 6px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 650;
+}
+
+.empty-state p {
+  max-width: 440px;
+  margin: 0 auto;
+  font-size: 0.92rem;
   color: var(--text-muted);
-  cursor: pointer;
 }
 
-.dataset {
+/* Gantt chart จำลองเล็ก ๆ ที่หายใจช้า ๆ */
+.empty-art {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.empty-art span {
+  display: block;
+  height: 22px;
+  border-radius: 7px;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 60%);
+  transform-origin: left center;
+  animation: empty-bar 3s ease-in-out infinite;
+}
+
+.empty-art span:nth-child(1) { width: 46px; background-color: #c54f14; }
+.empty-art span:nth-child(2) { width: 28px; background-color: #8255ec; animation-delay: 150ms; }
+.empty-art span:nth-child(3) { width: 58px; background-color: #078564; animation-delay: 300ms; }
+.empty-art span:nth-child(4) { width: 34px; background-color: #1370ea; animation-delay: 450ms; }
+.empty-art span:nth-child(5) { width: 22px; background-color: #df2066; animation-delay: 600ms; }
+
+.results-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fade-up 0.35s var(--ease) both;
+}
+
+/* วาดใหม่เพราะเปลี่ยนสีหรือภาษา: ไม่ต้องเล่น animation ซ้ำ */
+.results-view.is-static,
+.results-view.is-static * {
+  animation: none !important;
+}
+
+.card-header {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  margin-bottom: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 14px;
 }
 
-.dataset-label {
-  color: var(--text-muted);
+.card-eyebrow {
+  margin: 0 0 2px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent-text);
+}
+
+.card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 650;
+}
+
+.card-description {
+  margin: 0 0 12px;
   font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
-.chips {
+.card-badges {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.chip {
-  background: var(--surface-muted);
+.pill {
+  padding: 3px 11px;
   border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.chip.total {
-  background: var(--primary-soft);
-  color: var(--primary);
-}
-
-/* ---------- แท็บ ---------- */
-.tabs {
-  display: flex;
-  gap: 4px;
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-}
-
-.tab {
-  font: inherit;
-  background: none;
-  border: 0;
-  border-bottom: 3px solid transparent;
-  padding: 10px 16px;
-  color: var(--text-muted);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.tab:hover {
-  color: var(--text);
-}
-
-.tab[aria-selected="true"] {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
+  background: var(--bg-inset);
+  font-size: 0.84rem;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
 }
 
-.result-panel {
-  padding-top: 20px;
-}
-
-.result-panel h3 {
-  font-size: 1.125rem;
-  margin-bottom: 4px;
-}
-
-.result-panel h4 {
-  margin: 20px 0 8px;
-  font-size: 1rem;
-}
-
-.description {
-  margin: 0 0 12px;
-  color: var(--text-muted);
-}
-
-.order {
-  margin: 0 0 16px;
-  font-size: 0.95rem;
-  overflow-wrap: anywhere;
+.pill.accent {
+  background: var(--accent-soft);
+  color: var(--accent-text);
 }
 
 /* ---------- Gantt chart ---------- */
+
+/* เว้นด้านล่างให้ตัวเลขเวลาใต้แถบ (ตัวเลขวางแบบ absolute จึงต้องเผื่อที่เอง)
+   overflow-y: hidden กันแถบเลื่อนแนวตั้งโผล่ ถ้าตัวอักษรใหญ่กว่าที่เผื่อไว้เล็กน้อย */
 .gantt-scroll {
   overflow-x: auto;
-  padding-bottom: 22px; /* เว้นที่ให้ตัวเลขเวลาใต้แถบ */
+  overflow-y: hidden;
+  margin: 0 -4px;
+  padding: 10px 14px 44px;
 }
 
 .gantt {
   display: flex;
-  min-width: 100%;
+  gap: 4px;
+  height: 60px;
 }
 
 .gantt-slot {
-  /* ความกว้างเป็นสัดส่วนกับเวลาที่ใช้ CPU ผ่าน flex-grow (ตั้งใน ui.js) */
-  flex-basis: 0;
-  min-width: 2.5rem;
   position: relative;
-  height: 44px;
+  flex-basis: 0;
+  min-width: 40px;
+  border-radius: 12px;
+  outline-offset: 3px;
+  cursor: default;
+}
+
+.gantt-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* สีพื้นและสีตัวอักษรตั้งใน ui.js ตามสีที่ผู้ใช้เลือกให้แต่ละโปรเซส */
-  border-right: 2px solid var(--surface);
-  font-weight: 600;
-  font-size: 0.875rem;
+  height: 100%;
+  border-radius: 12px;
+  /* สีพื้นมาจาก ui.js (สีของโปรเซส) ชั้นนี้เพิ่มแสงสะท้อนด้านบนจาง ๆ ให้แถบมีมิติ */
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 55%);
+  /* แสงเรืองสีเดียวกับแถบใต้แถบ พอให้ดูลอย แต่ไม่ฟุ้งจนรก */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 9px 18px -10px color-mix(in srgb, var(--process-color, #000) 75%, transparent);
+  /* ตัวอักษรสีขาวเสมอ — สีเริ่มต้นทุกสีเข้มพอ (contrast ≥ 4.6:1) เงาบาง ๆ ช่วยเมื่อผู้ใช้เลือกสีอ่อนเอง */
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+  font-size: 0.92rem;
+  font-weight: 650;
+  transform-origin: left center;
+  /* backwards: ใช้ค่าเริ่มของ animation ระหว่างรอ แต่ไม่ค้างค่าสุดท้าย เอฟเฟกต์ตอนชี้เมาส์จึงยังทำงาน */
+  animation: bar-in 0.5s var(--ease) backwards;
+  transition: transform 0.2s var(--ease), filter 0.2s ease, box-shadow 0.2s ease;
 }
 
-.gantt-slot:first-child {
-  border-radius: 6px 0 0 6px;
+.gantt-slot:hover .gantt-bar,
+.gantt-slot:focus-visible .gantt-bar {
+  transform: translateY(-3px);
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 13px 24px -10px color-mix(in srgb, var(--process-color, #000) 85%, transparent);
 }
 
-.gantt-slot:last-child {
-  border-radius: 0 6px 6px 0;
-  border-right: 0;
-}
-
+/* ตัวเลขเวลาใต้ขอบซ้ายของแต่ละแถบ (และขอบขวาของแถบสุดท้าย) พร้อมขีดบอกตำแหน่ง */
 .gantt-time {
   position: absolute;
-  top: 100%;
-  margin-top: 3px;
-  font-size: 0.75rem;
-  font-weight: normal;
-  color: var(--text-muted);
+  top: calc(100% + 12px);
+  left: -2px;
+  font-size: 0.84rem;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-}
-
-.gantt-time.start {
-  left: 0;
+  color: var(--text-muted);
   transform: translateX(-50%);
 }
 
-.gantt-slot:first-child .gantt-time.start {
-  transform: none;
+.gantt-time::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 1px;
+  height: 5px;
+  background: var(--border-strong);
 }
 
 .gantt-time.end {
-  right: 0;
+  left: auto;
+  right: -2px;
+  transform: translateX(50%);
+}
+
+/* ลำดับการได้ CPU: เม็ดสีของโปรเซสเรียงตาม Gantt chart มีลูกศรเล็ก ๆ คั่นระหว่างเม็ด */
+.order-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 22px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 9px;
+  border-radius: 999px;
+  background: var(--bg-inset);
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ลูกศรอยู่ในช่องว่างระหว่างเม็ด (ไม่ใช่ข้อความ โปรแกรมอ่านหน้าจออ่านเป็นรายการตามลำดับอยู่แล้ว) */
+.order-item + .order-item:not(.total)::before {
+  content: "›";
+  position: absolute;
+  left: -15px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.order-item .swatch {
+  margin-right: 0;
+}
+
+.order-id {
+  font-weight: 650;
+}
+
+.order-time {
+  color: var(--text-muted);
+}
+
+.order-item.total {
+  padding-left: 12px;
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+/* จุดสีของโปรเซส (ตาราง, ลำดับการได้ CPU, tooltip, สูตร): วงกลมมีแสงสะท้อนมุมบนเล็กน้อย */
+.swatch {
+  display: inline-block;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  border-radius: 50%;
+  vertical-align: -1px;
+  background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 60%);
+}
+
+/* กล่องรายละเอียดของแถบ (position: fixed ui.js คำนวณตำแหน่งจากแถบที่ชี้อยู่) */
+.gantt-tooltip {
+  position: fixed;
+  z-index: 70;
+  min-width: 170px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.86rem;
+  pointer-events: none;
+}
+
+.tooltip-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.tooltip-title .swatch {
+  margin-right: 0;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--text-secondary);
+}
+
+.tooltip-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+/* ---------- ค่าสรุป 4 ช่อง ---------- */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.kpi-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 20px 20px 18px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  /* พื้นการ์ดอมสีของค่านั้นจาง ๆ ที่มุมบน แล้วจางเป็นสีการ์ดปกติ (สดแต่ไม่รก ตัวเลขยังอ่านง่าย) */
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--kpi-color) 14%, transparent), transparent 60%),
+    var(--bg-card);
+  box-shadow: var(--shadow-md);
+  animation: fade-up 0.4s var(--ease) both;
+}
+
+/* เส้นสีสั้น ๆ มุมซ้ายบน บอกว่าเป็นค่าไหน (ไม่ใช้พื้นสีทั้งการ์ด จะได้ไม่รก) */
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  width: 44px;
+  height: 4px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(90deg, var(--kpi-color), var(--kpi-color-2));
+}
+
+.kpi-card:nth-child(2) { animation-delay: 60ms; }
+.kpi-card:nth-child(3) { animation-delay: 120ms; }
+.kpi-card:nth-child(4) { animation-delay: 180ms; }
+
+/* สีของค่าสรุป 4 ช่อง: ส้ม / ม่วง / เขียวมรกต / ฟ้า แบบสด (D-019 — ผู้ใช้ชอบแล้ว จึงคงไว้)
+   --kpi-color = สีหลัก, --kpi-color-2 = สีปลายของ gradient (เลื่อนเฉดเล็กน้อยให้มีมิติ) */
+.kpi-orange { --kpi-color: #ff8500; --kpi-color-2: #ff4d4d; }
+.kpi-violet { --kpi-color: #8545ff; --kpi-color-2: #c04bff; }
+.kpi-teal { --kpi-color: #00c49a; --kpi-color-2: #00d4ff; }
+.kpi-cyan { --kpi-color: #008fff; --kpi-color-2: #4f46e5; }
+
+.kpi-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ไอคอนในกล่องไล่สี + แสงเรืองสีเดียวกันจาง ๆ ด้านล่าง */
+.kpi-top .icon {
+  width: 38px;
+  height: 38px;
+  padding: 9px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--kpi-color), var(--kpi-color-2));
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 8px 18px -8px var(--kpi-color);
+}
+
+.kpi-labels {
+  min-width: 0;
+}
+
+.kpi-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.kpi-full {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* แถวล่างของการ์ด: ตัวเลขทางซ้าย กราฟจิ๋วทางขวา วางชิดฐานเดียวกัน */
+.kpi-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.kpi-value {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  animation: value-pop 0.45s var(--ease) both;
+}
+
+/* กราฟจิ๋วสีของโปรเซส (ภาพประกอบ ค่าจริงอยู่ในตาราง) */
+.kpi-chart {
+  display: flex;
+  flex: 1 1 auto;
+  max-width: 150px;
+  min-width: 0;
+  height: 38px;
+}
+
+/* หนึ่งแท่งต่อโปรเซส สูงตามค่า */
+.kpi-bars {
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.kpi-bar {
+  flex: 1 1 0;
+  max-width: 14px;
+  min-width: 2px;
+  border-radius: 3px 3px 1px 1px;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 70%);
+  transform-origin: bottom;
+  animation: kpi-grow 0.5s var(--ease) both;
+}
+
+/* แถบ Gantt จิ๋ว: ช่วงละสี มีช่องเล็ก ๆ คั่น เห็นจุดที่ CPU สลับโปรเซส */
+.kpi-strip {
+  align-self: center;
+  gap: 2px;
+  height: 14px;
+  margin-bottom: 8px;
+}
+
+.kpi-strip-piece {
+  flex-basis: 0;
+  min-width: 2px;
+  border-radius: 3px;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 70%);
+  transform-origin: left;
+  animation: kpi-grow-x 0.5s var(--ease) both;
+}
+
+@keyframes kpi-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes kpi-grow-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 /* ---------- ตาราง ---------- */
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.toggle input {
+  width: 16px;
+  height: 16px;
+}
+
 .table-scroll {
   overflow-x: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
 }
 
 table {
-  border-collapse: collapse;
   width: 100%;
+  border-collapse: collapse;
+  font-size: 0.94rem;
   font-variant-numeric: tabular-nums;
 }
 
 th,
 td {
-  padding: 8px 12px;
-  text-align: right;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-th:first-child,
-td:first-child {
+  padding: 13px 18px;
   text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-soft);
 }
 
 thead th {
-  background: var(--surface-muted);
-  font-weight: 600;
+  background: var(--bg-inset);
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
 }
 
-thead th abbr {
+thead abbr {
   text-decoration: none;
+  border-bottom: 1px dotted var(--text-muted);
   cursor: help;
 }
 
-tfoot td {
+tbody th {
   font-weight: 600;
+}
+
+/* ช่องชื่อโปรเซส: แถบสีของโปรเซสด้านซ้าย (ui.js ตั้งค่า --process-color) */
+tbody th.process-cell {
+  box-shadow: inset 3px 0 0 var(--process-color, transparent);
+}
+
+tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+tbody tr:hover {
+  background: var(--bg-inset);
+}
+
+tbody tr:last-child th,
+tbody tr:last-child td {
   border-bottom: 0;
 }
 
-.formula {
-  color: var(--text-muted);
-  font-weight: normal;
+.num {
+  text-align: right;
 }
 
+/* TAT และ WT เป็นค่าหลักของโจทย์ จึงใช้สีเน้น */
+.key-metric {
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+.formula {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+tfoot th,
+tfoot td {
+  border-top: 1px solid var(--border);
+  border-bottom: 0;
+  background: var(--bg-inset);
+  font-weight: 650;
+}
+
+tfoot td {
+  color: var(--accent-text);
+}
+
+.best-row th,
 .best-row td {
   background: var(--success-soft);
 }
@@ -898,196 +2406,914 @@ tfoot td {
 .badge {
   display: inline-block;
   margin-left: 8px;
-  padding: 0 8px;
+  padding: 1px 9px;
   border-radius: 999px;
-  background: var(--success);
-  color: var(--surface);
-  font-size: 0.75rem;
+  background: var(--color-success);
+  color: var(--badge-text);
+  font-size: 0.82rem;
   font-weight: 600;
+  vertical-align: 1px;
 }
 
-/* ---------- กล่องสรุป AVG WT ---------- */
-.summary {
+/* ---------- สูตรการคำนวณ (accordion พับ/กางได้) ---------- */
+
+.formula-card {
+  padding: 0;
+}
+
+.formula-summary {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.stat {
-  flex: 1 1 240px;
-  background: var(--surface-muted);
-  border-radius: 8px;
-  padding: 12px 16px;
-}
-
-.stat-label {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-.stat-value {
-  font-size: 1.6rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.stat-formula {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  overflow-wrap: anywhere;
-}
-
-/* ---------- สูตรการคำนวณของแต่ละค่า ---------- */
-.formula-section {
-  margin-top: 24px;
-}
-
-.formula-header {
-  display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px 16px;
-  margin: 0 0 8px;
+  gap: 16px;
+  padding: 22px 26px;
+  border-radius: var(--radius-lg);
+  list-style: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.formula-header h4 {
-  margin: 0;
+.formula-summary:hover {
+  background: var(--bg-inset);
+}
+
+.formula-summary::-webkit-details-marker {
+  display: none;
+}
+
+/* วงกลมมีลูกศร บอกว่ากางหรือพับอยู่ */
+.formula-summary::after {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-right: 8px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: rotate(45deg);
+  transition: transform 0.25s var(--ease);
+}
+
+.formula-card[open] .formula-summary::after {
+  transform: rotate(-135deg);
+}
+
+.formula-card[open] .formula-summary {
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.formula-body {
+  padding: 4px 26px 26px;
+  animation: fade-up 0.3s var(--ease) both;
 }
 
 .formula-picker {
-  display: flex;
+  display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  color: var(--text-muted);
+  margin-bottom: 16px;
   font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
-select {
-  font: inherit;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 4px 8px;
+.formula-picker .swatch {
+  margin-right: 0;
 }
 
-select:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
+.formula-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-/* ตารางสูตรเป็นข้อความยาว: ชิดซ้ายและตัดบรรทัดได้ (ต่างจากตารางตัวเลข) */
-.formula-table th,
-.formula-table td {
-  text-align: left;
-  white-space: normal;
-  vertical-align: top;
+.formula-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: var(--bg-inset);
 }
 
-.formula-table tbody th {
-  font-weight: 700;
+.formula-tile-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+
+.formula-name {
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 0.84rem;
+  font-weight: 650;
   white-space: nowrap;
 }
 
 .formula-meaning {
-  color: var(--text-muted);
-  min-width: 12rem;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
 }
 
-.formula-rule {
-  min-width: 14rem;
-}
-
-.formula-example {
-  font-variant-numeric: tabular-nums;
-  color: var(--primary);
-  font-weight: 600;
-  min-width: 11rem;
-}
-
-/* ---------- แถบเปรียบเทียบ ---------- */
-.bars {
+.formula-line {
   display: grid;
-  gap: 8px;
-  margin: 8px 0 4px;
+  gap: 2px;
+}
+
+.formula-line-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.formula-line code {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.formula-example code {
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+/* ---------- เปรียบเทียบ ---------- */
+
+.card-subtitle {
+  margin: 0 0 18px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bar-group {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.bar-group-label {
+  grid-row: span 2;
+  font-weight: 650;
 }
 
 .bar-row {
   display: grid;
-  grid-template-columns: 9rem 1fr 4rem;
+  grid-template-columns: 66px 1fr minmax(96px, auto);
   align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
+  gap: 12px;
+  font-size: 0.86rem;
+}
+
+.bar-metric {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
 .bar-track {
-  background: var(--surface-muted);
-  border-radius: 4px;
-  height: 18px;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--track-bg);
 }
 
 .bar-fill {
-  background: var(--primary);
   height: 100%;
-  border-radius: 4px;
-  min-width: 2px;
+  border-radius: 999px;
+  transform-origin: left center;
+  animation: bar-in 0.7s var(--ease) backwards;
+}
+
+.bar-wt .bar-fill {
+  background: linear-gradient(90deg, #ff8500, #ff438c);
+  box-shadow: 0 4px 12px -4px rgba(255, 67, 140, 0.55);
+}
+
+.bar-tat .bar-fill {
+  background: linear-gradient(90deg, #8545ff, #008fff);
+  box-shadow: 0 4px 12px -4px rgba(0, 143, 255, 0.55);
 }
 
 .bar-value {
-  text-align: right;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .note {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin: 8px 0 0;
+  margin: 14px 0 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
 }
 
-/* ---------- จอเล็ก ---------- */
-@media (max-width: 600px) {
-  .card {
-    padding: 16px;
+.note.muted {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+/* ---------- 5) กล่องเลือกสี ---------- */
+
+/* position: fixed = วางตามตำแหน่งบนจอ ui.js ขยับตามจุดสีทุกครั้งที่รายการ CPU หรือหน้าเว็บเลื่อน */
+.color-popover {
+  position: fixed;
+  z-index: 40;
+  width: 260px;
+  padding: 16px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-popup);
+  animation: pop-in 0.2s var(--ease) both;
+}
+
+.color-popover-title {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.color-popover-section {
+  margin-bottom: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.preset-colors {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.preset-color {
+  aspect-ratio: 1;
+  min-height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 60%);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s ease;
+}
+
+.preset-color:hover {
+  transform: scale(1.08);
+}
+
+.preset-color[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--text-primary);
+}
+
+.custom-color {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.custom-color code {
+  margin-left: auto;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+input[type="color"] {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 3px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: 7px;
+}
+
+/* ---------- popup (ชั้นบนสุด) ---------- */
+
+/* <dialog> เองโปร่งใส เนื้อหาอยู่ใน .modal-panel — คลิกนอกแผงจึงนับเป็นคลิกที่พื้นหลัง (ปิด popup) */
+.modal {
+  width: min(580px, calc(100vw - 32px));
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.modal-small {
+  width: min(480px, calc(100vw - 32px));
+}
+
+.modal::backdrop {
+  background: rgba(24, 20, 36, 0.42);
+  backdrop-filter: blur(5px);
+  animation: fade-in 0.25s ease-out both;
+}
+
+.modal-panel {
+  max-height: calc(100vh - 48px);
+  padding: 30px;
+  overflow-y: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-popup);
+  animation: modal-in 0.35s var(--ease) both;
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+/* ภาพประกอบเป็นเนื้อหาหลักของ popup วางบนพื้นไล่สีพีช → ลาเวนเดอร์จาง ๆ */
+.modal-figure {
+  margin: 0 0 18px;
+  padding: 18px 18px 14px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(150deg, var(--figure-from), var(--figure-to));
+}
+
+.modal-figure figcaption {
+  margin-top: 10px;
+  font-size: 0.84rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.figure-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-body);
+}
+
+.figure-axis {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.figure-bar.is-empty {
+  opacity: 0.3;
+}
+
+.figure-value {
+  fill: var(--text-primary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.figure-label {
+  fill: var(--text-muted);
+  font-size: 10.5px;
+}
+
+.figure-chip-text {
+  fill: #ffffff;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.figure-arrow {
+  fill: none;
+  stroke: var(--accent-text);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.figure-arrow.dashed {
+  stroke-dasharray: 5 5;
+  opacity: 0.8;
+}
+
+.figure-cpu {
+  fill: #20233a;
+}
+
+.figure-cpu-text {
+  fill: #f1ecf2;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.modal-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.modal-facts.two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.modal-fact {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-inset);
+}
+
+.modal-fact dt {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.modal-fact dd {
+  margin: 4px 0 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.modal-facts.two-columns dd {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.status-text.is-done {
+  color: var(--color-success);
+}
+
+.status-text.is-stale {
+  color: var(--color-warning);
+}
+
+.modal-section {
+  margin-top: 22px;
+}
+
+.modal-section-title {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.warning-text {
+  color: var(--color-warning);
+}
+
+.pill-row {
+  display: inline-block;
+  margin: -6px 0 16px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.modal-steps {
+  margin: 0;
+  padding-left: 22px;
+  color: var(--text-secondary);
+}
+
+.modal-steps li {
+  margin-bottom: 6px;
+  padding-left: 4px;
+}
+
+.modal-steps li::marker {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.rename-form {
+  margin-top: 22px;
+}
+
+.rename-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.rename-row {
+  display: flex;
+  gap: 10px;
+}
+
+.rename-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.modal-actions-wrap {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* ปุ่มลบอยู่ฝั่งซ้าย แยกจากปุ่มอื่น กันกดพลาด */
+.modal-actions .danger {
+  margin-right: auto;
+}
+
+.confirm-box {
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: var(--error-soft);
+  animation: fade-up 0.2s ease-out both;
+}
+
+.confirm-box p {
+  margin: 0 0 12px;
+  font-size: 0.92rem;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.settings-row .hint {
+  margin-top: 2px;
+}
+
+.settings-row.danger-zone {
+  border-bottom: 0;
+}
+
+/* ---------- ท้ายหน้า ---------- */
+
+.site-footer {
+  padding: 30px 8px 24px;
+  font-size: 0.86rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* ---------- 6) Animation (นุ่ม สั้น ไม่วูบวาบ) ---------- */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* popup: จางเข้า + ลอยขึ้นเล็กน้อย */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* แผงตั้งค่า: จางเข้า + เลื่อนลงเล็กน้อย เหมือน dropdown ที่กางออก */
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bar-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes empty-bar {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.7); }
+}
+
+@keyframes value-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes attention {
+  50% {
+    box-shadow: 0 0 0 3px var(--bg-card), 0 0 0 8px var(--accent-gold), var(--shadow-button);
+  }
+}
+
+/* ---------- Responsive ---------- */
+
+/* โน้ตบุ๊ก: ค่าสรุปเหลือแถวละ 2 ช่อง และเว้นที่ให้ปุ่มมุมขวาบนไม่ทับหัวข้อ */
+@media (max-width: 1280px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .field-row {
+  .hero {
+    padding: 80px 0 36px;
+  }
+}
+
+/* แท็บเล็ตและมือถือ: เรียงเป็นคอลัมน์เดียว ชื่อโปรแกรม → รายการ CPU (พร้อมแผงตั้งค่า) → ผลลัพธ์
+   .main ใช้ display: contents เพื่อให้ส่วนหัว ผลลัพธ์ และท้ายหน้า เรียงลำดับร่วมกับแถบ CPU ได้ด้วย order */
+@media (max-width: 1024px) {
+  .app-shell {
+    display: flex;
     flex-direction: column;
+    gap: 20px;
+    padding: 12px 16px;
   }
 
-  .field,
-  .field-narrow {
+  .main {
+    display: contents;
+  }
+
+  .hero {
+    order: 1;
+    padding: 64px 0 4px;
+  }
+
+  .sidebar {
+    position: static;
+    order: 2;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* ซ่อนแถบบนจอแคบ: เหลือแถวโลโก้ + ชื่อ (เนื้อหาที่ซ่อนไม่กินที่) */
+  body.sidebar-collapsed .sidebar > :not(.sidebar-brand) {
+    display: none;
+  }
+
+  body.sidebar-collapsed .brand-text {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  body.sidebar-collapsed .sidebar {
+    height: auto;
+  }
+
+  /* จอแคบ: แถบ CPU อยู่ในคอลัมน์เดียวกับผลลัพธ์ จึงเลื่อนไปพร้อมหน้าเว็บแทน */
+  .cpu-list {
+    margin: 0;
+    padding: 6px 0 8px;
+    overflow: visible;
+  }
+
+  .surface {
+    order: 3;
+  }
+
+  .site-footer {
+    order: 4;
+  }
+
+  .backdrop-sun,
+  .backdrop-cpu.is-main {
+    left: 50%;
+  }
+
+  .backdrop-ember {
+    width: 420px;
+    height: 420px;
+    margin: -210px 0 0 -210px;
+  }
+
+  .backdrop-ember.is-left {
+    left: 8vw;
+  }
+
+  .backdrop-cpu.is-main {
+    top: 70vh;
+    width: 120vw;
+    height: 120vw;
+    margin: -60vw 0 0 -60vw;
+  }
+
+  .backdrop-cpu.is-corner {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .formula-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .modal-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bar-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bar-group-label {
+    grid-row: auto;
+  }
+}
+
+/* มือถือ */
+@media (max-width: 600px) {
+  .hero {
+    padding-top: 60px;
+  }
+
+  .hero-subtitle {
+    font-size: 0.96rem;
+  }
+
+  .sidebar {
+    padding: 18px 12px 12px;
+    border-radius: 22px;
+  }
+
+  .surface {
+    gap: 18px;
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .results-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .results-actions {
+    flex-wrap: nowrap;
+  }
+
+  .view-tabs {
+    display: flex;
+    flex: 1;
+  }
+
+  .view-tab {
+    flex: 1 0 auto;
+    padding: 7px 12px;
+  }
+
+  .algorithm-info .button {
     width: 100%;
   }
 
-  input[type="text"] {
-    max-width: none;
+  .kpi-card {
+    padding: 18px 16px 16px;
+  }
+
+  .kpi-value {
+    font-size: 1.8rem;
+  }
+
+  .formula-summary {
+    padding: 18px;
+  }
+
+  .formula-body {
+    padding: 4px 18px 18px;
+  }
+
+  th,
+  td {
+    padding: 11px 14px;
   }
 
   .bar-row {
-    grid-template-columns: 6.5rem 1fr 3.5rem;
+    grid-template-columns: 56px 1fr minmax(84px, auto);
   }
 
-  .header-row {
+  .modal-panel {
+    padding: 22px 18px;
+    border-radius: 24px;
+  }
+
+  .modal-title {
+    font-size: 1.35rem;
+  }
+
+  .rename-row {
     flex-direction: column;
   }
 
-  .formula-meaning {
-    min-width: 9rem;
+  .settings-row {
+    flex-wrap: wrap;
   }
+}
 
-  .site-header h1 {
-    font-size: 1.4rem;
-  }
-
-  .step-label {
-    font-size: 0.75rem;
-  }
-
-  /* ปุ่มท้ายขั้นกว้างเต็มจอ กดง่ายบนมือถือ ปุ่มหลัก (ถัดไป/คำนวณ) อยู่บนสุด */
-  .step-actions {
-    flex-direction: column-reverse;
-    align-items: stretch;
+/* เครื่องที่ตั้งค่า "ลดการเคลื่อนไหว": ปิด animation และ transition ทั้งหมด */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  .modal::backdrop {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }
