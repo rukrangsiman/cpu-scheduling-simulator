@@ -232,7 +232,26 @@ var I18n = (function () {
       compareCaveat: 'ค่าต่ำสุดในชุดข้อมูลนี้ไม่ได้แปลว่าอัลกอริทึมนั้นดีที่สุดในทุกสถานการณ์',
       rrHistoryTitle: 'Round Robin เมื่อเปลี่ยน Time Quantum',
       badgeShowing: 'กำลังแสดง',
-      rrHistoryNote: 'เปลี่ยนค่า Time Quantum ท้ายหน้าต่างโปรเซส แล้วกด Run อีกครั้ง ระบบจะใช้ชุด BT เดิมและเพิ่มแถวในตารางนี้ (ถ้าชุด BT เปลี่ยน ตารางนี้จะเริ่มใหม่) ถ้าอยากเก็บข้อมูลหลายแบบไว้เทียบกัน ให้กด "ทำสำเนา" CPU นี้'
+      rrHistoryNote: 'เปลี่ยนค่า Time Quantum ท้ายหน้าต่างโปรเซส แล้วกด Run อีกครั้ง ระบบจะใช้ชุด BT เดิมและเพิ่มแถวในตารางนี้ (ถ้าชุด BT เปลี่ยน ตารางนี้จะเริ่มใหม่) ถ้าอยากเก็บข้อมูลหลายแบบไว้เทียบกัน ให้กด "ทำสำเนา" CPU นี้',
+
+      // ---------- เปรียบเทียบ CPU (D-039) ----------
+      compareCpus: 'เปรียบเทียบ CPU',
+      cpuCompareEyebrow: 'ต่างชุดข้อมูล',
+      cpuCompareIntro: 'เทียบผล Run ล่าสุดของหลาย CPU เช่น ชุด BT ต่างกัน หรือ TQ ต่างกัน',
+      cpuCompareMetricGroup: 'ค่าที่ใช้เปรียบเทียบ',
+      cpuCompareClose: 'ปิดการเปรียบเทียบ',
+      cpuComparePickEyebrow: 'ชุดข้อมูล',
+      cpuComparePickTitle: 'เลือก CPU ที่จะเปรียบเทียบ',
+      cpuCompareSelected: 'เลือก {count} / {total}',
+      cpuCompareNeedTwo: 'เลือก CPU ที่ Run แล้วอย่างน้อย 2 ตัว',
+      cpuCompareHowTo: 'อยากเทียบเมื่อเปลี่ยน BT หรือ TQ: กด ⋯ บนการ์ด CPU → ทำสำเนา แล้วแก้ Burst Time หรือ TQ ของสำเนา กด Run — CPU นั้นจะขึ้นในหน้านี้ทันที',
+      cpuCompareChartTitle: '{metric} ของแต่ละ CPU',
+      cpuCompareChartHint: 'ยิ่งสั้นยิ่งดี · ทุกแท่งใช้สเกลเดียวกัน จึงเทียบข้าม CPU ได้',
+      cpuCompareTableTitle: 'ตาราง {metric}',
+      cpuCompareNote: 'ตัวเลขมาจากผล Run ล่าสุดของแต่ละ CPU (ชุด BT และ TQ ในตารางคือชุดที่ใช้ Run) · ช่องสีเขียว = ค่าต่ำสุดของ CPU นั้น · กดชื่อ CPU เพื่อดูผลละเอียด',
+      cpuCompareStaleNote: 'CPU ที่ขึ้นว่า "ผลเก่า" ถูกแก้ข้อมูลหลัง Run — ตัวเลขยังเป็นของชุดเดิม กด Run ใน CPU นั้นอีกครั้งเพื่ออัปเดต',
+      cpuCompareSjfNote: 'เมื่อทุกโปรเซสมาถึงพร้อมกัน (AT = 0) SJF ได้ {metric} ต่ำที่สุด (หรือเท่ากับต่ำที่สุด) เสมอ สิ่งที่น่าดูคือ FCFS และ RR ห่างจาก SJF แค่ไหนเมื่อชุด BT หรือ TQ เปลี่ยน',
+      cpuCompareOpen: 'ดูผลของ {name}'
     },
 
     en: {
@@ -451,7 +470,26 @@ var I18n = (function () {
       compareCaveat: 'The lowest value for this data does not mean that algorithm is the best in every situation',
       rrHistoryTitle: 'Round Robin with different Time Quantum',
       badgeShowing: 'showing',
-      rrHistoryNote: 'Change the Time Quantum at the bottom of the process window and press Run again. The same BTs are used and a row is added to this table (the table restarts if the BTs change). To keep several setups side by side, duplicate this CPU'
+      rrHistoryNote: 'Change the Time Quantum at the bottom of the process window and press Run again. The same BTs are used and a row is added to this table (the table restarts if the BTs change). To keep several setups side by side, duplicate this CPU',
+
+      // ---------- Compare CPUs (D-039) ----------
+      compareCpus: 'Compare CPUs',
+      cpuCompareEyebrow: 'Different data',
+      cpuCompareIntro: 'Compare the latest run of several CPUs, e.g. different BTs or a different TQ',
+      cpuCompareMetricGroup: 'Value to compare',
+      cpuCompareClose: 'Close comparison',
+      cpuComparePickEyebrow: 'Data sets',
+      cpuComparePickTitle: 'Choose CPUs to compare',
+      cpuCompareSelected: '{count} / {total} selected',
+      cpuCompareNeedTwo: 'Select at least 2 CPUs that have been run',
+      cpuCompareHowTo: 'To compare after changing BT or TQ: press ⋯ on a CPU card → Duplicate, change the Burst Times or TQ of the copy and press Run — it appears here right away',
+      cpuCompareChartTitle: '{metric} of each CPU',
+      cpuCompareChartHint: 'Shorter is better · every bar uses the same scale, so CPUs can be compared',
+      cpuCompareTableTitle: '{metric} table',
+      cpuCompareNote: 'Numbers come from the latest run of each CPU (the BTs and TQ in the table are the ones used for that run) · green cell = lowest value of that CPU · press a CPU name to see its full results',
+      cpuCompareStaleNote: 'CPUs marked "Out of date" were edited after their last run — their numbers are still for the old data. Press Run on that CPU to update',
+      cpuCompareSjfNote: 'When every process arrives together (AT = 0), SJF always has the lowest {metric} (or ties for lowest). The interesting part is how far FCFS and RR are from SJF when the BTs or TQ change',
+      cpuCompareOpen: 'Show results of {name}'
     }
   };
 

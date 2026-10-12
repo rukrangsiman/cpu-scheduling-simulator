@@ -41,6 +41,7 @@ Term Project: เว็บจำลอง CPU Scheduling (FCFS, SJF Non-preempti
   | `js/profiles.js` | ข้อมูล CPU หลายตัว (สร้าง / ทำสำเนา / บันทึก localStorage) (D-014) | ห้ามแตะ DOM, ห้ามคำนวณผล |
   | `js/ui.js` | แถบ CPU + แผงตั้งค่าแบบ dropdown + พื้นที่ผลลัพธ์ (D-017), รับ input, เรียก scheduler, render Gantt/KPI/ตาราง | ห้ามคำนวณผลเอง |
   | `js/modals.js` | popup (`<dialog>`) รายละเอียด CPU / วิธีทำงาน / ตั้งค่า + ภาพประกอบ SVG (D-016) | ห้ามคำนวณผลเอง โหลดก่อน `ui.js` |
+  | `js/compare.js` | หน้าเปรียบเทียบผล Run ของหลาย CPU (D-039) | ห้ามคำนวณผลเอง (หาค่าต่ำสุดเพื่อไฮไลต์ได้) โหลดหลัง `modals.js` ก่อน `ui.js` |
   | `js/theme.js` | สลับธีมมืด/สว่าง (โหลดใน `<head>`) | ไม่ยุ่งกับข้อมูลโปรเซส |
   | `js/i18n.js` | ข้อความบนหน้าเว็บ TH/EN (`I18n.t()`, `data-i18n`) | ข้อความใหม่ต้องเพิ่มทั้ง `th` และ `en` |
 - `scheduler.js`, `validation.js` และ `profiles.js` ต้องใช้ได้ทั้งใน browser และ Node:

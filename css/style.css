@@ -2720,6 +2720,219 @@ tfoot td {
   color: var(--text-muted);
 }
 
+/* ---------- เปรียบเทียบ CPU (D-039, js/compare.js) ---------- */
+
+/* ปุ่มในแถบซ้าย ใต้ "เพิ่ม CPU" (ผู้ใช้ขอ — D-039):
+   ยังไม่ได้เปิดหน้าเปรียบเทียบ = เม็ดไล่สีคอรัล (ชวนให้กด) / เปิดอยู่ = พื้นเรียบไม่มีสี (กดซ้ำเพื่อปิด) */
+.compare-cpus-button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--button-from) 88%, #000000), var(--button-to));
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), var(--shadow-button);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+}
+
+.compare-cpus-button:hover:not([aria-pressed="true"]) {
+  filter: brightness(1.08);
+}
+
+.compare-cpus-button[aria-pressed="true"] {
+  border-color: var(--sidebar-line);
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text);
+  box-shadow: none;
+}
+
+.compare-cpus-button[aria-pressed="true"]:hover {
+  border-color: var(--sidebar-line-hover);
+}
+
+.compare-intro {
+  max-width: 560px;
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* checkbox เลือก CPU: เม็ดเรียงต่อกัน ขึ้นแถวใหม่เมื่อไม่พอ */
+.compare-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.compare-pick {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 9px 16px 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.compare-pick:hover {
+  border-color: var(--border-strong);
+}
+
+.compare-pick:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.compare-pick input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: inherit;
+}
+
+/* CPU ที่ยังไม่ Run เลือกไม่ได้ (ยังไม่มีผล) */
+.compare-pick.is-idle {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.compare-pick-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.compare-pick-name {
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.compare-pick-meta {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.compare-pick.is-stale .compare-pick-meta {
+  color: var(--color-warning);
+}
+
+.compare-empty {
+  padding: 36px 24px;
+}
+
+.compare-empty h4 {
+  margin-top: 0;
+}
+
+.compare-empty p {
+  max-width: 520px;
+}
+
+/* กราฟ: กลุ่มละ 3 แท่ง (FCFS / SJF / RR) ชื่อ CPU คร่อม 3 แถว */
+.bar-group.is-triple .bar-group-label {
+  grid-row: span 3;
+}
+
+.compare-group-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.compare-group-name {
+  overflow-wrap: anywhere;
+}
+
+.compare-group-meta {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.compare-stale-tag {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--warning-soft);
+  color: var(--color-warning);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+th .compare-stale-tag {
+  margin-left: 8px;
+}
+
+.bar-fcfs .bar-fill {
+  background: linear-gradient(90deg, #ff8500, #ff438c);
+  box-shadow: 0 4px 12px -4px rgba(255, 67, 140, 0.55);
+}
+
+.bar-sjf .bar-fill {
+  background: linear-gradient(90deg, #8545ff, #008fff);
+  box-shadow: 0 4px 12px -4px rgba(0, 143, 255, 0.55);
+}
+
+.bar-rr .bar-fill {
+  background: linear-gradient(90deg, #08a76f, #00b3c7);
+  box-shadow: 0 4px 12px -4px rgba(0, 179, 199, 0.55);
+}
+
+/* ตาราง: ชุด BT ยาวได้ถึง 10 ตัว จึงยอมให้ขึ้นบรรทัดใหม่ (ช่องอื่น nowrap ตามตารางทั่วไป) */
+.cpu-compare-table .compare-bt {
+  min-width: 140px;
+  white-space: normal;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+}
+
+.cpu-compare-table td.is-lowest {
+  background: var(--success-soft);
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+/* ชื่อ CPU ในตาราง = ปุ่มเปิดผลของ CPU นั้น หน้าตาเหมือนลิงก์ */
+.compare-open-cpu {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-text);
+  font: inherit;
+  font-weight: 650;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.compare-open-cpu:hover {
+  text-decoration-color: currentColor;
+}
+
+.note.warning-note {
+  color: var(--color-warning);
+}
+
 /* ---------- 5) กล่องเลือกสี ---------- */
 
 /* position: fixed = วางตามตำแหน่งบนจอ ui.js ขยับตามจุดสีทุกครั้งที่รายการ CPU หรือหน้าเว็บเลื่อน */
@@ -3318,7 +3531,8 @@ input[type="color"]::-webkit-color-swatch {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .bar-group-label {
+  .bar-group-label,
+  .bar-group.is-triple .bar-group-label {
     grid-row: auto;
   }
 }

@@ -70,6 +70,12 @@
       </button>
       <p id="cpu-limit-note" class="sidebar-note" hidden></p>
 
+      <!-- เปิด/ปิดหน้าเปรียบเทียบ CPU ในพื้นที่ตรงกลาง (D-039, js/compare.js) -->
+      <button type="button" id="compare-cpus-button" class="compare-cpus-button" aria-pressed="false" aria-controls="cpu-compare-area">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16 M7 16V9 M12 16V5 M17 16v-4"/></svg>
+        <span data-i18n="compareCpus">เปรียบเทียบ CPU</span>
+      </button>
+
       <!-- ที่พักของแผงตั้งค่า ตอนที่ dropdown พับอยู่ (ซ่อนไว้ แต่ช่องกรอกยังอยู่ในหน้า ui.js จึงอ่านค่าได้เสมอ) -->
       <div id="panel-home" hidden>
         <!-- แผงตั้งค่าการจำลองของ CPU ที่เลือก มีชุดเดียวใช้ร่วมกันทุก CPU (สลับ CPU = ใส่ค่าของ CPU นั้นลงในฟอร์มนี้)
@@ -194,6 +200,30 @@
         <div id="results" class="results" aria-live="polite" hidden></div>
       </main>
 
+      <!-- ===== ตรงกลาง (แทนผลของ CPU ที่เลือก): เปรียบเทียบผล Run ของหลาย CPU (D-039, js/compare.js) ===== -->
+      <section id="cpu-compare-area" class="surface" aria-labelledby="cpu-compare-title" hidden>
+        <div class="results-head">
+          <div class="cpu-heading">
+            <p class="eyebrow" data-i18n="cpuCompareEyebrow">ต่างชุดข้อมูล</p>
+            <h2 id="cpu-compare-title" class="cpu-name" data-i18n="compareCpus">เปรียบเทียบ CPU</h2>
+            <p class="compare-intro" data-i18n="cpuCompareIntro">เทียบผล Run ล่าสุดของหลาย CPU เช่น ชุด BT ต่างกัน หรือ TQ ต่างกัน</p>
+          </div>
+          <div class="results-actions">
+            <div class="view-tabs" role="group" aria-label="ค่าที่ใช้เปรียบเทียบ" data-i18n-aria-label="cpuCompareMetricGroup">
+              <button type="button" class="view-tab compare-metric" data-metric="averageWaitingTime" aria-pressed="true">AVG WT</button>
+              <button type="button" class="view-tab compare-metric" data-metric="averageTurnaroundTime" aria-pressed="false">AVG TAT</button>
+            </div>
+            <button type="button" id="close-compare-button" class="icon-button"
+                    aria-label="ปิดการเปรียบเทียบ" title="ปิดการเปรียบเทียบ" data-i18n-aria-label="cpuCompareClose" data-i18n-title="cpuCompareClose">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12 M18 6L6 18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ไม่ใส่ aria-live: หน้านี้วาดใหม่ทุกครั้งที่พิมพ์ในแผงตั้งค่า โปรแกรมอ่านหน้าจอจะอ่านซ้ำไม่หยุด -->
+        <div id="cpu-compare-content" class="results"></div>
+      </section>
+
       <footer class="site-footer">
         <span data-i18n="footer">CPU Scheduling Simulator · FCFS · SJF (Non-preemptive) · Round Robin · AT = 0</span>
       </footer>
@@ -284,13 +314,14 @@
   <!-- กล่องรายละเอียดของแถบใน Gantt chart (แสดงเมื่อชี้เมาส์หรือกด Tab ไปที่แถบ) -->
   <div id="gantt-tooltip" class="gantt-tooltip" role="tooltip" hidden></div>
 
-  <!-- ลำดับสำคัญ: profiles.js ใช้ Validation / ui.js ใช้ Scheduler, Validation, I18n, Profiles และฟังก์ชัน popup ใน modals.js
+  <!-- ลำดับสำคัญ: profiles.js ใช้ Validation / ui.js ใช้ Scheduler, Validation, I18n, Profiles และฟังก์ชันใน modals.js กับ compare.js
        ui.js ต้องอยู่ท้ายสุด เพราะเริ่มทำงาน (init) ทันทีที่โหลดเสร็จ -->
   <script src="js/scheduler.js"></script>
   <script src="js/validation.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/profiles.js"></script>
   <script src="js/modals.js"></script>
+  <script src="js/compare.js"></script>
   <script src="js/ui.js"></script>
 </body>
 </html>

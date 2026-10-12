@@ -6,13 +6,14 @@
  *              (จำนวน, BT, สี, TQ, Run) กางลงมาเป็น dropdown ใต้การ์ด
  *   ตรงกลาง  = ผลลัพธ์ของ CPU ที่เลือก (แท็บ FCFS / SJF / RR / เปรียบเทียบ)
  *   popup    = รายละเอียด CPU, วิธีทำงานของอัลกอริทึม, ตั้งค่า (อยู่ใน modals.js)
+ *   ปุ่ม "เปรียบเทียบ CPU" = พื้นที่ตรงกลางเปลี่ยนเป็นหน้าเปรียบเทียบผลหลาย CPU (อยู่ใน compare.js, D-039)
  *
  * ขั้นตอนหลัก: อ่านค่าจากหน้าเว็บ → ตรวจด้วย Validation → คำนวณด้วย Scheduler → แสดงผล
  * ไฟล์นี้ไม่คำนวณ ST / CT / TAT / WT เอง ทุกตัวเลขในตารางมาจาก Scheduler
  * ข้อความบนหน้าเว็บมาจาก I18n.t() เพื่อให้สลับภาษาไทย / อังกฤษได้
  * ข้อมูลของ CPU แต่ละตัว (สร้าง / ทำสำเนา / บันทึก) อยู่ใน profiles.js
  *
- * ต้องโหลด scheduler.js, validation.js, i18n.js, profiles.js และ modals.js ก่อนไฟล์นี้ (ดูท้าย index.html)
+ * ต้องโหลด scheduler.js, validation.js, i18n.js, profiles.js, modals.js และ compare.js ก่อนไฟล์นี้ (ดูท้าย index.html)
  */
 
 // ---------- สถานะของโปรแกรม ----------
@@ -1607,6 +1608,7 @@ function switchToProfile(index) {
   showProfile();
   renderCpuList();
   saveProfiles();
+  refreshCpuCompare(); // CPU ที่เพิ่งเพิ่ม / ทำสำเนา ต้องขึ้นในหน้าเปรียบเทียบด้วย (ถ้าเปิดอยู่)
 }
 
 // รายการในแถบซ้ายถูกวาดใหม่ทุกครั้ง จึงต้องย้ายโฟกัสไปที่การ์ดใหม่ให้ผู้ใช้คีย์บอร์ด
@@ -1618,8 +1620,12 @@ function focusCpuItem(index) {
 }
 
 // กดการ์ด CPU = เลือก CPU นั้นเพื่อดูผลลัพธ์ (ยังไม่กางการตั้งค่า — กางด้วยปุ่มลูกศรเท่านั้น)
+// ถ้าหน้าเปรียบเทียบ CPU เปิดอยู่ ให้ปิดก่อน แม้กดการ์ดของ CPU ที่เลือกอยู่แล้ว (= กลับไปดูผลของ CPU นั้น)
 function onCpuItemClick(event) {
   var index = Number(event.currentTarget.getAttribute('data-index'));
+  if (cpuCompare.isOpen) {
+    closeCpuCompare(false);
+  }
   if (index !== app.activeIndex) {
     settingsPanelOpen = false;
     switchToProfile(index);
@@ -1684,6 +1690,7 @@ function renameCpuAt(index, text) {
   renderWorkspaceHeader();
   renderCpuList();
   saveProfiles();
+  refreshCpuCompare();
 }
 
 // ทำสำเนา (ข้อมูล สี และผลลัพธ์) วางไว้ถัดจากตัวเดิมแล้วเลือกตัวใหม่ เช่น ใช้ลองค่า TQ อื่นโดยไม่แตะตัวเดิม
@@ -1716,6 +1723,7 @@ function deleteCpuAt(index) {
   showProfile();
   renderCpuList();
   saveProfiles();
+  refreshCpuCompare();
 }
 
 // ล้างข้อมูล CPU ทั้งหมด แล้วเริ่มใหม่ที่ CPU 1 (เรียกจาก popup ตั้งค่า หลังผู้ใช้ยืนยัน)
@@ -1727,6 +1735,7 @@ function resetAllCpus() {
   showProfile();
   renderCpuList();
   saveProfiles();
+  refreshCpuCompare();
 }
 
 // ---------- CPU หลายตัว: แถบซ้ายและหัวของ CPU ----------
@@ -1859,11 +1868,12 @@ function saveProfiles() {
   Profiles.save(app.profiles, app.activeIndex, app.nextNumber);
 }
 
-// ข้อมูลของ CPU ที่เลือกเปลี่ยน: อัปเดตการ์ดในแถบซ้าย หัวผลลัพธ์ แล้วบันทึก
+// ข้อมูลของ CPU ที่เลือกเปลี่ยน: อัปเดตการ์ดในแถบซ้าย หัวผลลัพธ์ หน้าเปรียบเทียบ CPU แล้วบันทึก
 function refreshCpuSummary() {
   storeFormInProfile();
   updateActiveCpuCard();
   renderWorkspaceHeader();
+  refreshCpuCompare(); // ใน compare.js — วาดใหม่เฉพาะตอนที่หน้าเปรียบเทียบเปิดอยู่
   saveProfiles();
 }
 
@@ -1940,6 +1950,7 @@ function refreshLanguage() {
   renderWorkspaceHeader();
   renderAlgorithmInfo();
   renderResults(true);
+  refreshCpuCompare();
   refreshOpenDialogs(); // popup ที่เปิดอยู่ (เช่นหน้าตั้งค่า) เปลี่ยนภาษาตามทันที
 }
 
@@ -2082,6 +2093,7 @@ function init() {
   bindColorPopover();
   bindCpuControls();
   bindDialogs(); // อยู่ใน modals.js
+  bindCpuCompare(); // อยู่ใน compare.js
   restoreSidebarState();
 
   // ใช้ CPU ที่บันทึกไว้ (หรือสร้าง CPU 1 ใหม่) แล้วแสดง CPU ที่เลือกไว้ล่าสุด
