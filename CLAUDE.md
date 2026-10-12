@@ -38,7 +38,9 @@ Term Project: เว็บจำลอง CPU Scheduling (FCFS, SJF Non-preempti
   |---|---|---|
   | `js/scheduler.js` | อัลกอริทึม + คำนวณ ST/CT/TAT/WT/AVG | pure function, ห้ามแตะ DOM |
   | `js/validation.js` | ตรวจสอบ input | pure function, ห้ามแตะ DOM |
-  | `js/ui.js` | รับ input, เรียก scheduler, render ตาราง/Gantt | ห้ามคำนวณผลเอง |
+  | `js/ui.js` | หน้าเว็บ 4 ขั้น, รับ input, เรียก scheduler, render ตาราง/Gantt | ห้ามคำนวณผลเอง |
+  | `js/theme.js` | สลับธีมมืด/สว่าง (โหลดใน `<head>`) | ไม่ยุ่งกับข้อมูลโปรเซส |
+  | `js/i18n.js` | ข้อความบนหน้าเว็บ TH/EN (`I18n.t()`, `data-i18n`) | ข้อความใหม่ต้องเพิ่มทั้ง `th` และ `en` |
 - `scheduler.js` และ `validation.js` ต้องใช้ได้ทั้งใน browser และ Node:
   ```js
   if (typeof module !== 'undefined' && module.exports) { module.exports = Scheduler; }

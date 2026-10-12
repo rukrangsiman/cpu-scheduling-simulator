@@ -5,107 +5,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CPU Scheduling Simulator</title>
   <link rel="stylesheet" href="css/style.css">
+  <!-- โหลดใน head เพื่อใส่ธีมมืด/สว่างที่เคยเลือกไว้ก่อนหน้าเว็บแสดงผล (ไม่กะพริบ) -->
+  <script src="js/theme.js"></script>
 </head>
 <body>
+  <!-- ข้อความที่มี data-i18n จะถูกเปลี่ยนตามภาษาที่เลือก (ดู js/i18n.js) -->
   <header class="site-header">
-    <div class="container">
-      <h1>CPU Scheduling Simulator</h1>
-      <p class="subtitle">
-        จำลองการจัดลำดับการใช้ CPU ด้วย FCFS · SJF (Non-preemptive) · Round Robin
-        — ทุกโปรเซสมี Arrival Time = 0
-      </p>
+    <div class="container header-row">
+      <div>
+        <h1>CPU Scheduling Simulator</h1>
+        <p class="subtitle" data-i18n="subtitle">
+          จำลองการจัดลำดับการใช้ CPU ด้วย FCFS · SJF (Non-preemptive) · Round Robin — ทุกโปรเซสมี Arrival Time = 0
+        </p>
+      </div>
+
+      <div class="header-controls">
+        <div class="language-switch" role="group" aria-label="เลือกภาษา" data-i18n-aria-label="languageGroup">
+          <button type="button" class="language-option" data-language="th" aria-pressed="true">TH</button>
+          <button type="button" class="language-option" data-language="en" aria-pressed="false">ENG</button>
+        </div>
+
+        <!-- สวิตช์แบบสไลด์: aria-checked="true" = โหมดมืด -->
+        <button type="button" id="theme-switch" class="theme-switch" role="switch" aria-checked="false"
+                aria-label="โหมดมืด" data-i18n-aria-label="themeSwitch">
+          <span class="theme-switch-icon sun" aria-hidden="true">☀️</span>
+          <span class="theme-switch-icon moon" aria-hidden="true">🌙</span>
+          <span class="theme-switch-thumb" aria-hidden="true"></span>
+        </button>
+      </div>
     </div>
   </header>
 
   <main class="container">
-    <!-- ส่วนรับข้อมูล -->
-    <form id="input-form" class="card" novalidate>
-      <section class="step">
-        <h2><span class="step-number">1</span> กำหนดโปรเซส</h2>
+    <!-- แถบขั้นตอน: กดย้อนกลับไปขั้นที่ทำแล้วได้ -->
+    <nav aria-label="ขั้นตอนการใช้งาน" data-i18n-aria-label="stepperLabel">
+      <ol class="stepper">
+        <li><button type="button" class="step-link" data-step="1"><span class="step-number">1</span><span class="step-label" data-i18n="step1Name">จำนวนโปรเซส</span></button></li>
+        <li><button type="button" class="step-link" data-step="2"><span class="step-number">2</span><span class="step-label" data-i18n="step2Name">Burst Time และสี</span></button></li>
+        <li><button type="button" class="step-link" data-step="3"><span class="step-number">3</span><span class="step-label" data-i18n="step3Name">Time Quantum</span></button></li>
+        <li><button type="button" class="step-link" data-step="4"><span class="step-number">4</span><span class="step-label" data-i18n="step4Name">ผลลัพธ์</span></button></li>
+      </ol>
+    </nav>
 
-        <div class="field-row">
-          <div class="field">
-            <label for="process-count">จำนวนโปรเซส</label>
-            <input id="process-count" type="text" inputmode="numeric" autocomplete="off" placeholder="เช่น 3, 5, 10">
-            <small class="hint">จำนวนเต็ม 1–20 ระบบตั้งชื่อเป็น P1, P2, …, Pn</small>
-          </div>
+    <div id="error-box" class="error-box" role="alert" hidden>
+      <strong data-i18n="errorTitle">กรุณาแก้ไขข้อมูลต่อไปนี้</strong>
+      <ul id="error-list"></ul>
+    </div>
 
-          <fieldset class="field">
-            <legend>วิธีกำหนด Burst Time</legend>
-            <label class="radio"><input type="radio" name="burst-mode" value="random" checked> ให้ระบบสุ่ม (1–10)</label>
-            <label class="radio"><input type="radio" name="burst-mode" value="manual"> กรอกเอง</label>
-          </fieldset>
+    <!-- ขั้นที่ 1: จำนวนโปรเซส -->
+    <form id="step-1" class="card step-page" novalidate>
+      <h2 data-i18n="step1Title">ขั้นที่ 1 — กำหนดจำนวนโปรเซส</h2>
+      <p class="description" data-i18n="step1Description">ระบบจะตั้งชื่อโปรเซสเป็น P1, P2, …, Pn และทุกโปรเซสมาถึงพร้อมกัน (AT = 0)</p>
 
-          <div class="field field-actions">
-            <button type="button" id="build-button" class="button secondary">สร้างตาราง</button>
-            <button type="button" id="example-button" class="button ghost">ใช้ข้อมูลตัวอย่าง</button>
-          </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="process-count" data-i18n="processCountLabel">จำนวนโปรเซส</label>
+          <input id="process-count" type="text" inputmode="numeric" autocomplete="off" placeholder="เช่น 3, 5, 10" data-i18n-placeholder="processCountPlaceholder">
+          <small class="hint" data-i18n="processCountHint">จำนวนเต็ม 1–20</small>
         </div>
 
-        <div id="burst-section" class="burst-section" hidden>
-          <div class="burst-header">
-            <h3>Burst Time ของแต่ละโปรเซส <span class="muted">(AT = 0 ทุกโปรเซส)</span></h3>
-            <button type="button" id="reroll-button" class="button ghost small">สุ่มใหม่</button>
-          </div>
-          <div id="burst-grid" class="burst-grid"></div>
-        </div>
-      </section>
-
-      <section class="step">
-        <h2><span class="step-number">2</span> Time Quantum สำหรับ Round Robin</h2>
-        <div class="field field-narrow">
-          <label for="quantum">Time Quantum (TQ)</label>
-          <input id="quantum" type="text" inputmode="numeric" autocomplete="off" value="2">
-          <small class="hint">จำนวนเต็มบวก ค่าเริ่มต้น 2 — เปลี่ยนค่าแล้วกดคำนวณใหม่เพื่อเทียบผลบนชุดข้อมูลเดิม</small>
-        </div>
-      </section>
-
-      <div class="submit-row">
-        <button type="submit" class="button primary">คำนวณทั้ง 3 อัลกอริทึม</button>
+        <fieldset class="field">
+          <legend data-i18n="burstModeLegend">วิธีกำหนด Burst Time</legend>
+          <label class="radio"><input type="radio" name="burst-mode" value="random" checked> <span data-i18n="burstModeRandom">ให้ระบบสุ่ม (1–10)</span></label>
+          <label class="radio"><input type="radio" name="burst-mode" value="manual"> <span data-i18n="burstModeManual">กรอกเอง</span></label>
+        </fieldset>
       </div>
 
-      <div id="error-box" class="error-box" role="alert" hidden>
-        <strong>กรุณาแก้ไขข้อมูลต่อไปนี้</strong>
-        <ul id="error-list"></ul>
+      <div class="step-actions">
+        <button type="button" id="example-button" class="button ghost" data-i18n="exampleButton">ใช้ข้อมูลตัวอย่าง</button>
+        <button type="submit" class="button primary" data-i18n="nextButton">ถัดไป →</button>
       </div>
     </form>
 
-    <!-- ส่วนแสดงผล (ซ่อนไว้จนกว่าจะคำนวณครั้งแรก) -->
-    <section id="results" class="card" hidden>
+    <!-- ขั้นที่ 2: Burst Time และสีของแต่ละโปรเซส (สร้างช่องใน ui.js) -->
+    <form id="step-2" class="card step-page" novalidate hidden>
+      <h2 data-i18n="step2Title">ขั้นที่ 2 — Burst Time และสีของแต่ละโปรเซส</h2>
+      <p id="burst-mode-note" class="description"></p>
+
+      <div class="burst-toolbar">
+        <button type="button" id="reroll-button" class="button ghost small" data-i18n="rerollButton">สุ่ม Burst Time ใหม่</button>
+        <button type="button" id="reset-colors-button" class="button ghost small" data-i18n="resetColorsButton">ใช้สีเริ่มต้น</button>
+      </div>
+      <div id="burst-grid" class="burst-grid"></div>
+      <p class="hint" data-i18n="colorHint">กดที่ช่องสีหน้าชื่อโปรเซสเพื่อเลือกสีที่ใช้ใน Gantt chart และตารางผลลัพธ์</p>
+
+      <div class="step-actions">
+        <button type="button" class="button ghost" data-go-step="1" data-i18n="backButton">← ย้อนกลับ</button>
+        <button type="submit" class="button primary" data-i18n="nextButton">ถัดไป →</button>
+      </div>
+    </form>
+
+    <!-- ขั้นที่ 3: Time Quantum -->
+    <form id="step-3" class="card step-page" novalidate hidden>
+      <h2 data-i18n="step3Title">ขั้นที่ 3 — Time Quantum สำหรับ Round Robin</h2>
+      <p class="description" data-i18n="step3Description">FCFS และ SJF ไม่ใช้ค่านี้ ระบบจะคำนวณทั้ง 3 อัลกอริทึมจากชุด Burst Time เดียวกัน</p>
+
+      <div class="field field-narrow">
+        <label for="quantum" data-i18n="quantumLabel">Time Quantum (TQ)</label>
+        <input id="quantum" type="text" inputmode="numeric" autocomplete="off" value="2">
+        <small class="hint" data-i18n="quantumHint">จำนวนเต็มบวก ค่าเริ่มต้น 2 — เปลี่ยนค่าแล้วกดคำนวณใหม่เพื่อเทียบผลบนชุดข้อมูลเดิม</small>
+      </div>
+
+      <div class="step-actions">
+        <button type="button" class="button ghost" data-go-step="2" data-i18n="backButton">← ย้อนกลับ</button>
+        <button type="submit" class="button primary" data-i18n="calculateButton">คำนวณทั้ง 3 อัลกอริทึม</button>
+      </div>
+    </form>
+
+    <!-- ขั้นที่ 4: ผลลัพธ์ -->
+    <section id="step-4" class="card step-page" hidden>
       <div class="results-header">
-        <h2>ผลลัพธ์</h2>
+        <h2 data-i18n="resultsTitle">ผลลัพธ์</h2>
         <label class="toggle">
-          <input type="checkbox" id="show-formulas"> แสดงวิธีคำนวณ TAT / WT ในตาราง
+          <input type="checkbox" id="show-formulas"> <span data-i18n="showFormulas">แสดงวิธีคำนวณ TAT / WT ในตาราง</span>
         </label>
       </div>
 
-      <p id="stale-note" class="stale-note" hidden>
-        ข้อมูลถูกแก้ไขหลังการคำนวณครั้งล่าสุด ผลด้านล่างยังเป็นของชุดข้อมูลเดิม — กด "คำนวณทั้ง 3 อัลกอริทึม" เพื่ออัปเดต
+      <p id="stale-note" class="stale-note" data-i18n="staleNote" hidden>
+        ข้อมูลถูกแก้ไขหลังการคำนวณครั้งล่าสุด ผลด้านล่างยังเป็นของชุดข้อมูลเดิม — ทำขั้นที่ 1–3 ให้ครบแล้วกด "คำนวณทั้ง 3 อัลกอริทึม" อีกครั้งเพื่ออัปเดต
       </p>
 
       <div class="dataset">
-        <span class="dataset-label">ชุดข้อมูลที่ใช้คำนวณ</span>
+        <span class="dataset-label" data-i18n="datasetLabel">ชุดข้อมูลที่ใช้คำนวณ</span>
         <div id="dataset-chips" class="chips"></div>
       </div>
 
-      <div class="tabs" role="tablist" aria-label="เลือกดูผลของแต่ละอัลกอริทึม">
+      <div class="tabs" role="tablist" aria-label="เลือกดูผลของแต่ละอัลกอริทึม" data-i18n-aria-label="tabsLabel">
         <button type="button" role="tab" class="tab" data-tab="FCFS">FCFS</button>
         <button type="button" role="tab" class="tab" data-tab="SJF">SJF</button>
         <button type="button" role="tab" class="tab" data-tab="RR" id="rr-tab">Round Robin</button>
-        <button type="button" role="tab" class="tab" data-tab="COMPARE">เปรียบเทียบ</button>
+        <button type="button" role="tab" class="tab" data-tab="COMPARE" data-i18n="compareTab">เปรียบเทียบ</button>
       </div>
 
       <div id="result-panel" class="result-panel" role="tabpanel" aria-live="polite"></div>
+
+      <div class="step-actions">
+        <button type="button" class="button ghost" data-go-step="3" data-i18n="changeQuantumButton">← เปลี่ยน Time Quantum</button>
+        <button type="button" class="button secondary" data-go-step="1" data-i18n="editProcessesButton">แก้ไขโปรเซส / Burst Time</button>
+      </div>
     </section>
   </main>
 
+  <!-- กล่องเลือกสี: มีอันเดียว ui.js ย้ายไปแสดงใต้ช่องสีของโปรเซสที่ถูกกด -->
+  <div id="color-popover" class="color-popover" role="dialog" aria-labelledby="color-popover-title" hidden>
+    <strong id="color-popover-title" class="color-popover-title"></strong>
+    <div class="color-popover-section" data-i18n="presetColors">สีตัวอย่าง</div>
+    <div id="preset-colors" class="preset-colors"></div>
+    <label class="custom-color">
+      <input type="color" id="custom-color">
+      <span data-i18n="customColor">กำหนดเอง (RGB)</span>
+      <code id="custom-color-value"></code>
+    </label>
+  </div>
+
   <footer class="site-footer">
-    <div class="container">Term Project — CPU Scheduling Simulator</div>
+    <div class="container" data-i18n="footer">Term Project — CPU Scheduling Simulator</div>
   </footer>
 
-  <!-- ลำดับสำคัญ: ui.js ใช้ Scheduler และ Validation จึงต้องโหลดสองไฟล์นี้ก่อน -->
+  <!-- ลำดับสำคัญ: ui.js ใช้ Scheduler, Validation และ I18n จึงต้องโหลดสามไฟล์นี้ก่อน -->
   <script src="js/scheduler.js"></script>
   <script src="js/validation.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/ui.js"></script>
 </body>
 </html>

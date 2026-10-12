@@ -87,8 +87,8 @@ test('ค่าปกติ', () => {
 });
 
 test('ยังไม่มีตาราง', () => {
-  expectFail(Validation.validateBurstTimes([]), /สร้างตาราง/);
-  expectFail(Validation.validateBurstTimes(undefined), /สร้างตาราง/);
+  expectFail(Validation.validateBurstTimes([]), /ขั้นที่ 1/);
+  expectFail(Validation.validateBurstTimes(undefined), /ขั้นที่ 1/);
 });
 
 test('TC-V06 กรอกไม่ครบ บอกทุกโปรเซสที่ว่าง', () => {
@@ -138,6 +138,24 @@ test('TC-V08 TQ ไม่ใช่จำนวนเต็มบวก', () => {
   expectFail(Validation.validateQuantum('-2'), /^Time Quantum: ต้องมากกว่า 0/);
   expectFail(Validation.validateQuantum('1.5'), /^Time Quantum: ต้องเป็นจำนวนเต็มบวก/);
   expectFail(Validation.validateQuantum('101'), /^Time Quantum: ต้องไม่เกิน 100/);
+});
+
+// ---------- ข้อความภาษาอังกฤษ (ปุ่ม TH / ENG) ----------
+
+console.log('ภาษาอังกฤษ');
+
+test('ส่ง language = "en" ได้ข้อความภาษาอังกฤษ', () => {
+  expectFail(Validation.validateProcessCount('', 'en'), /^Number of processes: no value entered$/);
+  expectFail(Validation.validateProcessCount('21', 'en'), /^Number of processes: must not exceed 20 \(entered "21"\)$/);
+  expectFail(Validation.validateQuantum('0', 'en'), /^Time Quantum: must be greater than 0/);
+  expectFail(Validation.validateBurstTimes(['5', ''], 'en'), /^Burst Time is incomplete: P2 still empty$/);
+  expectFail(Validation.validateBurstTimes(['1.5'], 'en'), /^Burst Time of P1: must be a positive whole number/);
+  expectFail(Validation.validateBurstTimes([], 'en'), /step 1/);
+});
+
+test('ไม่ส่ง language หรือส่งภาษาที่ไม่รู้จัก ใช้ภาษาไทย', () => {
+  expectFail(Validation.validateQuantum('abc'), /ต้องเป็นจำนวนเต็มบวก/);
+  expectFail(Validation.validateQuantum('abc', 'fr'), /ต้องเป็นจำนวนเต็มบวก/);
 });
 
 console.log('\nผ่าน ' + passed + ' / ' + (passed + failed));
