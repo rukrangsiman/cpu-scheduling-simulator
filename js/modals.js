@@ -58,6 +58,22 @@ function svgElement(tag, attributes) {
   return element;
 }
 
+// ไล่สีของโปรเซสในภาพ SVG (D-044) ให้เหมือนแถบ Gantt: สร้าง <linearGradient> แล้วคืนค่า fill ที่ชี้ไปหามัน
+// สีปลายที่อ่อนกว่าคำนวณใน CSS (.figure-gradient ใน style.css) สูตรเดียวกับ --process-fill
+var figureGradientCount = 0; // นับไว้ตั้ง id ไม่ให้ซ้ำกัน แม้มีหลายภาพในหน้าเดียว
+
+function gradientFill(svg, color) {
+  figureGradientCount += 1;
+  var id = 'figure-gradient-' + figureGradientCount;
+  // x1,y1 → x2,y2 = มุมซ้ายบน → มุมขวาล่างของแท่ง (ทิศเดียวกับ 135deg ใน CSS)
+  var gradient = svgElement('linearGradient', { id: id, 'class': 'figure-gradient', x1: 0, y1: 0, x2: 1, y2: 1,
+    style: '--process-color: ' + color });
+  gradient.appendChild(svgElement('stop', { offset: 0, 'class': 'gradient-start' }));
+  gradient.appendChild(svgElement('stop', { offset: 1, 'class': 'gradient-end' }));
+  svg.appendChild(gradient);
+  return 'url(#' + id + ')';
+}
+
 function svgText(x, y, text, className) {
   var element = svgElement('text', { x: x, y: y, 'class': className, 'text-anchor': 'middle' });
   element.textContent = text;
@@ -120,7 +136,7 @@ function createBurstChart(profile) {
     var barHeight = Math.max(4, (value / max) * (chartBottom - chartTop));
     var x = 12 + j * slot + slot * 0.15;
     svg.appendChild(svgElement('rect', { x: x, y: chartBottom - barHeight, width: slot * 0.7, height: barHeight,
-      rx: Math.min(6, slot * 0.2), fill: colorOf(profile, j), 'class': value > 0 ? 'figure-bar' : 'figure-bar is-empty' }));
+      rx: Math.min(6, slot * 0.2), fill: gradientFill(svg, colorOf(profile, j)), 'class': value > 0 ? 'figure-bar' : 'figure-bar is-empty' }));
     // ชื่อและค่าแสดงเมื่อมีที่พอ (ไม่เกิน 12 โปรเซส) ถ้าเยอะกว่านั้นดูค่าได้ในการ์ดโปรเซส
     if (count <= 12) {
       svg.appendChild(svgText(x + slot * 0.35, chartBottom - barHeight - 6, profile.burstValues[j] || '–', 'figure-value'));
@@ -339,7 +355,7 @@ function createQueueFigure(source) {
   svg.appendChild(svgText(130, 16, t('readyQueue'), 'figure-label'));
   for (var j = 0; j < shown.length; j++) {
     var x = 8 + j * 36;
-    svg.appendChild(svgElement('rect', { x: x, y: 28, width: 30, height: 34, rx: 7, fill: source.color(shown[j]), 'class': 'figure-bar' }));
+    svg.appendChild(svgElement('rect', { x: x, y: 28, width: 30, height: 34, rx: 7, fill: gradientFill(svg, source.color(shown[j])), 'class': 'figure-bar' }));
     var label = svgText(x + 15, 50, shown[j], 'figure-chip-text');
     svg.appendChild(label);
   }
@@ -368,7 +384,7 @@ function createMiniGantt(source) {
     var x = 10 + gantt[i].start * scale;
     var slotWidth = (gantt[i].end - gantt[i].start) * scale;
     var color = source.color(gantt[i].id);
-    svg.appendChild(svgElement('rect', { x: x + 1, y: 10, width: Math.max(1, slotWidth - 2), height: 32, rx: 6, fill: color, 'class': 'figure-bar' }));
+    svg.appendChild(svgElement('rect', { x: x + 1, y: 10, width: Math.max(1, slotWidth - 2), height: 32, rx: 6, fill: gradientFill(svg, color), 'class': 'figure-bar' }));
     if (slotWidth >= 24) {
       var label = svgText(x + slotWidth / 2, 31, gantt[i].id, 'figure-chip-text');
       svg.appendChild(label);

@@ -45,13 +45,14 @@ var STATUS_ICON = { idle: 'clock', done: 'check', stale: 'refresh' };
 // ข้อมูลตัวอย่าง TC-01 ใน docs/TEST_CASES.md — ใช้วาดภาพใน popup "วิธีทำงาน" เมื่อ CPU ยังไม่ได้ Run (modals.js)
 var EXAMPLE_BURST_TIMES = [5, 3, 8, 6];
 
-// สีเริ่มต้นของ P1..P10 และ "สีตัวอย่าง" ในกล่องเลือกสี (D-021, เหลือ 10 สีตาม D-036 — หนึ่งสีต่อหนึ่งโปรเซส ไม่ซ้ำกัน)
-// สดใส (saturation สูง) แต่ไม่จัดจ้านจนหลุดธีมของเว็บ และทุกสีเข้มพอให้ตัวอักษรสีขาวบนแถบ Gantt อ่านง่าย
-// (contrast กับสีขาว ≥ 4.6:1 ตามสูตร WCAG — แต่ละเฉดเลือกความสว่างสูงสุดที่ยังผ่านเกณฑ์นี้ สีจึงไม่ตุ่น)
-// ส้ม ม่วง เขียวมรกต ฟ้า ชมพูกุหลาบ / บานเย็น ฟ้าอมเขียว แดง คราม เขียว
+// สีเริ่มต้นของ P1..P10 และ "สีตัวอย่าง" ในกล่องเลือกสี (D-045 — ชุดสีที่ผู้ใช้เลือกเอง แทนชุดของ D-044)
+// โทนสว่างสดใส หนึ่งสีต่อหนึ่งโปรเซส ไม่ซ้ำกัน — เพราะสีสว่าง ตัวอักษรบนแถบ Gantt จึงเป็นสีเข้ม (--process-text ใน style.css)
+// ซึ่งได้ contrast ≥ 4.5:1 กับทุกสีตามสูตร WCAG (ถ้าเป็นตัวขาวจะได้แค่ 1.7–3.6:1)
+// ส่วนการไล่สีไปยังเฉดที่สว่างกว่า ทำใน CSS (--process-fill ใน style.css)
+// Coral Red, Electric Blue, Teal, Violet, Amber / Lime Green, Sky Blue, Rose Pink, Indigo, Soft Orange
 var DEFAULT_COLORS = [
-  '#c54f14', '#8255ec', '#078564', '#1370ea', '#df2066',
-  '#bd2dda', '#087e9b', '#dd2f3a', '#6363e6', '#20871d'
+  '#ff6b6b', '#4d8dff', '#20c9b7', '#b276ff', '#ffb547',
+  '#a3d957', '#36bffa', '#f05ca8', '#7775ff', '#ff875e'
 ];
 
 var ALGORITHM_TITLES = {
@@ -850,8 +851,8 @@ function createGanttSlot(result, index) {
 
   var bar = createElement('div', 'gantt-bar', slot.id);
   var color = processColor(slot.id);
-  bar.style.backgroundColor = color; // ตัวอักษรบนแถบเป็นสีขาวเสมอ (กำหนดใน CSS)
-  bar.style.setProperty('--process-color', color); // ใช้ทำแสงเรืองใต้แถบ (CSS)
+  bar.style.backgroundColor = color; // ตัวอักษรบนแถบเป็นสีเข้มเสมอ (กำหนดใน CSS)
+  bar.style.setProperty('--process-color', color); // ใช้ไล่สีและทำแสงเรืองใต้แถบ (CSS)
   // แถบปรากฏทีละแถบจากซ้ายไปขวา หน่วงรวมไม่เกิน 0.6 วินาทีแม้มีหลายช่วง
   bar.style.animationDelay = Math.min(index * 40, 600) + 'ms';
   item.appendChild(bar);
@@ -998,6 +999,7 @@ function createKpiBars(result, key) {
     var percent = maxValue > 0 ? (row[key] / maxValue) * 100 : 0;
     bar.style.height = Math.max(percent, 8) + '%';
     bar.style.backgroundColor = processColor(row.id);
+    bar.style.setProperty('--process-color', processColor(row.id)); // ใช้ไล่สี (CSS)
     bar.title = row.id + ' = ' + row[key];
     chart.appendChild(bar);
   }
@@ -1013,6 +1015,7 @@ function createKpiStrip(result) {
     var piece = createElement('span', 'kpi-strip-piece');
     piece.style.flexGrow = String(slot.end - slot.start);
     piece.style.backgroundColor = processColor(slot.id);
+    piece.style.setProperty('--process-color', processColor(slot.id)); // ใช้ไล่สี (CSS)
     chart.appendChild(piece);
   }
   return chart;
