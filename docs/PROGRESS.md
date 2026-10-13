@@ -71,6 +71,7 @@
 - ✅ เรียก `submission-auditor` — 24/44 ข้อผ่าน ข้อที่เหลือเป็นงานสมาชิก แก้ข้อผิดพลาดที่พบในเอกสารแล้ว (AI-005)
 - ⬜ เรียก `submission-auditor` อีกครั้งหลังสมาชิกกรอกข้อมูลครบ
 - ✅ (เสริม) Deploy ขึ้น GitHub Pages: https://rukrangsiman.github.io/cpu-scheduling-simulator/ (D-042)
+- ✅ ไอคอนแท็บเป็นภาพชิป CPU + ชื่อแท็บคงที่ "CPU Scheduling Simulator" (D-043)
 
 ## Phase 6 — วิดีโอ
 - ⬜ `docs/VIDEO_PLAN.md`: บทวิดีโอส่วนที่ 2 แบ่งช่วงให้สมาชิกทุกคน
@@ -127,3 +128,5 @@
 | 2026-10-13 | แนะนำสิ่งที่ควรมีในหน้าตั้งค่า → เพิ่มสวิตช์ปิด animation พื้นหลัง (D-041, TC-U14) — test 19 / 17 / 12 ผ่าน | Claude Code |
 | 2026-10-13 | แก้: ปิด animation แล้ววงแหวนในภาพชิปยังหมุน (อยู่ใน `<use>` selector เข้าไม่ถึง → ใช้ตัวแปร CSS) ยืนยันด้วยภาพจริงห่างกัน 10 วินาที / ย่อคำอธิบายใต้สวิตช์เป็น "ปิดการเคลื่อนไหวของพื้นหลัง" | Claude Code |
 | 2026-10-13 | รวม `ui-multi-cpu-redesign` เข้า `main` (fast-forward), สร้าง repo public บน GitHub, deploy GitHub Pages (D-042) — ลอง TC-01 บนเว็บจริงผ่าน, test 19 / 17 / 12 ผ่าน | Claude Code |
+| 2026-10-13 | ไอคอนแท็บ (favicon) เป็นภาพชิป CPU แบบโลโก้ และชื่อแท็บคงที่ "CPU Scheduling Simulator" ไม่ขึ้นชื่อ CPU (D-043) — test 19 / 17 / 12 ผ่าน | Claude Code |
+| 2026-10-13 | ไอคอนแท็บเปลี่ยนเป็นสีโลโก้ธีมมืด (#cf6249 → #b1507a + แสงขาวด้านบน) ตามภาพที่ผู้ใช้ส่ง (D-043) | Claude Code |

@@ -1853,7 +1853,6 @@ function updateActiveCpuCard() {
 function renderWorkspaceHeader() {
   var status = cpuStatus(state);
   byId('cpu-name').textContent = state.name;
-  document.title = state.name + ' — CPU Scheduling Simulator';
 
   var meta = byId('cpu-meta');
   meta.textContent = '';
