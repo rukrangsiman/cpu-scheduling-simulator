@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CPU Scheduling Simulator</title>
+  <!-- คำอธิบายเว็บ + การ์ดตัวอย่างตอนแชร์ลิงก์ (LINE / Discord / Facebook) (D-047)
+       ใช้แค่ข้อความ ไม่มี og:image เพราะการ์ดแชร์ส่วนใหญ่ไม่รองรับรูป SVG
+       ไม่มีผลกับการเปิดไฟล์ตรงด้วย double-click -->
+  <meta name="description" content="จำลอง CPU Scheduling แบบ FCFS, SJF (Non-preemptive) และ Round Robin พร้อม Gantt Chart, ST / CT / TAT / WT และค่าเฉลี่ย">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CPU Sim Lab">
+  <meta property="og:title" content="CPU Scheduling Simulator">
+  <meta property="og:description" content="จำลอง FCFS, SJF (Non-preemptive) และ Round Robin พร้อม Gantt Chart และตารางผลลัพธ์">
+  <meta property="og:url" content="https://cpusimlab.com/">
   <!-- ไอคอนแท็บ = ภาพชิป CPU เดียวกับโลโก้ในแถบซ้าย (เส้นขาวบนพื้นไล่สีคอรัล → ชมพู แบบธีมมืด + แสงขาวจาง ๆ ด้านบน เหมือน .brand-mark)
        ฝังเป็น data URI ในไฟล์นี้เลย จึงไม่ต้องโหลดไฟล์แยก และใช้ได้ทั้งตอน double-click (file://) และบนเว็บ
        (%23 = เครื่องหมาย # ที่ต้องเข้ารหัสใน URL) -->
@@ -55,7 +64,7 @@
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z M10 10h4v4h-4z M9 3v4 M15 3v4 M9 17v4 M15 17v4 M3 9h4 M3 15h4 M17 9h4 M17 15h4"/></svg>
         </button>
         <span class="brand-text">
-          <strong>CPU Scheduler</strong>
+          <strong>CPU Sim Lab</strong>
           <small data-i18n="brandTagline">Simulation Studio</small>
         </span>
       </div>
@@ -231,6 +240,9 @@
 
       <footer class="site-footer">
         <span data-i18n="footer">CPU Scheduling Simulator · FCFS · SJF (Non-preemptive) · Round Robin · AT = 0</span>
+        <!-- ชื่อโดเมนเหมือนกันทั้งสองภาษา จึงแยกไว้นอก span ที่ i18n เปลี่ยนข้อความ (D-047) -->
+        <span aria-hidden="true">·</span>
+        <a class="footer-link" href="https://cpusimlab.com/">cpusimlab.com</a>
       </footer>
     </div>
   </div>

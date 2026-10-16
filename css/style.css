@@ -3426,6 +3426,18 @@ input[type="color"]::-webkit-color-swatch {
   color: var(--text-muted);
 }
 
+/* ลิงก์โดเมนท้ายหน้า (D-047): สีเดียวกับข้อความ ขีดเส้นใต้ตอนชี้ */
+.footer-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-link:hover,
+.footer-link:focus-visible {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
 /* ---------- 6) Animation (นุ่ม สั้น ไม่วูบวาบ) ---------- */
 
 @keyframes fade-in {

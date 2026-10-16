@@ -133,3 +133,4 @@
 | 2026-10-13 | สีเริ่มต้นของโปรเซสชุดใหม่: สลับสว่าง/เข้ม เฉดจากธีม คู่ที่ใกล้สุด ΔE 5.4 → 9.8 + ไล่สีทุกที่ที่วาดสีโปรเซส (CSS relative color / SVG gradient) (D-044) — test 19 / 17 / 12 ผ่าน, ทดสอบใน Browser pane สองธีม | Claude Code |
 | 2026-10-13 | ใช้ชุดสีโปรเซสที่ผู้ใช้ส่งมา (โทนสว่าง 10 สี), ตัวอักษรบน Gantt เป็นสีเข้ม (ผู้ใช้เลือกหลัง AI ถาม), ไล่สีไปทางสว่าง (D-045) — test 19 / 17 / 12 ผ่าน, ทดสอบใน Browser pane สองธีม | Claude Code |
 | 2026-10-16 | ผูกโดเมน `cpusimlab.com` กับ GitHub Pages (D-046) — ผู้ใช้ซื้อโดเมนและตั้ง DNS / Pages เองตามขั้นตอนของ AI, AI ตรวจ DNS / HTTPS / redirect แล้วแก้ลิงก์ในเอกสาร | Claude Code |
+| 2026-10-16 | ลิงก์ `cpusimlab.com` ท้ายหน้า, meta description + Open Graph, ชื่อแถบซ้าย "CPU Sim Lab" (D-047) — test 19 / 17 / 12 ผ่าน, ทดสอบใน Browser pane TH/EN | Claude Code |
