@@ -836,3 +836,19 @@
 - **ตรวจสอบอย่างไร:** test 19 / 17 / 12 ผ่าน; Browser pane: Run 10 โปรเซส (RR) ดู Gantt / เม็ดสี / กราฟจิ๋ว ทั้งธีมสว่างและมืด, popup วิธีทำงาน (ตัวอักษรเข้ม แท่งไล่สี); อ่านค่าที่ browser คำนวณ: สีตัวอักษร rgb(29, 31, 47), gradient เริ่มจากสีที่สว่างกว่า; ไม่มี console error
 - **สิ่งที่ทีมแก้หรือไม่ใช้:** _(ใส่หลังทบทวน)_
 - **มนุษย์ตรวจแล้ว:** ⬜ รอตรวจ
+
+### AI-045 — ผูกโดเมน cpusimlab.com กับ GitHub Pages
+- **วันที่:** 2026-10-14 ถึง 2026-10-16
+- **ผู้ใช้ AI:** _(ใส่ชื่อ)_
+- **เครื่องมือ:** Claude Code + GitHub CLI (`gh`) + `nslookup` / `curl`
+- **หมวด:** วางแผนการนำเสนอ
+- **Prompt:** (1) "ถ้าจะทำเป็น.comต้องทำไง" (2) (แนบภาพหน้าโดเมนใน Cloudflare) "ซื้อมาแล้วทำไงต่อ" (3) (แนบภาพหน้า home ของ Cloudflare) "มันไม่มีขึ้นทำไง" (4) "ข้อ1-2ทำเสร็จแล้ว ข้อ3ทำยังไง" (5) (แนบภาพ Verified) "เสร็จข้อ3แล้ว ทำไงต่อ"
+- **AI ทำอะไร:**
+  - อธิบายขั้นตอน: ซื้อโดเมน → ตั้ง A / CNAME ใน DNS → ใส่ Custom domain ใน GitHub Pages → ยืนยันโดเมนด้วย TXT record และเตือนให้ปิด proxy ของ Cloudflare (เมฆสีเทา)
+  - เมื่อหน้า home ของ Cloudflare ไม่แสดงโดเมน ให้ลิงก์ตรงไปหน้า DNS Records (ประกอบจาก account ID ใน URL ของภาพ) และทางสำรอง
+  - ตรวจผลด้วย `nslookup` (A 4 ตัว + CNAME `www`), `gh api .../pages` (cname, ใบรับรอง approved, https_enforced) และ `curl` (200 / redirect 301)
+  - `git pull` ไฟล์ `CNAME` ที่ GitHub commit ให้ แล้วแก้ลิงก์เว็บในเอกสาร
+- **ไฟล์ที่เกี่ยวข้อง:** `CNAME` (GitHub สร้าง), `README.md`, `docs/DECISIONS.md` (D-042, D-046), `docs/PROGRESS.md`, `docs/NEXT_STEPS.md`
+- **ตรวจสอบอย่างไร:** `nslookup` ผ่าน 1.1.1.1, `gh api` สถานะ Pages, `curl -I` ทั้ง `cpusimlab.com`, `www.cpusimlab.com` และลิงก์ `github.io` เดิม; test 19 / 17 / 12 ผ่าน
+- **สิ่งที่ทีมแก้หรือไม่ใช้:** ผู้ใช้ซื้อโดเมนและกดตั้งค่าทุกอย่างในบัญชี Cloudflare / GitHub เอง (AI ให้แค่ขั้นตอนและตรวจผล)
+- **มนุษย์ตรวจแล้ว:** ⬜ รอตรวจ

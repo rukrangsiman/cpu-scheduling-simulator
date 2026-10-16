@@ -458,7 +458,7 @@ AI เสนอใน D-030 ว่าแถบเข้มบนพื้นค�
 ### D-042 Deploy ขึ้น GitHub Pages (public repo) — ✅ (ผู้ใช้ขอ 2026-10-13)
 ผู้ใช้ถามวิธี deploy ขึ้น public → AI เสนอ GitHub Pages / Netlify / Cloudflare Pages / Vercel → ผู้ใช้เลือก GitHub Pages, repo แบบ public (ชั่วคราว) และ merge เข้า `main` ก่อน
 - repo: https://github.com/rukrangsiman/cpu-scheduling-simulator (public) — push ทั้ง `main` และ `ui-multi-cpu-redesign`
-- เว็บ: https://rukrangsiman.github.io/cpu-scheduling-simulator/ — deploy จาก `main` โฟลเดอร์ root ทุกครั้งที่ push เข้า `main` เว็บจะอัปเดตเอง
+- เว็บ: https://rukrangsiman.github.io/cpu-scheduling-simulator/ (ตั้งแต่ D-046 ย้ายไปที่ https://cpusimlab.com ลิงก์นี้ redirect ไปเอง) — deploy จาก `main` โฟลเดอร์ root ทุกครั้งที่ push เข้า `main` เว็บจะอัปเดตเอง
 - `main` fast-forward ให้ตรงกับ `ui-multi-cpu-redesign` (main ไม่มี commit แยก จึงไม่มี merge commit / conflict)
 - ไม่ต้องแก้โค้ด: D-001 (ไม่มี absolute path / CDN / ES modules) ทำให้หน้าเว็บทำงานใต้ subpath `/cpu-scheduling-simulator/` ได้ทันที
 - **ผลที่ตามมา:** ไฟล์ทั้ง repo (รวม `docs/AI_LOG.md`, `CLAUDE.md`, `.claude/`) เปิดดูได้สาธารณะ, localStorage บนเว็บแยกจากตอนเปิดไฟล์ในเครื่อง
@@ -498,3 +498,14 @@ AI เสนอใน D-030 ว่าแถบเข้มบนพื้นค�
   ถ้ายังไล่ไปทางมืดแบบ D-044 ปลายแถบของสีคราม/ม่วงจะทำให้ตัวอักษรเข้มต่ำกว่าเกณฑ์ (Indigo ฐานได้ 4.48:1 อยู่แล้ว)
 - **ข้อสังเกต:** คู่สีที่ใกล้กันที่สุดในชุดนี้คือ Coral Red / Soft Orange (P1 / P10, ΔE 6.6) และ Electric Blue / Indigo (P2 / P9, ΔE 6.9) — ไม่ได้อยู่ติดกันในลำดับ จึงยังไม่ได้แก้
 - **ไม่เปลี่ยน:** วิธีไล่สีด้วย CSS relative color + `@supports` สำรอง (D-044), ข้อมูลใน localStorage, สีที่ผู้ใช้เคยเลือกเองไว้ (กด "ใช้สีเริ่มต้น" เพื่อเปลี่ยนเป็นชุดใหม่)
+
+### D-046 ใช้โดเมน cpusimlab.com กับ GitHub Pages — ✅ (ผู้ใช้ขอ 2026-10-14 ถึง 2026-10-16)
+ผู้ใช้ถาม "ถ้าจะทำเป็น.comต้องทำไง" แล้วซื้อ `cpusimlab.com` ที่ Cloudflare Registrar และตั้งค่าเองตามขั้นตอนที่ AI ให้ (AI ไม่ได้ซื้อหรือกดตั้งค่าในบัญชีใด ๆ แทน)
+- **DNS (Cloudflare):** A `@` → 185.199.108.153 / .109.153 / .110.153 / .111.153, CNAME `www` → `rukrangsiman.github.io` ทุกรายการเป็น DNS only (เมฆสีเทา) เพื่อให้ GitHub ออกใบรับรอง HTTPS ได้
+- **GitHub:** repo Settings → Pages → Custom domain = `cpusimlab.com` (GitHub commit ไฟล์ `CNAME` เข้า `main` ให้เอง), เปิด Enforce HTTPS, ยืนยันโดเมนกับบัญชีด้วย TXT record `_github-pages-challenge-rukrangsiman` (กันคนอื่นเอาโดเมนไปผูกกับ repo ของเขา)
+- **ผลที่ได้:** `https://cpusimlab.com` ตอบ 200, `www.cpusimlab.com` และลิงก์ `github.io` เดิม redirect (301) มาที่ `https://cpusimlab.com/`
+- ไม่ต้องแก้โค้ด: ทุก path เป็น relative (D-001) จึงย้ายจาก subpath `/cpu-scheduling-simulator/` มาอยู่ที่ root ของโดเมนได้ทันที
+- **ผลที่ตามมา:**
+  - localStorage แยกตามโดเมน — CPU / ธีม / ภาษาที่เคยบันทึกบน `github.io` จะไม่ตามมาที่ `cpusimlab.com`
+  - โดเมนต้องต่ออายุทุกปี (.com ราว $10–11 / ปี) **ถ้าไม่ต่อ ให้ลบ Custom domain ใน Settings → Pages ก่อนหมดอายุ** ไม่งั้นลิงก์ `github.io` จะ redirect ไปโดเมนที่ใช้ไม่ได้แล้ว
+  - ห้ามลบไฟล์ `CNAME` ที่ root ของ repo (ถ้าลบ เว็บจะหลุดจากโดเมน)
