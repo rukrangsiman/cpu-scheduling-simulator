@@ -514,7 +514,9 @@ AI เสนอใน D-030 ว่าแถบเข้มบนพื้นค�
 ผู้ใช้ถามว่าได้โดเมนแล้วควรแก้คำตรงไหนในหน้าเว็บ AI เสนอ 3 ข้อ ผู้ใช้ให้ทำทั้งหมด
 - **ท้ายหน้า:** เพิ่มลิงก์ `cpusimlab.com` ต่อท้ายข้อความเดิม แยกไว้นอก `<span data-i18n="footer">` เพราะชื่อโดเมนเหมือนกันทั้ง TH/EN (จึงไม่ต้องแก้ i18n.js) สีเดียวกับข้อความ ขีดเส้นใต้ตอนชี้ (`.footer-link`)
 - **meta tags ใน `<head>`:** `description` + Open Graph (`og:type`, `og:site_name` = CPU Sim Lab, `og:title`, `og:description`, `og:url` = https://cpusimlab.com/) ให้การ์ดตอนแชร์ลิงก์มีคำอธิบาย
-  ไม่ใส่ `og:image` เพราะการ์ดแชร์ส่วนใหญ่ไม่รองรับ SVG ต้องทำรูป PNG แยก (ทำเพิ่มภายหลังได้)
+- **รูปการ์ดแชร์ (เพิ่มตามที่ผู้ใช้ขอหลังลองแชร์ลิงก์แล้ว):** `assets/og-image.png` 1200 × 630 (PNG เพราะการ์ดแชร์ส่วนใหญ่ไม่รองรับ SVG)
+  ใส่ `og:image` (URL เต็ม) + `og:image:width/height/alt` + `twitter:card = summary_large_image` ให้ Discord แสดงรูปใหญ่
+  ต้นฉบับคือ `assets/og-image.html` (สี/ฟอนต์ธีมมืด, โลโก้, ชื่อ, Gantt SJF ของ BT 10/4/9/9 จริง, โดเมน) สร้าง PNG ใหม่ด้วย Edge headless ตามคำสั่งในคอมเมนต์ของไฟล์
 - **ชื่อในแถบซ้าย:** "CPU Scheduler" → **"CPU Sim Lab"** ให้ตรงกับโดเมน (tagline "Simulation Studio" เหมือนเดิม)
 - **ไม่เปลี่ยน:** `<title>` และหัวข้อใหญ่ยังเป็น "CPU Scheduling Simulator" (ชื่องานที่ผู้ตรวจรู้จัก, D-043)
 - ทั้งหมดเป็นข้อความ / URL สาธารณะ ไม่กระทบการเปิดไฟล์ด้วย double-click

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>og-image source</title>
+  <!--
+    ต้นฉบับของรูปการ์ดแชร์ลิงก์ assets/og-image.png (D-047) — ไม่ใช่ส่วนหนึ่งของหน้าเว็บ
+    ขนาด 1200 × 630 px ตามที่ LINE / Discord / Facebook แนะนำ สีและฟอนต์เดียวกับธีมมืดใน css/style.css
+    ถ้าแก้ไฟล์นี้ ให้สร้าง PNG ใหม่ด้วยคำสั่ง (รันที่โฟลเดอร์โปรเจ็ค):
+      "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless --disable-gpu --hide-scrollbars
+        --force-device-scale-factor=1 --window-size=1200,630 --screenshot="%CD%\assets\og-image.png" "%CD%\assets\og-image.html"
+    Gantt ตัวอย่าง = SJF ของ BT 10, 4, 9, 9 (ค่าเริ่มต้นของ CPU 1): P2 → P3 → P4 → P1
+  -->
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+    }
+
+    body {
+      position: relative;
+      background: #121320;
+      color: #f2ede7;
+      font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+    }
+
+    /* แสงพื้นหลังแบบเดียวกับหน้าเว็บ: ดวงอาทิตย์คอรัล-ม่วงด้านบน + แสงส้มมุมขวาล่าง */
+    .sun {
+      position: absolute;
+      top: -260px;
+      left: 260px;
+      width: 760px;
+      height: 760px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(228, 143, 120, 0.75) 0%, rgba(150, 82, 130, 0.35) 42%, transparent 70%);
+      opacity: 0.42;
+    }
+
+    .ember {
+      position: absolute;
+      right: -220px;
+      bottom: -300px;
+      width: 720px;
+      height: 720px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(236, 122, 78, 0.45) 0%, transparent 65%);
+    }
+
+    /* ภาพชิป CPU แบบเส้นจาง ๆ ด้านขวา */
+    .chip-art {
+      position: absolute;
+      top: 70px;
+      right: -70px;
+      width: 470px;
+      height: 470px;
+      opacity: 0.13;
+      transform: rotate(12deg);
+    }
+
+    .content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 64px 80px 56px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    /* โลโก้เหมือน favicon / .brand-mark ธีมมืด */
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 84px;
+      height: 84px;
+      border-radius: 24px;
+      background:
+        radial-gradient(120% 120% at 30% 0%, rgba(255, 255, 255, 0.28), transparent 55%),
+        linear-gradient(135deg, #cf6249, #b1507a);
+      box-shadow: 0 18px 40px rgba(207, 98, 73, 0.35);
+    }
+
+    .brand-mark svg {
+      width: 48px;
+      height: 48px;
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .brand-name {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-tagline {
+      margin-top: 2px;
+      font-size: 21px;
+      color: #a09bae;
+    }
+
+    .title {
+      margin-top: 52px;
+      font-size: 84px;
+      font-weight: 700;
+      line-height: 1.02;
+      padding-bottom: 12px;
+      letter-spacing: -1.5px;
+      background: linear-gradient(100deg, #f4ebe3 0%, #c9b8ec 34%, #ee8a73 70%, #f0c48a 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 30px;
+      font-weight: 600;
+      color: #d9d2e3;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle span {
+      margin: 0 14px;
+      color: #ee8a73;
+    }
+
+    /* Gantt จิ๋ว: ความกว้างแต่ละแถบ = BT / 32 ของความยาวทั้งหมด */
+    .gantt {
+      display: flex;
+      gap: 6px;
+      width: 760px;
+      margin-top: 40px;
+    }
+
+    .slot {
+      position: relative;
+    }
+
+    .bar {
+      display: grid;
+      place-items: center;
+      height: 58px;
+      border-radius: 14px;
+      color: #1d1f2f;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .tick {
+      position: absolute;
+      top: 66px;
+      right: -3px;
+      font-size: 18px;
+      color: #a09bae;
+      transform: translateX(50%);
+    }
+
+    .tick.is-start {
+      right: auto;
+      left: 0;
+      transform: translateX(-50%);
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+    }
+
+    .domain {
+      font-size: 28px;
+      font-weight: 600;
+      color: #f2ede7;
+    }
+
+    .badge {
+      padding: 9px 22px;
+      border: 1px solid rgba(238, 138, 115, 0.45);
+      border-radius: 999px;
+      background: rgba(238, 138, 115, 0.12);
+      font-size: 20px;
+      font-weight: 600;
+      color: #ee8a73;
+    }
+  </style>
+</head>
+<body>
+  <div class="sun"></div>
+  <div class="ember"></div>
+
+  <svg class="chip-art" viewBox="0 0 24 24" fill="none" stroke="#b7a2ff" stroke-width="0.5" stroke-linecap="round">
+    <path d="M7 7h10v10H7z M10 10h4v4h-4z M9 3v4 M12 3v4 M15 3v4 M9 17v4 M12 17v4 M15 17v4 M3 9h4 M3 12h4 M3 15h4 M17 9h4 M17 12h4 M17 15h4"/>
+  </svg>
+
+  <div class="content">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24"><path d="M7 7h10v10H7z M10 10h4v4h-4z M9 3v4 M15 3v4 M9 17v4 M15 17v4 M3 9h4 M3 15h4 M17 9h4 M17 15h4"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">CPU Sim Lab</div>
+        <div class="brand-tagline">Simulation Studio</div>
+      </div>
+    </div>
+
+    <h1 class="title">CPU Scheduling Simulator</h1>
+    <p class="subtitle">FCFS<span>·</span>SJF<span>·</span>Round Robin</p>
+
+    <div class="gantt">
+      <div class="slot" style="flex: 4;">
+        <div class="bar" style="background: linear-gradient(135deg, #7eaaff, #4d8dff);">P2</div>
+        <span class="tick is-start">0</span>
+        <span class="tick">4</span>
+      </div>
+      <div class="slot" style="flex: 9;">
+        <div class="bar" style="background: linear-gradient(135deg, #5fe0cf, #20c9b7);">P3</div>
+        <span class="tick">13</span>
+      </div>
+      <div class="slot" style="flex: 9;">
+        <div class="bar" style="background: linear-gradient(135deg, #cba1ff, #b276ff);">P4</div>
+        <span class="tick">22</span>
+      </div>
+      <div class="slot" style="flex: 10;">
+        <div class="bar" style="background: linear-gradient(135deg, #ff9a9a, #ff6b6b);">P1</div>
+        <span class="tick">32</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="domain">cpusimlab.com</span>
+      <span class="badge">OS Term Project</span>
+    </div>
+  </div>
+</body>
+</html>

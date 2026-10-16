@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CPU Scheduling Simulator</title>
   <!-- คำอธิบายเว็บ + การ์ดตัวอย่างตอนแชร์ลิงก์ (LINE / Discord / Facebook) (D-047)
-       ใช้แค่ข้อความ ไม่มี og:image เพราะการ์ดแชร์ส่วนใหญ่ไม่รองรับรูป SVG
+       รูปการ์ดเป็น PNG 1200 × 630 (การ์ดแชร์ส่วนใหญ่ไม่รองรับ SVG) ต้นฉบับอยู่ที่ assets/og-image.html
+       og:image ต้องเป็น URL เต็ม แอปแชตถึงจะโหลดรูปได้
        ไม่มีผลกับการเปิดไฟล์ตรงด้วย double-click -->
   <meta name="description" content="จำลอง CPU Scheduling แบบ FCFS, SJF (Non-preemptive) และ Round Robin พร้อม Gantt Chart, ST / CT / TAT / WT และค่าเฉลี่ย">
   <meta property="og:type" content="website">
@@ -13,6 +14,11 @@
   <meta property="og:title" content="CPU Scheduling Simulator">
   <meta property="og:description" content="จำลอง FCFS, SJF (Non-preemptive) และ Round Robin พร้อม Gantt Chart และตารางผลลัพธ์">
   <meta property="og:url" content="https://cpusimlab.com/">
+  <meta property="og:image" content="https://cpusimlab.com/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="CPU Scheduling Simulator — FCFS, SJF, Round Robin พร้อม Gantt Chart">
+  <meta name="twitter:card" content="summary_large_image">
   <!-- ไอคอนแท็บ = ภาพชิป CPU เดียวกับโลโก้ในแถบซ้าย (เส้นขาวบนพื้นไล่สีคอรัล → ชมพู แบบธีมมืด + แสงขาวจาง ๆ ด้านบน เหมือน .brand-mark)
        ฝังเป็น data URI ในไฟล์นี้เลย จึงไม่ต้องโหลดไฟล์แยก และใช้ได้ทั้งตอน double-click (file://) และบนเว็บ
        (%23 = เครื่องหมาย # ที่ต้องเข้ารหัสใน URL) -->

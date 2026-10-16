@@ -867,3 +867,20 @@
 - **ตรวจสอบอย่างไร:** test 19 / 17 / 12 ผ่าน; Browser pane: ท้ายหน้าแสดง "· cpusimlab.com" ทั้ง TH และ EN, แถบซ้ายขึ้น "CPU Sim Lab", meta 6 ตัวอยู่ใน `<head>`, ไม่มี console error
 - **สิ่งที่ทีมแก้หรือไม่ใช้:** _(ใส่หลังทบทวน)_
 - **มนุษย์ตรวจแล้ว:** ⬜ รอตรวจ
+
+### AI-047 — รูปการ์ดแชร์ลิงก์ (og:image)
+- **วันที่:** 2026-10-16
+- **ผู้ใช้ AI:** _(ใส่ชื่อ)_
+- **เครื่องมือ:** Claude Code + Microsoft Edge (headless screenshot)
+- **หมวด:** เขียนโค้ด UI
+- **Prompt:** (1) "ทำไมยังไม่ได้" (แนบภาพเว็บที่ยังเป็นหน้าเก่า) (2) (แนบภาพการ์ดแชร์ใน LINE / Discord) (3) "ต้องการรูปด้วย"
+- **AI ทำอะไร:**
+  - (1) ตรวจว่า server ส่งหน้าใหม่แล้ว แต่ GitHub Pages ตั้ง `Cache-Control: max-age=600` จึงแนะนำ Ctrl + F5
+  - (3) ออกแบบรูป 1200 × 630 เป็น HTML (`assets/og-image.html`) ใช้สีธีมมืดของเว็บ แล้วสั่ง Edge headless แคปเป็น `assets/og-image.png`
+  - เปิดดูรูปที่ได้แล้วแก้เอง 2 จุด: หางตัว g ใน "Scheduling" ถูกตัด (background-clip: text) และตัวเลขเวลาใต้ Gantt ไม่ตรงรอยต่อแถบ (เพราะช่องว่างระหว่างแถบ → ผูกตัวเลขกับปลายแต่ละแถบแทน)
+  - Gantt ในรูปใช้ผล SJF จริงของ BT 10, 4, 9, 9 (P2 → P3 → P4 → P1 เวลา 0 / 4 / 13 / 22 / 32)
+  - เพิ่ม `og:image` + ขนาด + alt + `twitter:card` ใน index.html
+- **ไฟล์ที่เกี่ยวข้อง:** `assets/og-image.html`, `assets/og-image.png`, `index.html`, `docs/DECISIONS.md` (D-047), `docs/PROGRESS.md`, `docs/NEXT_STEPS.md`
+- **ตรวจสอบอย่างไร:** test 19 / 17 / 12 ผ่าน; ขนาดรูป 1200 × 630; local server ส่งรูปเป็น `image/png`; Browser pane โหลดหน้าแล้วไม่มี console error
+- **สิ่งที่ทีมแก้หรือไม่ใช้:** _(ใส่หลังทบทวน)_
+- **มนุษย์ตรวจแล้ว:** ⬜ รอตรวจ
