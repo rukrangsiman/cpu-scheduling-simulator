@@ -135,3 +135,4 @@
 | 2026-10-16 | ผูกโดเมน `cpusimlab.com` กับ GitHub Pages (D-046) — ผู้ใช้ซื้อโดเมนและตั้ง DNS / Pages เองตามขั้นตอนของ AI, AI ตรวจ DNS / HTTPS / redirect แล้วแก้ลิงก์ในเอกสาร | Claude Code |
 | 2026-10-16 | ลิงก์ `cpusimlab.com` ท้ายหน้า, meta description + Open Graph, ชื่อแถบซ้าย "CPU Sim Lab" (D-047) — test 19 / 17 / 12 ผ่าน, ทดสอบใน Browser pane TH/EN | Claude Code |
 | 2026-10-16 | รูปการ์ดแชร์ลิงก์ `assets/og-image.png` 1200 × 630 + `og:image` / `twitter:card` (D-047) — test 19 / 17 / 12 ผ่าน | Claude Code |
+| 2026-10-16 | ให้ Google ค้นเจอ: `robots.txt`, `sitemap.xml`, canonical, ลิงก์เว็บในช่อง Website ของ repo (D-048) — ผู้ใช้ยืนยันโดเมนใน Search Console เอง, test 19 / 17 / 12 ผ่าน | Claude Code |

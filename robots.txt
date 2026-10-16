@@ -1,0 +1,5 @@
+# ให้บอทค้นหาทุกตัวเข้าอ่านได้ทุกหน้า และบอกที่อยู่ sitemap (D-048)
+User-agent: *
+Allow: /
+
+Sitemap: https://cpusimlab.com/sitemap.xml

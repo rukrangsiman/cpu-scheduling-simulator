@@ -520,3 +520,13 @@ AI เสนอใน D-030 ว่าแถบเข้มบนพื้นค�
 - **ชื่อในแถบซ้าย:** "CPU Scheduler" → **"CPU Sim Lab"** ให้ตรงกับโดเมน (tagline "Simulation Studio" เหมือนเดิม)
 - **ไม่เปลี่ยน:** `<title>` และหัวข้อใหญ่ยังเป็น "CPU Scheduling Simulator" (ชื่องานที่ผู้ตรวจรู้จัก, D-043)
 - ทั้งหมดเป็นข้อความ / URL สาธารณะ ไม่กระทบการเปิดไฟล์ด้วย double-click
+
+### D-048 ให้ Google ค้นเจอเว็บ: robots.txt + sitemap.xml + canonical + ลิงก์ใน repo — ✅ (ผู้ใช้ขอ 2026-10-16)
+ผู้ใช้ถาม "ถ้าอยากให้Webขึ้นเวลาSearchด้วยต้องทำไง" แล้วยืนยันโดเมนใน Google Search Console เอง (Domain property ผ่าน TXT record ใน Cloudflare) ทดสอบ URL จริงผ่าน "จัดทำดัชนีหน้าได้" และขอการจัดทำดัชนี
+- **`robots.txt`** (root): อนุญาตทุกบอททุกหน้า + บอกที่อยู่ sitemap
+- **`sitemap.xml`** (root): มี URL เดียว `https://cpusimlab.com/` (เว็บมีหน้าเดียว) — ผู้ใช้ส่งใน Search Console → Sitemap
+- **`<link rel="canonical" href="https://cpusimlab.com/">`** ใน index.html: ลิงก์ที่มี query (`?v=2`) หรือลิงก์ `github.io` เดิมไม่ถูกนับเป็นหน้าซ้ำ
+- **repo GitHub:** ใส่ `https://cpusimlab.com` ในช่อง Website (About) ด้วย `gh repo edit --homepage`
+- `assets/og-image.html` ไม่ได้ใส่ใน sitemap (เป็นแค่ต้นฉบับรูป)
+- ถ้าเพิ่มหน้าใหม่ในอนาคต ให้เพิ่ม `<url>` ใน sitemap.xml และแก้ `<lastmod>`
+- คาดการณ์ที่บอกผู้ใช้: ค้น `cpusimlab` น่าจะเจอภายในไม่กี่วันถึง 1–2 สัปดาห์ ส่วนคำกว้าง ๆ เช่น "CPU scheduling simulator" มีคู่แข่งเยอะ จะไม่ขึ้นหน้าแรกเร็ว ๆ

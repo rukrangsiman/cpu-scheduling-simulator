@@ -884,3 +884,18 @@
 - **ตรวจสอบอย่างไร:** test 19 / 17 / 12 ผ่าน; ขนาดรูป 1200 × 630; local server ส่งรูปเป็น `image/png`; Browser pane โหลดหน้าแล้วไม่มี console error
 - **สิ่งที่ทีมแก้หรือไม่ใช้:** _(ใส่หลังทบทวน)_
 - **มนุษย์ตรวจแล้ว:** ⬜ รอตรวจ
+
+### AI-048 — ให้ Google ค้นเจอเว็บ (robots.txt, sitemap.xml, canonical)
+- **วันที่:** 2026-10-16
+- **ผู้ใช้ AI:** _(ใส่ชื่อ)_
+- **เครื่องมือ:** Claude Code + GitHub CLI (`gh`)
+- **หมวด:** วางแผนการนำเสนอ
+- **Prompt:** (1) "ถ้าอยากให้Webขึ้นเวลาSearchด้วยต้องทำไง" (2) (แนบภาพ Search Console "URL ไม่ได้อยู่ใน Google") (3) (แนบภาพ "URL พร้อมใช้งานสำหรับ Google") (4) "เพิ่ม robots.txt, sitemap.xml, canonical และใส่ลิงก์เว็บในช่อง Website ของ repo GitHub ด้วย แล้ว commit + push ขึ้น main"
+- **AI ทำอะไร:**
+  - ตรวจว่าเว็บยังไม่มี robots.txt / sitemap.xml (404) และ repo ยังไม่มีลิงก์เว็บ แล้วแบ่งขั้นตอนเป็นส่วนที่ผู้ใช้ต้องทำในบัญชีตัวเอง (Search Console) กับส่วนที่ AI ทำในโค้ด
+  - อธิบายผลใน Search Console: "Google ไม่รู้จัก URL" เป็นปกติของเว็บใหม่, ผลทดสอบ URL จริงผ่านแล้ว ให้กดขอการจัดทำดัชนี
+  - สร้าง `robots.txt`, `sitemap.xml`, เพิ่ม canonical ใน index.html, ตั้ง Website ของ repo เป็น https://cpusimlab.com
+- **ไฟล์ที่เกี่ยวข้อง:** `robots.txt`, `sitemap.xml`, `index.html`, `docs/DECISIONS.md` (D-048), `docs/PROGRESS.md`, `docs/NEXT_STEPS.md`
+- **ตรวจสอบอย่างไร:** test 19 / 17 / 12 ผ่าน; sitemap.xml parse เป็น XML ได้; local server ส่งทั้งสองไฟล์ 200; Browser pane: canonical = https://cpusimlab.com/ ไม่มี console error; หลัง push ตรวจไฟล์บนเว็บจริงด้วย `curl`
+- **สิ่งที่ทีมแก้หรือไม่ใช้:** ผู้ใช้ยืนยันโดเมนและขอการจัดทำดัชนีใน Search Console เอง
+- **มนุษย์ตรวจแล้ว:** ⬜ รอตรวจ
