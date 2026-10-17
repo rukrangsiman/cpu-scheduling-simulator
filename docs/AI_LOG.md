@@ -895,7 +895,24 @@
   - ตรวจว่าเว็บยังไม่มี robots.txt / sitemap.xml (404) และ repo ยังไม่มีลิงก์เว็บ แล้วแบ่งขั้นตอนเป็นส่วนที่ผู้ใช้ต้องทำในบัญชีตัวเอง (Search Console) กับส่วนที่ AI ทำในโค้ด
   - อธิบายผลใน Search Console: "Google ไม่รู้จัก URL" เป็นปกติของเว็บใหม่, ผลทดสอบ URL จริงผ่านแล้ว ให้กดขอการจัดทำดัชนี
   - สร้าง `robots.txt`, `sitemap.xml`, เพิ่ม canonical ใน index.html, ตั้ง Website ของ repo เป็น https://cpusimlab.com
+  - **AI บอกผิด แล้วแก้:** บอกให้พิมพ์แค่ `sitemap.xml` เพราะคิดว่าช่องจะเติม `https://cpusimlab.com/` ให้ แต่ property แบบ Domain ไม่เติมให้ ผู้ใช้เลยเจอ "ที่อยู่ Sitemap ไม่ถูกต้อง" → แก้เป็นให้ใส่ URL เต็ม
+  - เมื่อ Search Console อ่าน sitemap ได้ 404 ตรวจด้วย `curl` (ทำตัวเป็น Googlebot) ว่าตอนนี้ตอบ 200 ทุกทาง สาเหตุน่าจะเป็น Google มาอ่านตอน CDN ของ GitHub ยังจำ 404 ก่อน deploy ไว้ (`max-age=600`) จึงให้ส่ง sitemap ใหม่
 - **ไฟล์ที่เกี่ยวข้อง:** `robots.txt`, `sitemap.xml`, `index.html`, `docs/DECISIONS.md` (D-048), `docs/PROGRESS.md`, `docs/NEXT_STEPS.md`
 - **ตรวจสอบอย่างไร:** test 19 / 17 / 12 ผ่าน; sitemap.xml parse เป็น XML ได้; local server ส่งทั้งสองไฟล์ 200; Browser pane: canonical = https://cpusimlab.com/ ไม่มี console error; หลัง push ตรวจไฟล์บนเว็บจริงด้วย `curl`
 - **สิ่งที่ทีมแก้หรือไม่ใช้:** ผู้ใช้ยืนยันโดเมนและขอการจัดทำดัชนีใน Search Console เอง
+- **มนุษย์ตรวจแล้ว:** ⬜ รอตรวจ
+
+### AI-049 — ไอคอนเว็บในผลค้นหา Google (favicon PNG)
+- **วันที่:** 2026-10-17
+- **ผู้ใช้ AI:** _(ใส่ชื่อ)_
+- **เครื่องมือ:** Claude Code
+- **หมวด:** วางแผนการนำเสนอ
+- **Prompt:** (แนบภาพผลค้นหา Google ที่มีเว็บ cpusimlab.com แต่ไอคอนเป็นลูกโลก) "มันเสิร์ชขึ้นแล้วแต่มันไม่มีรูป ใส่ได้ไหม"
+- **AI ทำอะไร:**
+  - หาสาเหตุ: favicon เดิม (D-043) เป็น SVG data URI ซึ่ง Google ดึงไปใช้ไม่ได้ ต้องเป็นไฟล์ที่มี URL
+  - สร้าง `assets/favicon-192.png` จาก SVG เดิมด้วย Edge headless (มุมโปร่งใส) แล้วเพิ่ม `<link rel="icon">` ชี้ไฟล์นี้ไว้ก่อน data URI เพื่อให้แท็บ browser ยังใช้ไอคอนเดิม
+  - อธิบายว่ารูปตัวอย่างใหญ่ทางขวาของผลค้นหา Google เลือกเอง บังคับไม่ได้ และไอคอนใหม่ต้องรอ Google มาอ่านหน้าอีกรอบ
+- **ไฟล์ที่เกี่ยวข้อง:** `assets/favicon-192.png`, `index.html`, `docs/DECISIONS.md` (D-049), `docs/PROGRESS.md`, `docs/NEXT_STEPS.md`
+- **ตรวจสอบอย่างไร:** test 19 / 17 / 12 ผ่าน; เปิดดูรูป PNG (192 × 192, RGBA); Browser pane: ไฟล์ตอบ 200 `image/png`, มี `<link rel="icon">` สองตัวตามลำดับ, ไม่มี console error
+- **สิ่งที่ทีมแก้หรือไม่ใช้:** —
 - **มนุษย์ตรวจแล้ว:** ⬜ รอตรวจ
