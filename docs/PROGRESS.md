@@ -4,14 +4,14 @@
 > สถานะ: ⬜ ยังไม่เริ่ม · 🟨 กำลังทำ · ✅ เสร็จ
 
 **Phase ปัจจุบัน:** โปรแกรม (Minimal Luxury D-016/D-017 + CPU หลายตัว) และ README เสร็จ → รอสมาชิกทดสอบ/กรอกข้อมูล (Phase 4–5) และเตรียมวิดีโอ (Phase 6)
-**อัปเดตล่าสุด:** 2026-10-13
+**อัปเดตล่าสุด:** 2026-10-20
 
 ---
 
 ## Phase 0 — Setup และวางแผน
 - ✅ สร้างเอกสารการทำงาน (CLAUDE.md, docs/*, subagents)
 - ✅ ผู้ใช้ยืนยัน DECISIONS ทั้งหมด (D-001 ถึง D-010)
-- ⬜ ใส่รายชื่อสมาชิกและแบ่ง Role A / B / C
+- ✅ ใส่รายชื่อสมาชิกและแบ่ง Role A / B / C (README หัวข้อ 8 — 5 คน จากรายงานโครงงาน)
 - ✅ `git init` + commit แรก
 
 ## Phase 1 — Algorithm core (Role A)
@@ -137,3 +137,4 @@
 | 2026-10-16 | รูปการ์ดแชร์ลิงก์ `assets/og-image.png` 1200 × 630 + `og:image` / `twitter:card` (D-047) — test 19 / 17 / 12 ผ่าน | Claude Code |
 | 2026-10-16 | ให้ Google ค้นเจอ: `robots.txt`, `sitemap.xml`, canonical, ลิงก์เว็บในช่อง Website ของ repo (D-048) — ผู้ใช้ยืนยันโดเมนใน Search Console เอง, test 19 / 17 / 12 ผ่าน | Claude Code |
 | 2026-10-17 | favicon แบบไฟล์ `assets/favicon-192.png` ให้ Google แสดงไอคอนในผลค้นหา (D-049) — test 19 / 17 / 12 ผ่าน, Browser pane: ไฟล์ตอบ 200 image/png ไม่มี console error | Claude Code |
+| 2026-10-20 | ตรวจ/แก้รายงาน Word (AI-050–053) และ README: ชื่อวิชา, สมาชิก 5 คน, วิธีเปิดผ่านลิงก์เป็นวิธีที่ 1, โครงสร้างไฟล์ครบ, เอาคำอธิบายชุดทดสอบ Node.js ออกตามที่ผู้ใช้สั่ง (D-050) — test 19 / 17 / 12 ผ่าน | Claude Code |
