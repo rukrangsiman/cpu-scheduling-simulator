@@ -138,3 +138,4 @@
 | 2026-10-16 | ให้ Google ค้นเจอ: `robots.txt`, `sitemap.xml`, canonical, ลิงก์เว็บในช่อง Website ของ repo (D-048) — ผู้ใช้ยืนยันโดเมนใน Search Console เอง, test 19 / 17 / 12 ผ่าน | Claude Code |
 | 2026-10-17 | favicon แบบไฟล์ `assets/favicon-192.png` ให้ Google แสดงไอคอนในผลค้นหา (D-049) — test 19 / 17 / 12 ผ่าน, Browser pane: ไฟล์ตอบ 200 image/png ไม่มี console error | Claude Code |
 | 2026-10-20 | ตรวจ/แก้รายงาน Word (AI-050–053) และ README: ชื่อวิชา, สมาชิก 5 คน, วิธีเปิดผ่านลิงก์เป็นวิธีที่ 1, โครงสร้างไฟล์ครบ, เอาคำอธิบายชุดทดสอบ Node.js ออกตามที่ผู้ใช้สั่ง (D-050) — test 19 / 17 / 12 ผ่าน | Claude Code |
+| 2026-10-20 | กรอกช่องว่างใน README / TEST_CASES ตามหน้าที่ในรายงาน (ผู้ตรวจ, version Chrome / Edge), เพิ่ม Codex ในตารางเครื่องมือ AI, ลบ branch `ui-multi-cpu-redesign` — test 19 / 17 / 12 ผ่าน | Claude Code |
