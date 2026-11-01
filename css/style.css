@@ -1941,6 +1941,20 @@ body.sidebar-instant .backdrop-cpu {
   animation: none !important;
 }
 
+/* Gantt chart กับตารางผลลัพธ์อยู่ติดกัน และเตี้ยลงเล็กน้อย ให้ดูทั้งคู่ได้ในจอเดียว (D-051)
+   จอแคบกว่า 1024px ใช้ระยะของ .card ใน @media ด้านล่างเหมือนเดิม
+   scroll-margin-top: เว้นระยะเหนือการ์ดตอน ui.js เลื่อนหน้ามาที่ Gantt chart หลัง Run */
+.gantt-card,
+.table-card {
+  padding: 20px 26px;
+  scroll-margin-top: 10px;
+}
+
+.gantt-card .card-header,
+.table-card .card-header {
+  margin-bottom: 10px;
+}
+
 .card-header {
   display: flex;
   flex-wrap: wrap;
@@ -2000,13 +2014,13 @@ body.sidebar-instant .backdrop-cpu {
   overflow-x: auto;
   overflow-y: hidden;
   margin: 0 -4px;
-  padding: 10px 14px 44px;
+  padding: 8px 14px 38px;
 }
 
 .gantt {
   display: flex;
   gap: 4px;
-  height: 60px;
+  height: 54px; /* เดิม 60px — ลดลงให้ตารางอยู่ในจอเดียวกับ Gantt chart บนโน้ตบุ๊กจอเตี้ย (D-051) */
 }
 
 .gantt-slot {
@@ -2116,23 +2130,29 @@ body.sidebar-instant .backdrop-cpu {
   transform: translateX(50%);
 }
 
-/* ลำดับการได้ CPU: เม็ดสีของโปรเซสเรียงตาม Gantt chart มีลูกศรเล็ก ๆ คั่นระหว่างเม็ด */
+/* ลำดับการได้ CPU: เม็ดสีของโปรเซสเรียงตาม Gantt chart มีลูกศรเล็ก ๆ คั่นระหว่างเม็ด
+   อยู่แถวเดียวเสมอ ถ้าเม็ดเยอะ (เช่น RR) ให้เลื่อนแนวนอนเหมือน Gantt chart แทนการขึ้นแถวใหม่
+   การ์ด Gantt จึงสูงเท่ากันทุกอัลกอริทึม และไม่ดันตารางพ้นจอ (D-051) */
 .order-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 8px 22px;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
   margin: 4px 0 0;
-  padding: 0;
+  padding: 0 0 4px;
   list-style: none;
 }
 
 .order-item {
   position: relative;
+  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 12px 4px 9px;
+  padding: 3px 11px 3px 8px;
   border-radius: 999px;
   background: var(--bg-inset);
   font-size: 0.86rem;
@@ -2144,7 +2164,7 @@ body.sidebar-instant .backdrop-cpu {
 .order-item + .order-item:not(.total)::before {
   content: "›";
   position: absolute;
-  left: -15px;
+  left: -12px;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -2418,9 +2438,10 @@ table {
 .result-table .col-tat,
 .result-table .col-wt { width: 20.5%; }
 
+/* แถวเตี้ยลงจาก 13px (D-051) ให้ตาราง 10 โปรเซสกับ Gantt chart ยังอยู่ในจอเดียวกันได้ */
 th,
 td {
-  padding: 13px 18px;
+  padding: 9px 18px;
   text-align: left;
   white-space: nowrap;
   border-bottom: 1px solid var(--border-soft);
@@ -3743,7 +3764,7 @@ input[type="color"]::-webkit-color-swatch {
 
   th,
   td {
-    padding: 11px 14px;
+    padding: 8px 14px;
   }
 
   .bar-row {

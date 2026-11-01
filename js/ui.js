@@ -688,13 +688,34 @@ function runAllAlgorithms(burstTimes, quantum) {
   scrollToResultsIfHidden();
 }
 
-// ผลลัพธ์อยู่ใต้หน้าต่างโปรเซส ถ้าหัวหน้าต่างผลลัพธ์ยังอยู่ต่ำกว่าครึ่งล่างของจอ ให้เลื่อนลงไปให้เห็นทันที
-// (ถ้าเห็นอยู่แล้วไม่ต้องเลื่อน หน้าจะได้ไม่กระโดดทุกครั้งที่กด Run ซ้ำเพื่อลอง TQ ใหม่)
+// หลัง Run ให้เห็น Gantt chart กับตารางพร้อมกันในจอเดียว (D-051)
+// ถ้าเห็นครบอยู่แล้วไม่ต้องเลื่อน หน้าจะได้ไม่กระโดดทุกครั้งที่กด Run ซ้ำเพื่อลอง TQ ใหม่
 function scrollToResultsIfHidden() {
   var resultsArea = byId('results-area');
-  if (resultsArea.getBoundingClientRect().top > window.innerHeight * 0.6) {
-    resultsArea.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+  var ganttCard = resultsArea.querySelector('.gantt-card');
+  var tableCard = resultsArea.querySelector('.table-card');
+  // แท็บ "เปรียบเทียบ" ไม่มี Gantt chart: เลื่อนแบบเดิม คือเมื่อหัวหน้าต่างผลลัพธ์อยู่ต่ำกว่าครึ่งล่างของจอ
+  if (ganttCard === null || tableCard === null) {
+    if (resultsArea.getBoundingClientRect().top > window.innerHeight * 0.6) {
+      resultsArea.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+    }
+    return;
   }
+
+  var ganttTop = ganttCard.getBoundingClientRect().top;
+  var tableBottom = tableCard.getBoundingClientRect().bottom;
+  if (ganttTop >= 0 && tableBottom <= window.innerHeight) {
+    return;
+  }
+
+  // ถ้าตั้งแต่หัวหน้าต่างผลลัพธ์ (ชื่อ CPU + แท็บอัลกอริทึม) จนถึงท้ายตารางพอดีจอ ให้เลื่อนไปที่หัวหน้าต่าง
+  // จะได้กดสลับแท็บได้โดยไม่ต้องเลื่อนขึ้น — ถ้าไม่พอ (เช่น 10 โปรเซสบนจอเตี้ย) ให้เลื่อนไปที่ Gantt chart แทน
+  var areaTop = resultsArea.getBoundingClientRect().top;
+  var target = resultsArea;
+  if (tableBottom - areaTop > window.innerHeight) {
+    target = ganttCard;
+  }
+  target.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
 }
 
 // เก็บผล RR ไว้หนึ่งแถวต่อหนึ่งค่า TQ เรียงจาก TQ น้อยไปมาก
@@ -772,11 +793,13 @@ function renderResults(isStatic) {
   container.appendChild(view);
 }
 
-// Gantt chart → ค่าสรุป 4 ช่อง → ตาราง → สูตร (พับได้) เรียงจากบนลงล่าง อ่านทีละเรื่อง
+// Gantt chart → ตาราง → ค่าสรุป 4 ช่อง → สูตร (พับได้) เรียงจากบนลงล่าง
+// ตารางอยู่ติดกับ Gantt chart เพื่อให้ดูทั้งสองอย่างได้ในจอเดียวโดยไม่ต้องเลื่อน (D-051)
+// ค่าเฉลี่ย WT / TAT ยังเห็นได้ทันทีที่แถวล่างสุดของตาราง
 function renderAlgorithmView(view, result) {
   view.appendChild(createGanttCard(result));
-  view.appendChild(createKpiGrid(result));
   view.appendChild(createTableCard(result));
+  view.appendChild(createKpiGrid(result));
   view.appendChild(createFormulaSection(result));
 }
 
