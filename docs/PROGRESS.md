@@ -147,3 +147,4 @@
 | 2026-10-21 | เปลี่ยนลิงก์วิดีโอใน README เป็น https://www.youtube.com/watch?v=IltIeDM3ue0 (ผู้ใช้ส่งลิงก์ใหม่) | Claude Code |
 | 2026-10-27 | ตรวจโปรเจ็กต์และวิดีโอตามแบบประเมินของอาจารย์ (rubric 23 ข้อ + เงื่อนไข 8 ข้อ) แล้วเพิ่ม ChatGPT ในตารางเครื่องมือ AI ของ README / AI_LOG (AI-061) — test 19 / 17 / 12 ผ่าน | Claude Code |
 | 2026-11-01 | ย้ายตารางผลลัพธ์มาไว้ใต้ Gantt chart ให้ดูได้ในจอเดียว (D-051, AI-062) — Backup ไว้ที่ `backups/ui-before-gantt-table-2026-11-01/` + branch `backup/ui-before-gantt-table`; ทดสอบใน Browser pane 3 ขนาดจอ, test 19 / 17 / 12 ผ่าน | Claude Code |
+| 2026-11-01 | เปลี่ยนลิงก์วิดีโอใน README เป็น https://www.youtube.com/watch?v=BNpUQ8daTyo (ผู้ใช้ส่งลิงก์ใหม่, AI-063) | Claude Code |
